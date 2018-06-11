@@ -1,0 +1,16 @@
+plugins {
+	id 'com.diffplug.gradle.spotless' version '3.26.0'
+}
+
+spotless {
+	format 'misc', {
+		target '.gitignore', '*.gradle', '*.md', '.ci/*.sh', 'src/main/resources/*.gradle'
+		indentWithTabs()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	freshmark {
+		target '*.md'
+		propertiesFile('gradle.properties')
+	}
+}
