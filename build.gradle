@@ -1,4 +1,5 @@
 plugins {
+	id 'java-gradle-plugin'
 	id 'com.diffplug.gradle.spotless' version '3.26.0'
 }
 
@@ -13,4 +14,14 @@ spotless {
 		target '*.md'
 		propertiesFile('gradle.properties')
 	}
+}
+
+apply plugin: 'eclipse'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'com.diffplug.durian:durian-io:1.2.0'
 }
