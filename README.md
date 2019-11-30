@@ -61,15 +61,25 @@ To change and test scripts before you push them up to GitHub, you can do this:
 
 ```gradle
 blowdryer {
-  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
+  //github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
   devLocal '../path-to-local-blowdryer-acme'
 }
 ```
 
+The call to `devLocal` means that all calls to `AsFile.resource` will skip caching and get served from that local folder's `src/main/resources` subfolder.
 
+### `repoSubfolder`
 
+If you want your scripts to come from a different subfolder, you can change it:
 
-Once you set `File devPath` to anything non-null, all Blowdryer resources will be resolved from that local folder, rather than from the Blowdryer jar.  `applyFromLocal` does exactly the same thing as `template`, except it skips the enum typechecking and just goes straight to the `$devPath/src/main/resources/foo.gradle`.
+```gradle
+blowdryer {
+  repoSubfolder 'some/other/dir/but/why'
+  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
+}
+```
+
+The nice thing about the default `src/main/resources` is that if you ever want to, you could copy the blowdryer code into your blowdryer repo, and deploy your own plugin that pulls resources from the local jar rather than from github.  Keeping the default lets you switch to that approach in the future without moving your scripts.
 
 ## Limitations
 

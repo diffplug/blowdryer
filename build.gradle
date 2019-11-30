@@ -27,6 +27,7 @@ repositories {
 dependencies {
 	implementation "com.squareup.okhttp3:okhttp:4.2.2"
 	implementation "com.squareup.okio:okio:2.4.1"
+	implementation 'com.diffplug.durian:durian-core:1.2.0'
 	implementation 'com.diffplug.durian:durian-io:1.2.0'
 	testImplementation 'junit:junit:4.12'
 	testImplementation 'org.assertj:assertj-core:3.14.0'
