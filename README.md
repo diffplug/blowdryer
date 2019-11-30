@@ -1,8 +1,8 @@
 # Blowdryer: keep your gradle builds DRY
 
-The pain points of maintaining multiple loosely-related gradle projects in separate repositories are:
+Some pain points of maintaining multiple loosely-related gradle projects in separate repositories are:
 
-- challenging to keep their build files consistent (copy-paste doesn't scale)
+- challenging to keep build files consistent (copy-paste doesn't scale)
 - frustrating to fix the same build upgrade problems over and over in multiple repositories
 - a single "master plugin" which applies plugins for you is too restrictive
   - hard to debug
@@ -49,9 +49,7 @@ When you setup the blowdryer plugin in your root project, you're telling blowdry
 ```java
 public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
   String root = "https://raw.githubusercontent.com/" + repoOrg + "/" + anchor + "/" + repoSubfolder + "/";
-  AsFile.setResourcePlugin(resource -> {
-    return root + resource;
-  });
+  AsFile.setResourcePlugin(resource -> root + resource);
 }
 ```
 
@@ -79,7 +77,7 @@ blowdryer {
 }
 ```
 
-The nice thing about the default `src/main/resources` is that if you ever want to, you could copy the blowdryer code into your blowdryer repo, and deploy your own plugin that pulls resources from the local jar rather than from github.  Keeping the default lets you switch to that approach in the future without moving your scripts.
+The nice thing about the default `src/main/resources` is that if you ever want to, you could copy the blowdryer code into your blowdryer repo, and deploy your own plugin that pulls resources from the local jar rather than from a remote URL.  Keeping the default lets you switch to that approach in the future without moving your scripts.
 
 ## Limitations
 
@@ -93,14 +91,12 @@ The workaround is to make sure that either:
 
 Another possible workaround would be to implement your own `apply from` which trades gradle's encapsulation away in favor of easier interoperability.
 
+## In the wild
 
+Here are resource repositories in the wild:
 
+- https://github.com/diffplug/blowdryer-diffplug
 
-Here is how
+## Acknowledgements
 
-- turning immutable URLs (e.g. a hashed git blob) into local files
-  - downloaded once to your system temp dir, then never checked again (even across multiple builds)
-  - local file can be used for any gradle property you want
-- apply a coherent set of script plugins
-
-end up having to fix the same build problem over and over .  You end up copy-pasting common bits of configuration from project to project.  Blowdryer is a project which helps with (Dont)
+- Maintained by [DiffPlug](https://www.diffplug.com/).
