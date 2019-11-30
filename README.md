@@ -1,5 +1,7 @@
 # <img align="left" src="logo.png"> Blowdryer: keep your gradle builds DRY
 
+Structure, performance, and workflow for applying a coherent set of config files and script plugins (apply from: 'somescript.gradle').
+
 Some pain points of maintaining multiple loosely-related gradle projects in separate repositories are:
 
 - challenging to keep build files consistent (copy-paste doesn't scale)
