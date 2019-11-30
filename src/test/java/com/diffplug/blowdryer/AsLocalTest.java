@@ -1,4 +1,4 @@
-package com.diffplug.gradle.aslocal;
+package com.diffplug.blowdryer;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;

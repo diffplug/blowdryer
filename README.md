@@ -1,4 +1,4 @@
-# Blowdryer: keep your gradle builds DRY
+# <img align="left" src="logo.png"> Blowdryer: keep your gradle builds DRY
 
 Some pain points of maintaining multiple loosely-related gradle projects in separate repositories are:
 
