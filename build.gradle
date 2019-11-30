@@ -6,13 +6,14 @@ plugins {
 
 spotless {
 	format 'misc', {
-		target '.gitignore', '*.gradle', '*.md', '.ci/*.sh', 'src/main/resources/*.gradle'
+		target '.gitignore', '*.gradle', '.ci/*.sh', 'src/main/resources/*.gradle'
 		indentWithTabs()
-		trimTrailingWhitespace()
-		endWithNewline()
 	}
 	freshmark {
 		target '*.md'
+		indentWithSpaces(2)
+		trimTrailingWhitespace()
+		endWithNewline()
 		propertiesFile('gradle.properties')
 	}
 }

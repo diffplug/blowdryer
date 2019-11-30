@@ -5,67 +5,69 @@ The pain points of maintaining multiple loosely-related gradle projects in separ
 - challenging to keep their build files consistent (copy-paste doesn't scale)
 - frustrating to fix the same build upgrade problems over and over in multiple repositories
 - a single "master plugin" which applies plugins for you is too restrictive
-	- hard to debug
-	- hard to experiment and innovate
+  - hard to debug
+  - hard to experiment and innovate
 
-Blowdryer helps by providing structure, performance, and workflow for applying a coherent set of [script plugins](https://docs.gradle.org/current/userguide/plugins.html#sec:script_plugins) (`apply from: 'somescript.gradle'`).
+Blowdryer helps by providing structure, performance, and workflow for applying a coherent set of config files and [script plugins](https://docs.gradle.org/current/userguide/plugins.html#sec:script_plugins) (`apply from: 'somescript.gradle'`).
 
-## How it works
+## How to use it
 
-In the `build.gradle` for each of your projects, you do this:
-
-```gradle
-plugins {
-id 'com.diffplug.blowdryer' version '1.0.0'
-}
-
-blowdryer {
-templates 'java8', 'eclipse', 'spotless'
-}
-```
-
-Which will apply the scripts with those same names in the [`src/main/resources`](src/main/resources) directory of the blowdryer repository, at the same version that blowdryer was published.  If those scripts rely on any local configuration files, you can use `AsFile.fromResource()` to grab them from the git repository as local files.
-
-## How to add your own templates
-
-The section above was fibbing.  You should not use this plugin - you should fork it and use *your own* plugin.  For example, this is how ACME should use it:
+In the `build.gradle` for your **root** project, do this:
 
 ```gradle
 plugins {
-id 'org.acme.blowdryer' version '1.0.0'
+  id 'com.diffplug.blowdryer' version '1.0.0'
 }
 
-blowdryerAcme {
-templates 'kotlin', 'idea', 'spotless'
+blowdryer {
+  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
+  //   or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
+  //   or 'tree', '07f588e52eb0f31e596eab0228a5df7233a98a14'
 }
 ```
 
-If you have a new way to make or compose templates, please contribute it back to this repository.  But if you just have a new template, the way to share it is by starting as a fork from this repository, and once you have something useful then send a PR to extend this list:
+Now, in any other `build.gradle` throughout your project you can do this:
 
-- [blowdryer-diffplug](https://github.com/diffplug/blowdryer-diffplug)
+```gradle
+import com.diffplug.blowdryer.AsFile
 
-People can browse the forks to see how other organizations are splitting their builds up.
+apply from: AsFile.resource('someScript.gradle')
+// or
+somePlugin {
+    configFile AsFile.resource('somePluginConfig.xml')
+}
+```
 
-### Exact steps to fork
+`AsFile.resource` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-foo`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache`.
 
-1. Fork this repository
-	- rename `TemplateExtension.NAME` to be `blowdryerAcme`
-	- change the package from `com.diffplug` to `org.acme`
-	- change the plugin ID, implementation class, and maven metadata in `build.gradle`
-2. Put your scripts into `src/main/resources`
-3. Modify the `Templates` enum to have a value for each script you would like to have
+### How it works
 
-### Testing
+`AsFile.immutableUrl` is another method you can use, which returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the URL is immutable.
 
-To test your plugin, you can use the normal [publish to mavenLocal approach](https://github.com/diffplug/goomph/blob/master/CONTRIBUTING.md#test-locally).  There are a few tricks to make things even easier:
+When you setup the blowdryer plugin in your root project, you're telling blowdryer what URL scheme to use when resolving a call to `AsFile.resource`, for example:
+
+```java
+public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
+  String root = "https://raw.githubusercontent.com/" + repoOrg + "/" + anchor + "/" + repoSubfolder + "/";
+  AsFile.setResourcePlugin(resource -> {
+    return root + resource;
+  });
+}
+```
+
+## Dev workflow
+
+To change and test scripts before you push them up to GitHub, you can do this:
 
 ```gradle
 blowdryer {
-devPath = rootProject.file('../blowdryer')
-templates 'kotlin', 'idea', 'spotless'
-applyFromLocal 'foo.gradle'
+  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
+  devLocal '../path-to-local-blowdryer-acme'
 }
 ```
+
+
+
 
 Once you set `File devPath` to anything non-null, all Blowdryer resources will be resolved from that local folder, rather than from the Blowdryer jar.  `applyFromLocal` does exactly the same thing as `template`, except it skips the enum typechecking and just goes straight to the `$devPath/src/main/resources/foo.gradle`.
 
@@ -87,8 +89,8 @@ Another possible workaround would be to implement your own `apply from` which tr
 Here is how
 
 - turning immutable URLs (e.g. a hashed git blob) into local files
-	- downloaded once to your system temp dir, then never checked again (even across multiple builds)
-	- local file can be used for any gradle property you want
+  - downloaded once to your system temp dir, then never checked again (even across multiple builds)
+  - local file can be used for any gradle property you want
 - apply a coherent set of script plugins
 
 end up having to fix the same build problem over and over .  You end up copy-pasting common bits of configuration from project to project.  Blowdryer is a project which helps with (Dont)

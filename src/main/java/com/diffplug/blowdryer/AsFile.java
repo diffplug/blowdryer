@@ -9,6 +9,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import com.diffplug.common.base.Errors;
@@ -26,15 +27,11 @@ import okio.Okio;
 public class AsFile {
 	static {
 		File tmpDir = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value());
-		cacheDir = new File(tmpDir, "DiffPlugAsFile");
+		cacheDir = new File(tmpDir, "blowdryer-cache");
 	}
 
 	private static final File cacheDir;
 	private static final Map<String, File> urlToContent = new HashMap<>();
-
-	public static File resource(String resourcePath) {
-		
-	}
 
 	/**
 	 * Downloads the given url to a local file in the system temporary directory.
@@ -120,6 +117,51 @@ public class AsFile {
 			String hashed = Base64.getEncoder().encodeToString(hash)
 					.replace('/', '-').replace('=', '-');
 			return first + "--" + hashed + end;
+		}
+	}
+
+	//////////////////////
+	// plugin interface //
+	//////////////////////
+	static interface ResourcePlugin {
+		String toImmutableUrl(String resourcePath);
+	}
+
+	private static ResourcePlugin plugin;
+
+	static void assertPluginNotSet(String errorMessage) {
+		if (AsFile.plugin != null) {
+			throw new IllegalStateException(errorMessage);
+		}
+	}
+
+	static void setResourcePlugin(ResourcePlugin plugin) {
+		assertPluginNotSet("You already initialized the `blowdryer` plugin, you can't do this twice.");
+		AsFile.plugin = plugin;
+	}
+
+	public static File resource(String resourcePath) {
+		if (plugin == null) {
+			throw new IllegalStateException("You needed to initialize the `blowdryer` plugin in the root build.gradle first.");
+		}
+		if (plugin instanceof DevPlugin) {
+			return new File(((DevPlugin) plugin).root, resourcePath);
+		} else {
+			return immutableUrl(plugin.toImmutableUrl(resourcePath));
+		}
+	}
+
+	static final class DevPlugin implements ResourcePlugin {
+		File root;
+
+		public DevPlugin(File root) {
+			this.root = Objects.requireNonNull(root);
+		}
+
+		@Override
+		@Deprecated
+		public final String toImmutableUrl(String resourcePath) {
+			throw new UnsupportedOperationException();
 		}
 	}
 }
