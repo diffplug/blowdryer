@@ -2,7 +2,7 @@
 
 Structure, performance, and workflow for applying a coherent set of config files and script plugins (apply from: 'somescript.gradle').
 
-If you are maintaining multiple loosely-related gradle projects in separate repositories, then you probably have these problems:
+If you have multiple loosely-related gradle projects in separate repositories, then you probably have these problems:
 
 - challenging to keep build files consistent (copy-paste doesn't scale)
 - frustrating to fix the same build upgrade problems over and over in multiple repositories
