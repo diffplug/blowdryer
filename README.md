@@ -1,8 +1,8 @@
-# <img align="left" src="logo.png"> Blowdryer: keep your gradle builds DRY
+# <img align="left" src="logo.png"> Blowdryer: keep your gradle builds dry
 
 Structure, performance, and workflow for applying a coherent set of config files and script plugins (apply from: 'somescript.gradle').
 
-Some pain points of maintaining multiple loosely-related gradle projects in separate repositories are:
+If you are maintaining multiple loosely-related gradle projects in separate repositories, then you probably have these problems:
 
 - challenging to keep build files consistent (copy-paste doesn't scale)
 - frustrating to fix the same build upgrade problems over and over in multiple repositories
@@ -10,7 +10,7 @@ Some pain points of maintaining multiple loosely-related gradle projects in sepa
   - hard to debug
   - hard to experiment and innovate
 
-Blowdryer helps by providing structure, performance, and workflow for applying a coherent set of config files and [script plugins](https://docs.gradle.org/current/userguide/plugins.html#sec:script_plugins) (`apply from: 'somescript.gradle'`).
+Blowdryer lets you centralize your build scripts into a single repository, with an easy workflow for pulling those improvements into the various projects that use them.
 
 ## How to use it
 
@@ -49,6 +49,8 @@ somePlugin {
 When you setup the blowdryer plugin in your root project, you're telling blowdryer what URL scheme to use when resolving a call to `AsFile.resource`, for example:
 
 ```java
+//blowdryer {
+//  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
 public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
   String root = "https://raw.githubusercontent.com/" + repoOrg + "/" + anchor + "/" + repoSubfolder + "/";
   AsFile.setResourcePlugin(resource -> root + resource);
@@ -79,7 +81,7 @@ blowdryer {
 }
 ```
 
-The nice thing about the default `src/main/resources` is that if you ever want to, you could copy the blowdryer code into your blowdryer repo, and deploy your own plugin that pulls resources from the local jar rather than from a remote URL.  Keeping the default lets you switch to that approach in the future without moving your scripts.
+The nice thing about the default `src/main/resources` is that if you ever want to, you can publish the repository as a plain-old jar and pull the resources from that jar rather than from a github repository.  That's currently unsupported in blowdryer, but it would be easy to add.
 
 ## Limitations
 
