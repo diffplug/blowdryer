@@ -4,22 +4,22 @@
 output = [
     link(shield('Gradle plugin', 'plugins.gradle.org', 'com.diffplug.blowdryer', 'blue'), 'https://plugins.gradle.org/plugin/com.diffplug.blowdryer'),
     link(shield('Maven central', 'mavencentral', 'com.diffplug:blowdryer', 'blue'), 'https://search.maven.org/search?q=g:com.diffplug%20AND%20a:blowdryer'),
-    link(shield('License Apache', 'license', 'apache', 'blue'), 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)'),
+    link('https://img.shields.io/badge/apache--2.0-blue.svg', 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)'),
     '',
-    link(image('Latest', 'https://jitpack.io/v/diffplug/blowdryer.svg?color=blue'), 'https://jitpack.io/#diffplug/blowdryer'),
+    link(image('Latest', 'https://jitpack.io/v/diffplug/blowdryer.svg'), 'https://jitpack.io/#diffplug/blowdryer'),
     link(shield('Changelog', 'keepachangelog', 'yes', 'brightgreen'), 'CHANGELOG.md'),
-    link(shield('Javadoc', 'javadoc', '{{stable}}', 'brightgreen'), 'https://{{org}}.github.io/{{name}}/javadoc/{{stable}}/'),
+    link(shield('Javadoc', 'javadoc', '{{stable}}', 'brightgreen'), 'https://jitpack.io/com/github/diffplug/blowdryer/latest/javadoc/'),
     link(shield('Live chat', 'gitter', 'chat', 'brightgreen'), 'https://gitter.im/diffplug/blowdryer'),
     link(image('JitCI', 'https://jitci.com/gh/diffplug/blowdryer/svg'), 'https://jitci.com/gh/diffplug/blowdryer')
     ].join('\n');
 -->
 [![Gradle plugin](https://img.shields.io/badge/plugins.gradle.org-com.diffplug.blowdryer-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.blowdryer)
 [![Maven central](https://img.shields.io/badge/mavencentral-com.diffplug%3Ablowdryer-blue.svg)](https://search.maven.org/search?q=g:com.diffplug%20AND%20a:blowdryer)
-[![License Apache](https://img.shields.io/badge/license-apache-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
+[https://img.shields.io/badge/apache--2.0-blue.svg](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 
-[![Latest](https://jitpack.io/v/diffplug/blowdryer.svg?color=blue)](https://jitpack.io/#diffplug/blowdryer)
+[![Latest](https://jitpack.io/v/diffplug/blowdryer.svg)](https://jitpack.io/#diffplug/blowdryer)
 [![Changelog](https://img.shields.io/badge/keepachangelog-yes-brightgreen.svg)](CHANGELOG.md)
-[![Javadoc](https://img.shields.io/badge/javadoc-unreleased-brightgreen.svg)](https://diffplug.github.io/durian-build/javadoc/unreleased/)
+[![Javadoc](https://img.shields.io/badge/javadoc-unreleased-brightgreen.svg)](https://jitpack.io/com/github/diffplug/blowdryer/latest/javadoc/)
 [![Live chat](https://img.shields.io/badge/gitter-chat-brightgreen.svg)](https://gitter.im/diffplug/blowdryer)
 [![JitCI](https://jitci.com/gh/diffplug/blowdryer/svg)](https://jitci.com/gh/diffplug/blowdryer)
 <!---freshmark /shields -->
