@@ -40,6 +40,10 @@ import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.Okio;
 
+/**
+ * Public static methods which retrieve resources as
+ * determined by {@link BlowdryerExtension}.
+ */
 public class Blowdryer {
 	static {
 		File tmpDir = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value());
@@ -197,6 +201,7 @@ public class Blowdryer {
 		}
 	}
 
+	/** Returns the given resource as a File. */
 	public static File file(String resourcePath) {
 		synchronized (Blowdryer.class) {
 			assertInitialized();
