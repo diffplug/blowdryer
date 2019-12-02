@@ -4,7 +4,7 @@
 output = [
     link(shield('Gradle plugin', 'plugins.gradle.org', 'com.diffplug.blowdryer', 'blue'), 'https://plugins.gradle.org/plugin/com.diffplug.blowdryer'),
     link(shield('Maven central', 'mavencentral', 'com.diffplug:blowdryer', 'blue'), 'https://search.maven.org/search?q=g:com.diffplug%20AND%20a:blowdryer'),
-    link('https://img.shields.io/badge/apache--2.0-blue.svg', 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)'),
+    link(image('License Apache 2.0', 'https://img.shields.io/badge/apache--2.0-blue.svg'), 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)'),
     '',
     link(image('Latest', 'https://jitpack.io/v/diffplug/blowdryer.svg'), 'https://jitpack.io/#diffplug/blowdryer'),
     link(shield('Changelog', 'keepachangelog', 'yes', 'brightgreen'), 'CHANGELOG.md'),
@@ -15,7 +15,7 @@ output = [
 -->
 [![Gradle plugin](https://img.shields.io/badge/plugins.gradle.org-com.diffplug.blowdryer-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.blowdryer)
 [![Maven central](https://img.shields.io/badge/mavencentral-com.diffplug%3Ablowdryer-blue.svg)](https://search.maven.org/search?q=g:com.diffplug%20AND%20a:blowdryer)
-[https://img.shields.io/badge/apache--2.0-blue.svg](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
+[![License Apache 2.0](https://img.shields.io/badge/apache--2.0-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 
 [![Latest](https://jitpack.io/v/diffplug/blowdryer.svg)](https://jitpack.io/#diffplug/blowdryer)
 [![Changelog](https://img.shields.io/badge/keepachangelog-yes-brightgreen.svg)](CHANGELOG.md)
