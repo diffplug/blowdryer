@@ -39,16 +39,16 @@ public class BlowdryerPluginTest extends GradleHarness {
 	@Test
 	public void githubTag() throws IOException {
 		writePathTagExtra("build.gradle", "test/a",
-				"assert Blowdryer.resource('sample').text == 'a'");
+				"assert Blowdryer.file('sample').text == 'a'");
 		gradleRunner().build();
 
 		writePathTagExtra("build.gradle", "test/b",
-				"assert Blowdryer.resource('sample').text == 'b'");
+				"assert Blowdryer.file('sample').text == 'b'");
 		gradleRunner().build();
 
 		// double-check that failures do fail
 		writePathTagExtra("build.gradle", "test/b",
-				"assert Blowdryer.resource('sample').text == 'a'");
+				"assert Blowdryer.file('sample').text == 'a'");
 		gradleRunner().buildAndFail();
 	}
 
@@ -63,7 +63,7 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"}",
 				"import com.diffplug.blowdryer.Blowdryer",
 				"",
-				"assert Blowdryer.resource('sample').text == 'c\\n'");
+				"assert Blowdryer.file('sample').text == 'c\\n'");
 		write("../blowdryer-script/src/main/resources/sample", "c");
 		gradleRunner().build();
 	}
@@ -73,25 +73,25 @@ public class BlowdryerPluginTest extends GradleHarness {
 		write("settings.gradle",
 				"include 'subproject'");
 		writePathTagExtra("build.gradle", "test/a",
-				"assert Blowdryer.resource('sample').text == 'a'");
+				"assert Blowdryer.file('sample').text == 'a'");
 		write("subproject/build.gradle",
 				"import com.diffplug.blowdryer.Blowdryer",
 				"",
-				"assert Blowdryer.resource('sample').text == 'a'");
+				"assert Blowdryer.file('sample').text == 'a'");
 		gradleRunner().build();
 
 		// double-check that failures do fail
 		write("subproject/build.gradle",
 				"import com.diffplug.blowdryer.Blowdryer",
 				"",
-				"assert Blowdryer.resource('sample').text == 'b'");
+				"assert Blowdryer.file('sample').text == 'b'");
 		gradleRunner().buildAndFail();
 	}
 
 	@Test
 	public void missingResourceThrowsError() throws IOException {
 		writePathTagExtra("build.gradle", "test/a",
-				"Blowdryer.resource('notPresent')");
+				"Blowdryer.file('notPresent')");
 		Assertions.assertThat(gradleRunner().buildAndFail().getOutput().replace("\r\n", "\n")).contains(
 				"https://raw.githubusercontent.com/diffplug/blowdryer/test/a/src/main/resources/notPresent\n" +
 						"  received http code 404\n" +

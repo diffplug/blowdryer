@@ -87,7 +87,7 @@ public class BlowdryerExtension {
 	public void applyFrom(Collection<String> scripts) {
 		for (String script : scripts) {
 			project.apply(cfg -> {
-				cfg.from(Blowdryer.resource(script));
+				cfg.from(Blowdryer.file(script));
 			});
 		}
 	}

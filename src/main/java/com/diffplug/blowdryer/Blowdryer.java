@@ -39,6 +39,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.Okio;
+import org.gradle.api.Project;
 
 public class Blowdryer {
 	static {
@@ -176,7 +177,7 @@ public class Blowdryer {
 		Blowdryer.plugin = plugin;
 	}
 
-	public static File resource(String resourcePath) {
+	public static File file(String resourcePath) {
 		if (plugin == null) {
 			throw new IllegalStateException("You needed to initialize the `blowdryer` plugin in the root build.gradle first.");
 		}
@@ -185,6 +186,25 @@ public class Blowdryer {
 		} else {
 			return immutableUrl(plugin.toImmutableUrl(resourcePath));
 		}
+	}
+
+	public static String prop(Project project, String propFile, String key) {
+		Object value = project.findProperty(key);
+		if (value == null) {
+			return prop(propFile, key);
+		}
+		if (value instanceof String) {
+			return (String) value;
+		}
+		throw new IllegalArgumentException("Project '" + project.getName() + "' has property named '" + key + "' but it is a '" + value.getClass() + "', and it must be a String.");
+	}
+
+	public static void setProps(Project project, String prop) {
+		project.getExtensions().getExtraProperties();
+	}
+
+	public static String prop(String propFile, String key) {
+		return "";
 	}
 
 	static final class DevPlugin implements ResourcePlugin {
