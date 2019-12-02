@@ -40,6 +40,7 @@ import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.Okio;
 import org.gradle.api.Project;
+import org.gradle.api.plugins.ExtraPropertiesExtension;
 
 public class Blowdryer {
 	static {
@@ -49,11 +50,13 @@ public class Blowdryer {
 
 	private static final File cacheDir;
 	private static final Map<String, File> urlToContent = new HashMap<>();
+	private static final Map<File, Map<String, String>> fileToProps = new HashMap<>();
 
 	static void wipeEntireCache() {
 		synchronized (Blowdryer.class) {
 			try {
 				urlToContent.clear();
+				fileToProps.clear();
 				java.nio.file.Files.walk(cacheDir.toPath())
 						.sorted(Comparator.reverseOrder())
 						.forEach(Errors.rethrow().wrap((Path path) -> java.nio.file.Files.delete(path)));
@@ -81,11 +84,8 @@ public class Blowdryer {
 
 			try {
 				if (metaFile.exists() && dataFile.exists()) {
-					Properties props = new Properties();
-					try (InputStream input = Files.asByteSource(metaFile).openBufferedStream()) {
-						props.load(input);
-					}
-					String propUrl = props.getProperty(PROP_URL);
+					Map<String, String> props = loadPropertyFile(metaFile);
+					String propUrl = props.get(PROP_URL);
 					if (propUrl.equals(url)) {
 						urlToContent.put(url, dataFile);
 						return dataFile;
@@ -109,6 +109,18 @@ public class Blowdryer {
 				throw Errors.asRuntime(e);
 			}
 		}
+	}
+
+	private static Map<String, String> loadPropertyFile(File file) throws IOException {
+		Properties props = new Properties();
+		try (InputStream input = Files.asByteSource(file).openBufferedStream()) {
+			props.load(input);
+		}
+		Map<String, String> asMap = new HashMap<>(props.size());
+		for (Map.Entry<Object, Object> entry : props.entrySet()) {
+			asMap.put(entry.getKey().toString(), entry.getValue().toString());
+		}
+		return asMap;
 	}
 
 	private static final String PROP_URL = "url";
@@ -169,42 +181,33 @@ public class Blowdryer {
 	}
 
 	static void setResourcePluginNull() {
-		Blowdryer.plugin = null;
+		synchronized (Blowdryer.class) {
+			Blowdryer.plugin = null;
+		}
 	}
 
 	static void setResourcePlugin(ResourcePlugin plugin) {
-		assertPluginNotSet("You already initialized the `blowdryer` plugin, you can't do this twice.");
-		Blowdryer.plugin = plugin;
+		synchronized (Blowdryer.class) {
+			assertPluginNotSet("You already initialized the `blowdryer` plugin, you can't do this twice.");
+			Blowdryer.plugin = plugin;
+		}
 	}
 
-	public static File file(String resourcePath) {
+	private static void assertInitialized() {
 		if (plugin == null) {
 			throw new IllegalStateException("You needed to initialize the `blowdryer` plugin in the root build.gradle first.");
 		}
-		if (plugin instanceof DevPlugin) {
-			return new File(((DevPlugin) plugin).root, resourcePath);
-		} else {
-			return immutableUrl(plugin.toImmutableUrl(resourcePath));
-		}
 	}
 
-	public static String prop(Project project, String propFile, String key) {
-		Object value = project.findProperty(key);
-		if (value == null) {
-			return prop(propFile, key);
+	public static File file(String resourcePath) {
+		synchronized (Blowdryer.class) {
+			assertInitialized();
+			if (plugin instanceof DevPlugin) {
+				return new File(((DevPlugin) plugin).root, resourcePath);
+			} else {
+				return immutableUrl(plugin.toImmutableUrl(resourcePath));
+			}
 		}
-		if (value instanceof String) {
-			return (String) value;
-		}
-		throw new IllegalArgumentException("Project '" + project.getName() + "' has property named '" + key + "' but it is a '" + value.getClass() + "', and it must be a String.");
-	}
-
-	public static void setProps(Project project, String prop) {
-		project.getExtensions().getExtraProperties();
-	}
-
-	public static String prop(String propFile, String key) {
-		return "";
 	}
 
 	static final class DevPlugin implements ResourcePlugin {
@@ -218,6 +221,51 @@ public class Blowdryer {
 		@Deprecated
 		public final String toImmutableUrl(String resourcePath) {
 			throw new UnsupportedOperationException();
+		}
+	}
+
+	////////////////
+	// Properties //
+	////////////////
+	/** Returns all of the properties from the given url. */
+	private static Map<String, String> props(String resourcePath) {
+		synchronized (Blowdryer.class) {
+			try {
+				assertInitialized();
+				if (plugin instanceof DevPlugin) {
+					return loadPropertyFile(file(resourcePath));
+				} else {
+					File file = file(resourcePath);
+					Map<String, String> props = fileToProps.get(file);
+					if (props != null) {
+						return props;
+					}
+					props = loadPropertyFile(file);
+					fileToProps.put(file, props);
+					return props;
+				}
+			} catch (IOException e) {
+				throw Errors.asRuntime(e);
+			}
+		}
+	}
+
+	/** Returns the key from the given propFile (adds .properties extension automatically). */
+	public static String prop(String propFile, String key) throws IOException {
+		Map<String, String> map = props(propFile + ".properties");
+		String value = map.get(key);
+		if (value == null) {
+			throw new IllegalArgumentException(propFile + ".properties does not have key '" + key + "', does have " + map.keySet());
+		}
+		return value;
+	}
+
+	/** Sets every property from propFile (adds .properties extension automatically) onto the given project. */
+	public static void setExtProps(Project project, String propFile) {
+		Map<String, String> map = props(propFile + ".properties");
+		ExtraPropertiesExtension ext = project.getExtensions().getExtraProperties();
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			ext.set(entry.getKey(), entry.getValue());
 		}
 	}
 }
