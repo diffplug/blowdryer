@@ -16,17 +16,18 @@
 package com.diffplug.blowdryer;
 
 
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 
-public class BlowdryerPlugin implements Plugin<Project> {
-	static final String PLUGIN_ID = "com.diffplug.blowdryer";
+public class AsFileTest {
+	@Test
+	public void filenameSafe() {
+		filenameSafe("http://shortName.com/a+b-0-9~Z", "http-shortName.com-a+b-0-9-Z");
+		filenameSafe("https://raw.githubusercontent.com/diffplug/durian-build/07f588e52eb0f31e596eab0228a5df7233a98a14/gradle/spotless/spotless.license.java",
+				"https-raw.githubusercontent.com-diffplug--3vpUTw--14-gradle-spotless-spotless.license.java");
+	}
 
-	@Override
-	public void apply(Project project) {
-		if (project.getRootProject() != project) {
-			throw new IllegalArgumentException("You must apply " + PLUGIN_ID + " only on the root project, not " + project.getPath());
-		}
-		project.getExtensions().create(BlowdryerExtension.NAME, BlowdryerExtension.class);
+	private void filenameSafe(String url, String safe) {
+		Assertions.assertThat(AsFile.filenameSafe(url)).isEqualTo(safe);
 	}
 }
