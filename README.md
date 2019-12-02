@@ -58,13 +58,10 @@ Now, in any other `build.gradle` throughout your project you can do this:
 import com.diffplug.blowdryer.Blowdryer
 
 apply from: Blowdryer.file('someScript.gradle')
-
 somePlugin {
     configFile Blowdryer.file('somePluginConfig.xml')
     configProp Blowdryer.prop('propfile', 'key') // key from propfile.properties
 }
-
-Blowdryer.setExtProps(project, 'propfile') // sets every prop in `propfile.properties` as extra on project
 ```
 
 `Blowdryer.file` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-acme`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache`.

@@ -39,8 +39,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.Okio;
-import org.gradle.api.Project;
-import org.gradle.api.plugins.ExtraPropertiesExtension;
 
 public class Blowdryer {
 	static {
@@ -258,14 +256,5 @@ public class Blowdryer {
 			throw new IllegalArgumentException(propFile + ".properties does not have key '" + key + "', does have " + map.keySet());
 		}
 		return value;
-	}
-
-	/** Sets every property from propFile (adds .properties extension automatically) onto the given project. */
-	public static void setExtProps(Project project, String propFile) {
-		Map<String, String> map = props(propFile + ".properties");
-		ExtraPropertiesExtension ext = project.getExtensions().getExtraProperties();
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			ext.set(entry.getKey(), entry.getValue());
-		}
 	}
 }
