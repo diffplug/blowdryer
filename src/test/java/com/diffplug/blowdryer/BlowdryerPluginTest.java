@@ -53,6 +53,22 @@ public class BlowdryerPluginTest extends GradleHarness {
 	}
 
 	@Test
+	public void devLocal() throws IOException {
+		write("build.gradle",
+				"plugins {",
+				"  id 'com.diffplug.blowdryer'",
+				"}",
+				"blowdryer {",
+				"  devLocal('../blowdryer-script');",
+				"}",
+				"import com.diffplug.blowdryer.AsFile",
+				"",
+				"assert AsFile.resource('sample').text == 'c\\n'");
+		write("../blowdryer-script/src/main/resources/sample", "c");
+		gradleRunner().build();
+	}
+
+	@Test
 	public void multiproject() throws IOException {
 		write("settings.gradle",
 				"include 'subproject'");
