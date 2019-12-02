@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +48,19 @@ public class AsFile {
 
 	private static final File cacheDir;
 	private static final Map<String, File> urlToContent = new HashMap<>();
+
+	static void wipeEntireCache() {
+		synchronized (AsFile.class) {
+			try {
+				urlToContent.clear();
+				java.nio.file.Files.walk(cacheDir.toPath())
+						.sorted(Comparator.reverseOrder())
+						.forEach(Errors.rethrow().wrap((Path path) -> java.nio.file.Files.delete(path)));
+			} catch (IOException e) {
+				throw Errors.asRuntime(e);
+			}
+		}
+	}
 
 	/**
 	 * Downloads the given url to a local file in the system temporary directory.

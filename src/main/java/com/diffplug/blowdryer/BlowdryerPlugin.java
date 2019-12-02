@@ -29,5 +29,9 @@ public class BlowdryerPlugin implements Plugin<Project> {
 		}
 		AsFile.setResourcePluginNull(); // because of gradle daemon
 		project.getExtensions().create(BlowdryerExtension.NAME, BlowdryerExtension.class, project);
+
+		project.getTasks().register("blowdryerWipeEntireCache", task -> {
+			task.doFirst(unused -> AsFile.wipeEntireCache());
+		});
 	}
 }
