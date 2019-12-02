@@ -32,7 +32,7 @@ If you have multiple loosely-related gradle projects in separate repositories, t
   - hard to debug
   - hard to experiment and innovate
 
-Blowdryer lets you centralize your build scripts and config files into a single repository, with an easy workflow for pulling those resources into various projects that use them, improving them in-place, then cycling those improvements back across the other projects.
+Blowdryer lets you centralize your build scripts, config files, and properties into a single repository, with an easy workflow for pulling those resources into various projects that use them, improving them in-place, then cycling those improvements back across the other projects.
 
 ## How to use it
 
