@@ -27,6 +27,8 @@ spotless {
 }
 
 apply plugin: 'eclipse'
+tasks.eclipse.dependsOn(cleanEclipse)
+tasks.eclipse.dependsOn(pluginUnderTestMetadata)
 
 repositories {
 	mavenCentral()

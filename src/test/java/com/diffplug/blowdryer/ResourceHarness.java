@@ -64,6 +64,7 @@ public class ResourceHarness {
 	/** Writes the given content to the given path. */
 	protected File write(String path, String... lines) throws IOException {
 		File file = file(path);
+		file.getParentFile().mkdirs();
 		Files.write(file.toPath(), Arrays.asList(lines), StandardCharsets.UTF_8);
 		return file;
 	}
