@@ -19,7 +19,7 @@ package com.diffplug.blowdryer;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
-public class AsFileTest {
+public class BlowdryerTest {
 	@Test
 	public void filenameSafe() {
 		filenameSafe("http://shortName.com/a+b-0-9~Z", "http-shortName.com-a+b-0-9-Z");
@@ -28,6 +28,6 @@ public class AsFileTest {
 	}
 
 	private void filenameSafe(String url, String safe) {
-		Assertions.assertThat(AsFile.filenameSafe(url)).isEqualTo(safe);
+		Assertions.assertThat(Blowdryer.filenameSafe(url)).isEqualTo(safe);
 	}
 }

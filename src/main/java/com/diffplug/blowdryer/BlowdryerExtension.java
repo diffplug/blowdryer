@@ -43,7 +43,7 @@ public class BlowdryerExtension {
 	 * in the future without moving your scripts.
 	 */
 	public void repoSubfolder(String repoSubfolder) {
-		AsFile.assertPluginNotSet("You have to call `repoSubfolder` first.");
+		Blowdryer.assertPluginNotSet("You have to call `repoSubfolder` first.");
 		this.repoSubfolder = assertNoLeadingOrTrailingSlash(repoSubfolder);
 	}
 
@@ -56,14 +56,14 @@ public class BlowdryerExtension {
 		assertNoLeadingOrTrailingSlash(repoOrg);
 		assertNoLeadingOrTrailingSlash(anchor);
 		String root = "https://raw.githubusercontent.com/" + repoOrg + "/" + anchor + "/" + repoSubfolder + "/";
-		AsFile.setResourcePlugin(resource -> root + resource);
+		Blowdryer.setResourcePlugin(resource -> root + resource);
 	}
 
 	/** Sets the source to be the given local folder, usually for developing changes before they are pushed to git. */
 	public void devLocal(Object devPath) {
 		File projectRoot = Errors.rethrow().get(() -> project.file(devPath).getCanonicalFile());
 		File resourceRoot = new File(projectRoot, repoSubfolder);
-		AsFile.setResourcePlugin(new AsFile.DevPlugin(resourceRoot));
+		Blowdryer.setResourcePlugin(new Blowdryer.DevPlugin(resourceRoot));
 	}
 
 	private static String assertNoLeadingOrTrailingSlash(String input) {
@@ -87,7 +87,7 @@ public class BlowdryerExtension {
 	public void applyFrom(Collection<String> scripts) {
 		for (String script : scripts) {
 			project.apply(cfg -> {
-				cfg.from(AsFile.resource(script));
+				cfg.from(Blowdryer.resource(script));
 			});
 		}
 	}

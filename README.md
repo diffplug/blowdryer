@@ -55,29 +55,29 @@ blowdryer {
 Now, in any other `build.gradle` throughout your project you can do this:
 
 ```gradle
-import com.diffplug.blowdryer.AsFile
+import com.diffplug.blowdryer.Blowdryer
 
-apply from: AsFile.resource('someScript.gradle')
+apply from: Blowdryer.file('someScript.gradle')
 // or
 somePlugin {
-    configFile AsFile.resource('somePluginConfig.xml')
+    configFile Blowdryer.file('somePluginConfig.xml')
 }
 ```
 
-`AsFile.resource` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-acme`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache`.
+`Blowdryer.file` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-acme`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache`.
 
 ### How it works
 
-`AsFile.immutableUrl` (TODO, link to javadoc) is another method you can use, which returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the URL is immutable.
+`Blowdryer.immutableUrl` (TODO, link to javadoc) is another method you can use, which returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the URL is immutable.
 
-When you setup the blowdryer plugin in your root project, you're telling blowdryer what URL scheme to use when resolving a call to `AsFile.resource` (TODO, link to javadoc), for example:
+When you setup the blowdryer plugin in your root project, you're telling blowdryer what URL scheme to use when resolving a call to `Blowdryer.file` (TODO, link to javadoc), for example:
 
 ```java
 //blowdryer {
 //  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
 public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
   String root = "https://raw.githubusercontent.com/" + repoOrg + "/" + anchor + "/" + repoSubfolder + "/";
-  AsFile.setResourcePlugin(resource -> root + resource);
+  Blowdryer.setResourcePlugin(resource -> root + resource);
 }
 ```
 
@@ -92,7 +92,7 @@ blowdryer {
 }
 ```
 
-The call to `devLocal` (TODO: test) means that all calls to `AsFile.resource` will skip caching and get served from that local folder's `src/main/resources` subfolder.
+The call to `devLocal` means that all calls to `Blowdryer.file` will skip caching and get served from that local folder's `src/main/resources` subfolder.
 
 ### `repoSubfolder`
 

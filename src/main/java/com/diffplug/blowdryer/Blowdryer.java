@@ -40,7 +40,7 @@ import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.Okio;
 
-public class AsFile {
+public class Blowdryer {
 	static {
 		File tmpDir = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value());
 		cacheDir = new File(tmpDir, "blowdryer-cache");
@@ -50,7 +50,7 @@ public class AsFile {
 	private static final Map<String, File> urlToContent = new HashMap<>();
 
 	static void wipeEntireCache() {
-		synchronized (AsFile.class) {
+		synchronized (Blowdryer.class) {
 			try {
 				urlToContent.clear();
 				java.nio.file.Files.walk(cacheDir.toPath())
@@ -68,7 +68,7 @@ public class AsFile {
 	 * This is appropriate only for immutable URLs, such as specific hashes from Git.
 	 */
 	public static File immutableUrl(String url) {
-		synchronized (AsFile.class) {
+		synchronized (Blowdryer.class) {
 			File result = urlToContent.get(url);
 			if (result != null) {
 				return result;
@@ -162,18 +162,18 @@ public class AsFile {
 	private static ResourcePlugin plugin;
 
 	static void assertPluginNotSet(String errorMessage) {
-		if (AsFile.plugin != null) {
+		if (Blowdryer.plugin != null) {
 			throw new IllegalStateException(errorMessage);
 		}
 	}
 
 	static void setResourcePluginNull() {
-		AsFile.plugin = null;
+		Blowdryer.plugin = null;
 	}
 
 	static void setResourcePlugin(ResourcePlugin plugin) {
 		assertPluginNotSet("You already initialized the `blowdryer` plugin, you can't do this twice.");
-		AsFile.plugin = plugin;
+		Blowdryer.plugin = plugin;
 	}
 
 	public static File resource(String resourcePath) {
