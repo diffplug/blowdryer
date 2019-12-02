@@ -152,6 +152,10 @@ public class AsFile {
 		}
 	}
 
+	static void setResourcePluginNull() {
+		AsFile.plugin = null;
+	}
+
 	static void setResourcePlugin(ResourcePlugin plugin) {
 		assertPluginNotSet("You already initialized the `blowdryer` plugin, you can't do this twice.");
 		AsFile.plugin = plugin;

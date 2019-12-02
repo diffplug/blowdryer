@@ -56,9 +56,7 @@ public class BlowdryerExtension {
 		assertNoLeadingOrTrailingSlash(repoOrg);
 		assertNoLeadingOrTrailingSlash(anchor);
 		String root = "https://raw.githubusercontent.com/" + repoOrg + "/" + anchor + "/" + repoSubfolder + "/";
-		AsFile.setResourcePlugin(resource -> {
-			return root + resource;
-		});
+		AsFile.setResourcePlugin(resource -> root + resource);
 	}
 
 	/** Sets the source to be the given local folder, usually for developing changes before they are pushed to git. */
