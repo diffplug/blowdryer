@@ -32,7 +32,7 @@ If you have multiple loosely-related gradle projects in separate repositories, t
   - hard to debug
   - hard to experiment and innovate
 
-Blowdryer lets you centralize your build scripts and config files into a single repository, with an easy workflow for pulling those resources into various projects that use them, improving them in-place, then cycling those improvements back across the other projects.
+Blowdryer lets you centralize your build scripts, config files, and properties into a single repository, with an easy workflow for pulling those resources into various projects that use them, improving them in-place, then cycling those improvements back across the other projects.
 
 ## How to use it
 
@@ -58,21 +58,23 @@ Now, in any other `build.gradle` throughout your project you can do this:
 import com.diffplug.blowdryer.Blowdryer
 
 apply from: Blowdryer.file('someScript.gradle')
-// or
 somePlugin {
     configFile Blowdryer.file('somePluginConfig.xml')
+    configProp Blowdryer.prop('propfile', 'key') // key from propfile.properties
 }
 ```
 
 `Blowdryer.file` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-acme`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache`.
 
-### How it works
+`Blowdryer.prop` parses a java `.properties` file which was downloaded using `Blowdryer.file`, and then returns the value associated with the given key.
+
+### Internals
 
 `Blowdryer.immutableUrl` (TODO, link to javadoc) is another method you can use, which returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the URL is immutable.
 
 When you setup the blowdryer plugin in your root project, you're telling blowdryer what URL scheme to use when resolving a call to `Blowdryer.file` (TODO, link to javadoc), for example:
 
-```java
+```javafea
 //blowdryer {
 //  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
 public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
