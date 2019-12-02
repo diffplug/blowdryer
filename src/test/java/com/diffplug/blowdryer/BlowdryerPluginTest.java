@@ -23,7 +23,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public class BlowdryerPluginTest extends GradleHarness {
-	private void writePathTagExtra(String path, String tag, String... extra) throws IOException {
+	private void githubTagExtra(String path, String tag, String... extra) throws IOException {
 		write(path,
 				"plugins {",
 				"  id 'com.diffplug.blowdryer'",
@@ -38,22 +38,30 @@ public class BlowdryerPluginTest extends GradleHarness {
 
 	@Test
 	public void githubTag() throws IOException {
-		writePathTagExtra("build.gradle", "test/a",
-				"assert Blowdryer.file('sample').text == 'a'");
+		githubTagExtra("build.gradle", "test/2/a",
+				"assert Blowdryer.file('sample').text == 'a'",
+				"assert Blowdryer.prop('sample', 'name') == 'test'",
+				"assert Blowdryer.prop('sample', 'ver_spotless') == '1.2.0'");
 		gradleRunner().build();
 
-		writePathTagExtra("build.gradle", "test/b",
-				"assert Blowdryer.file('sample').text == 'b'");
+		githubTagExtra("build.gradle", "test/2/b",
+				"assert Blowdryer.file('sample').text == 'b'",
+				"assert Blowdryer.prop('sample', 'name') == 'testB'",
+				"assert Blowdryer.prop('sample', 'group') == 'com.diffplug.gradleB'");
 		gradleRunner().build();
 
 		// double-check that failures do fail
-		writePathTagExtra("build.gradle", "test/b",
+		githubTagExtra("build.gradle", "test/2/b",
 				"assert Blowdryer.file('sample').text == 'a'");
 		gradleRunner().buildAndFail();
 	}
 
 	@Test
 	public void devLocal() throws IOException {
+		write("../blowdryer-script/src/main/resources/sample", "c");
+		write("../blowdryer-script/src/main/resources/sample.properties",
+				"name=test",
+				"group=com.diffplug.gradle");
 		write("build.gradle",
 				"plugins {",
 				"  id 'com.diffplug.blowdryer'",
@@ -63,8 +71,9 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"}",
 				"import com.diffplug.blowdryer.Blowdryer",
 				"",
-				"assert Blowdryer.file('sample').text == 'c\\n'");
-		write("../blowdryer-script/src/main/resources/sample", "c");
+				"assert Blowdryer.file('sample').text == 'c\\n'",
+				"assert Blowdryer.prop('sample', 'name') == 'test'",
+				"assert Blowdryer.prop('sample', 'group') == 'com.diffplug.gradle'");
 		gradleRunner().build();
 	}
 
@@ -72,12 +81,16 @@ public class BlowdryerPluginTest extends GradleHarness {
 	public void multiproject() throws IOException {
 		write("settings.gradle",
 				"include 'subproject'");
-		writePathTagExtra("build.gradle", "test/a",
-				"assert Blowdryer.file('sample').text == 'a'");
+		githubTagExtra("build.gradle", "test/2/a",
+				"assert Blowdryer.file('sample').text == 'a'",
+				"assert Blowdryer.prop('sample', 'name') == 'test'",
+				"assert Blowdryer.prop('sample', 'group') == 'com.diffplug.gradle'");
 		write("subproject/build.gradle",
 				"import com.diffplug.blowdryer.Blowdryer",
 				"",
-				"assert Blowdryer.file('sample').text == 'a'");
+				"assert Blowdryer.file('sample').text == 'a'",
+				"assert Blowdryer.prop('sample', 'name') == 'test'",
+				"assert Blowdryer.prop('sample', 'group') == 'com.diffplug.gradle'");
 		gradleRunner().build();
 
 		// double-check that failures do fail
@@ -90,10 +103,10 @@ public class BlowdryerPluginTest extends GradleHarness {
 
 	@Test
 	public void missingResourceThrowsError() throws IOException {
-		writePathTagExtra("build.gradle", "test/a",
+		githubTagExtra("build.gradle", "test/2/a",
 				"Blowdryer.file('notPresent')");
 		Assertions.assertThat(gradleRunner().buildAndFail().getOutput().replace("\r\n", "\n")).contains(
-				"https://raw.githubusercontent.com/diffplug/blowdryer/test/a/src/main/resources/notPresent\n" +
+				"https://raw.githubusercontent.com/diffplug/blowdryer/test/2/a/src/main/resources/notPresent\n" +
 						"  received http code 404\n" +
 						"  404: Not Found");
 	}
@@ -102,7 +115,7 @@ public class BlowdryerPluginTest extends GradleHarness {
 	public void applyOnNonRootThrowsError() throws IOException {
 		write("settings.gradle",
 				"include 'subproject'");
-		writePathTagExtra("subproject/build.gradle", "test/a");
+		githubTagExtra("subproject/build.gradle", "test/2/a");
 		Assertions.assertThat(gradleRunner().buildAndFail().getOutput().replace("\r\n", "\n")).contains(
 				"An exception occurred applying plugin request [id: 'com.diffplug.blowdryer']\n" +
 						"> Failed to apply plugin [id 'com.diffplug.blowdryer']\n" +
