@@ -1,6 +1,8 @@
 # <img align="left" src="logo.png"> Blowdryer: keep your gradle builds dry
 
-Structure, performance, and workflow for applying a coherent set of config files and script plugins (apply from: 'somescript.gradle').
+[![JitCI](https://jitci.com/gh/diffplug/blowdryer/svg)](https://jitci.com/gh/diffplug/blowdryer)
+[![Live chat](https://img.shields.io/badge/gitter-chat-brightgreen.svg)](https://gitter.im/diffplug/blowdryer)
+[![License Apache](https://img.shields.io/badge/license-apache-brightgreen.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 
 If you have multiple loosely-related gradle projects in separate repositories, then you probably have these problems:
 
@@ -10,11 +12,13 @@ If you have multiple loosely-related gradle projects in separate repositories, t
   - hard to debug
   - hard to experiment and innovate
 
-Blowdryer lets you centralize your build scripts into a single repository, with an easy workflow for pulling those improvements into the various projects that use them.
+Blowdryer lets you centralize your build scripts and config files into a single repository, with an easy workflow for pulling those resources into various projects that use them, improving them in-place, then cycling those improvements back across the other projects.
 
 ## How to use it
 
-In the `build.gradle` for your **root** project, do this:
+First, make a public github repository ([`diffplug/blowdryer-diffplug`](https://github.com/diffplug/blowdryer-diffplug) is a good example), and push the stuff that you want to centralize into the `src/main/resources` subdirectory of that repo.
+
+Then, in the `build.gradle` for the **root** project that you want to suck these into, do this:
 
 ```gradle
 plugins {
@@ -40,13 +44,13 @@ somePlugin {
 }
 ```
 
-`AsFile.resource` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-acme`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache`.
+`AsFile.resource` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-acme`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache`. (TODO - implement task)
 
 ### How it works
 
-`AsFile.immutableUrl` is another method you can use, which returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the URL is immutable.
+`AsFile.immutableUrl` (TODO, link to javadoc) is another method you can use, which returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the URL is immutable.
 
-When you setup the blowdryer plugin in your root project, you're telling blowdryer what URL scheme to use when resolving a call to `AsFile.resource`, for example:
+When you setup the blowdryer plugin in your root project, you're telling blowdryer what URL scheme to use when resolving a call to `AsFile.resource` (TODO, link to javadoc), for example:
 
 ```java
 //blowdryer {
@@ -68,7 +72,7 @@ blowdryer {
 }
 ```
 
-The call to `devLocal` means that all calls to `AsFile.resource` will skip caching and get served from that local folder's `src/main/resources` subfolder.
+The call to `devLocal` (TODO: test) means that all calls to `AsFile.resource` will skip caching and get served from that local folder's `src/main/resources` subfolder.
 
 ### `repoSubfolder`
 
@@ -93,7 +97,7 @@ The workaround is to make sure that either:
 - any script which applies a third-party plugin is completely "self-contained", and does not need to be referenced by any other plugins
 - add that plugin as a dependency of your `blowdryer` plugin.
 
-Another possible workaround would be to implement your own `apply from` which trades gradle's encapsulation away in favor of easier interoperability.
+Another possible workaround would be to implement our own `apply from` which trades gradle's encapsulation away in favor of easier interoperability.  Dunno how hard that would be, but this would be a natural place for such a hack to live.
 
 ## In the wild
 
