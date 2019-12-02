@@ -1,8 +1,28 @@
 # <img align="left" src="logo.png"> Blowdryer: keep your gradle builds dry
 
+<!---freshmark shields
+output = [
+    link(shield('Gradle plugin', 'plugins.gradle.org', 'com.diffplug.blowdryer', 'blue'), 'https://plugins.gradle.org/plugin/com.diffplug.blowdryer'),
+    link(shield('Maven central', 'mavencentral', 'com.diffplug:blowdryer', 'blue'), 'https://search.maven.org/search?q=g:com.diffplug%20AND%20a:blowdryer'),
+    '',
+    link(image('Latest', 'https://jitpack.io/v/diffplug/blowdryer.svg?color=blue'), 'https://jitpack.io/#diffplug/blowdryer'),
+    link(shield('Changelog', 'keepachangelog', 'yes', 'brightgreen'), 'CHANGELOG.md'),
+    link(shield('Javadoc', 'javadoc', '{{stable}}', 'brightgreen'), 'https://{{org}}.github.io/{{name}}/javadoc/{{stable}}/'),
+    link(image('JitCI', 'https://jitci.com/gh/diffplug/blowdryer/svg'), 'https://jitci.com/gh/diffplug/blowdryer'),
+    link(shield('Live chat', 'gitter', 'chat', 'brightgreen'), 'https://gitter.im/diffplug/blowdryer'),
+    link(shield('License Apache', 'license', 'apache', 'brightgreen'), 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)')
+    ].join('\n');
+-->
+[![Gradle plugin](https://img.shields.io/badge/plugins.gradle.org-com.diffplug.blowdryer-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.blowdryer)
+[![Maven central](https://img.shields.io/badge/mavencentral-com.diffplug%3Ablowdryer-blue.svg)](https://search.maven.org/search?q=g:com.diffplug%20AND%20a:blowdryer)
+
+[![Latest](https://jitpack.io/v/diffplug/blowdryer.svg?color=blue)](https://jitpack.io/#diffplug/blowdryer)
+[![Changelog](https://img.shields.io/badge/keepachangelog-yes-brightgreen.svg)](CHANGELOG.md)
+[![Javadoc](https://img.shields.io/badge/javadoc-unreleased-brightgreen.svg)](https://diffplug.github.io/durian-build/javadoc/unreleased/)
 [![JitCI](https://jitci.com/gh/diffplug/blowdryer/svg)](https://jitci.com/gh/diffplug/blowdryer)
 [![Live chat](https://img.shields.io/badge/gitter-chat-brightgreen.svg)](https://gitter.im/diffplug/blowdryer)
 [![License Apache](https://img.shields.io/badge/license-apache-brightgreen.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
+<!---freshmark /shields -->
 
 If you have multiple loosely-related gradle projects in separate repositories, then you probably have these problems:
 
