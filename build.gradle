@@ -43,6 +43,9 @@ dependencies {
 	testImplementation 'org.assertj:assertj-core:3.14.0'
 }
 
+/////////////////////////////
+// Gradle publishing setup //
+/////////////////////////////
 gradlePlugin {
 	plugins {
 		blowdryer {
@@ -54,5 +57,5 @@ gradlePlugin {
 pluginBundle {
 	website = 'https://github.com/diffplug/blowdryer' 
 	vcsUrl = 'https://github.com/diffplug/blowdryer' 
-	tags = ['defaults', 'standards', 'dry', 'multi-project']
+	tags = ['defaults', 'standards', 'dry', 'multi-project', '干']
 }

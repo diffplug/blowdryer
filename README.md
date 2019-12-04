@@ -83,6 +83,21 @@ public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
 }
 ```
 
+### Chinese for "dry" (干)
+
+If you feel like banging on the unicode drum, you can also use it like so:
+
+```gradle
+import com.diffplug.blowdryer.干
+
+apply from: 干.file('someScript.gradle')
+somePlugin {
+    configFile 干.file('somePluginConfig.xml')
+    configProp 干.prop('propfile', 'key') // key from propfile.properties
+}
+```
+
+
 ## Dev workflow
 
 To change and test scripts before you push them up to GitHub, you can do this:
