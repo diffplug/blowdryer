@@ -18,6 +18,7 @@ package com.diffplug.blowdryer;
 
 import java.io.File;
 import java.io.IOException;
+import org.gradle.api.Project;
 
 /** Alias for {@link Blowdryer}. */
 public class 干 {
@@ -34,5 +35,15 @@ public class 干 {
 	/** Alias for {@link Blowdryer#prop(String, String)}. */
 	public static String prop(String propFile, String key) throws IOException {
 		return Blowdryer.prop(propFile, key);
+	}
+
+	/** Alias for {@link Blowdryer#cfg(Project, String, String)}. */
+	public static String cfg(Project project, String key, String descForError) {
+		return Blowdryer.cfg(project, key, descForError);
+	}
+
+	/** Alias for {@link Blowdryer#cfg(Project, Class, String, String)}. */
+	public static <T> T cfg(Project project, Class<T> clazz, String key, String descForError) {
+		return Blowdryer.cfg(project, clazz, key, descForError);
 	}
 }

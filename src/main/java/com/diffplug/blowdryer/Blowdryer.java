@@ -39,6 +39,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.Okio;
+import org.gradle.api.Project;
 
 /**
  * Public static methods which retrieve resources as
@@ -261,5 +262,36 @@ public class Blowdryer {
 			throw new IllegalArgumentException(propFile + ".properties does not have key '" + key + "', does have " + map.keySet());
 		}
 		return value;
+	}
+
+	/**
+	 * Reads a property from the project, and throws "Undefined 'key': descForError" if it is missing.
+	 * Requires the property value to be a String.
+	 */
+	public static String cfg(Project project, String key, String descForError) {
+		return cfg(project, String.class, key, descForError);
+	}
+
+	/**
+	 * Reads a property from the project, and throws "Undefined 'key': descForError" if it is missing,
+	 * or "Wrong type 'key': descForError - expected java.io.File but was java.io.String"
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T cfg(Project project, Class<T> clazz, String key, String descForError) {
+		Object value = project.findProperty(key);
+		if (value == null) {
+			if (clazz.equals(String.class)) {
+				// https://docs.gradle.org/current/userguide/build_environment.html#sec:project_properties
+			}
+			throw new IllegalArgumentException("Undefined '" + key + "': " + descForError +
+					"\nset in gradle.properties: https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:extra_properties" +
+					"\nset in buildscript: https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:extra_properties" +
+					"\nset in environment: https://docs.gradle.org/current/userguide/build_environment.html#sec:project_properties" +
+					"\nexact search order: https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#findProperty-java.lang.String-");
+		} else if (!(clazz.isInstance(value))) {
+			throw new IllegalArgumentException("Wrong type '" + key + "': " + descForError + " - expected " + clazz + " but was " + value.getClass());
+		} else {
+			return (T) value;
+		}
 	}
 }

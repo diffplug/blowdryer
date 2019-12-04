@@ -59,8 +59,8 @@ import com.diffplug.blowdryer.Blowdryer
 
 apply from: Blowdryer.file('someScript.gradle')
 somePlugin {
-    configFile Blowdryer.file('somePluginConfig.xml')
-    configProp Blowdryer.prop('propfile', 'key') // key from propfile.properties
+  configFile Blowdryer.file('somePluginConfig.xml')
+  configProp Blowdryer.prop('propfile', 'key') // key from propfile.properties
 }
 ```
 
@@ -68,13 +68,13 @@ somePlugin {
 
 `Blowdryer.prop` parses a java `.properties` file which was downloaded using `Blowdryer.file`, and then returns the value associated with the given key.
 
-### Internals
+### How it works
 
 `Blowdryer.immutableUrl` (TODO, link to javadoc) is another method you can use, which returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the URL is immutable.
 
 When you setup the blowdryer plugin in your root project, you're telling blowdryer what URL scheme to use when resolving a call to `Blowdryer.file` (TODO, link to javadoc), for example:
 
-```javafea
+```java
 //blowdryer {
 //  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
 public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
@@ -83,7 +83,27 @@ public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
 }
 ```
 
-### Chinese for "dry" (干)
+### Configuring script plugins
+
+When you call into a script plugin, you might want to set some configuration values first.  For example:
+
+```gradle
+// build.gradle
+ext.pluginPass = 'supersecret'
+ext.keyFile = new File('keyFile')
+apply from: Blowdryer.file('someScript.gradle')
+
+// someScript.gradle
+somePlugin {
+  pass Blowdryer.cfg(project, 'pluginPass', 'password for the keyFile')
+  // if the property isn't a String, you have to specify the class you
+  keyFile Blowdryer.cfg(project, File.class, 'keyFile', 'location of the keyFile')
+}
+```
+
+If the property isn't set, you'll get a nice error message describing what was missing, along with links to gradle's documentation on how to set properties.
+
+## Chinese for "dry" (干)
 
 If you feel like banging on the unicode drum, you can also use it like so:
 
@@ -92,11 +112,12 @@ import com.diffplug.blowdryer.干
 
 apply from: 干.file('someScript.gradle')
 somePlugin {
-    configFile 干.file('somePluginConfig.xml')
-    configProp 干.prop('propfile', 'key') // key from propfile.properties
+  configFile 干.file('somePluginConfig.xml')
+  configProp 干.prop('propfile', 'key')
+  password   干.cfg(project, 'pluginPass', 'password for the keyFile')
+  keyFile    干.cfg(project, File.class, 'keyFile', 'location of the keyFile')
 }
 ```
-
 
 ## Dev workflow
 
