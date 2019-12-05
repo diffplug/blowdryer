@@ -128,15 +128,21 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"name=test",
 				"group=com.diffplug.gradle");
 		write("../blowdryer-script/src/main/resources/script.gradle",
-				//				"plugins {",
-				//				"  id 'com.diffplug.blowdryer'",
-				//				"}",
 				"apply plugin: 'com.diffplug.blowdryer-import'",
 				"",
 				"println 干.cfg('pluginPass', 'password for the keyFile')",
 				"println 干.cfg(File.class, 'keyFile', 'location of the keyFile')",
 				"println 干.prop('sample', 'group')",
 				"");
+		//		write("../blowdryer-script/src/main/resources/script.gradle.kts",
+		//				"apply(plugin = \"com.diffplug.blowdryer\")",
+		//				"",
+		//				"import com.diffplug.blowdryer.Blowdryer",
+		//				"println(com.diffplug.blowdryer.Blowdryer.prop(\"sample\", \"group\"))",
+		//				//"干.cfg(\"pluginPass\", \"password for the keyFile\")",
+		//				//"干.cfg(javaClass<File>, \"keyFile\", \"location of the keyFile\")",
+		//				//"干.prop(\"sample\", \"group\")",
+		//				"");
 		write("build.gradle",
 				"plugins {",
 				"  id 'com.diffplug.blowdryer'",
@@ -148,7 +154,8 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"",
 				"ext.pluginPass = 'supersecret'",
 				"ext.keyFile = new File('keyFile.txt')",
-				"apply from: 干.file('script.gradle')");
+				"apply from: 干.file('script.gradle')",
+				"apply from: 干.file('script.gradle.kts')");
 		Assertions.assertThat(gradleRunner().build().getOutput().replace("\r\n", "\n")).contains(
 				"> Configure project :\n" +
 						"supersecret\n" +
