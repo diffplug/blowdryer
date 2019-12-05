@@ -121,4 +121,39 @@ public class BlowdryerPluginTest extends GradleHarness {
 						"> Failed to apply plugin [id 'com.diffplug.blowdryer']\n" +
 						"   > You must apply com.diffplug.blowdryer only on the root project, not :subproject");
 	}
+
+	@Test
+	public void cfgTest() throws IOException {
+		write("../blowdryer-script/src/main/resources/sample.properties",
+				"name=test",
+				"group=com.diffplug.gradle");
+		write("../blowdryer-script/src/main/resources/script.gradle",
+				//				"plugins {",
+				//				"  id 'com.diffplug.blowdryer'",
+				//				"}",
+				"apply plugin: 'com.diffplug.blowdryer-import'",
+				"",
+				"println 干.cfg('pluginPass', 'password for the keyFile')",
+				"println 干.cfg(File.class, 'keyFile', 'location of the keyFile')",
+				"println 干.prop('sample', 'group')",
+				"");
+		write("build.gradle",
+				"plugins {",
+				"  id 'com.diffplug.blowdryer'",
+				"  id 'com.diffplug.blowdryer-import'",
+				"}",
+				"blowdryer {",
+				"  devLocal('../blowdryer-script');",
+				"}",
+				"",
+				"ext.pluginPass = 'supersecret'",
+				"ext.keyFile = new File('keyFile.txt')",
+				"apply from: 干.file('script.gradle')");
+		Assertions.assertThat(gradleRunner().build().getOutput().replace("\r\n", "\n")).contains(
+				"> Configure project :\n" +
+						"supersecret\n" +
+						"keyFile.txt\n" +
+						"com.diffplug.gradle\n" +
+						"\n");
+	}
 }

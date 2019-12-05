@@ -52,6 +52,10 @@ gradlePlugin {
 			id = 'com.diffplug.blowdryer'
 			implementationClass = 'com.diffplug.blowdryer.BlowdryerPlugin'
 		}
+		干 {
+			id = 'com.diffplug.blowdryer-import'
+			implementationClass = 'com.diffplug.blowdryer.干'
+		}
 	}
 }
 pluginBundle {

@@ -18,32 +18,46 @@ package com.diffplug.blowdryer;
 
 import java.io.File;
 import java.io.IOException;
+import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
 /** Alias for {@link Blowdryer}. */
-public class 干 {
-	/** Alias for {@link Blowdryer#immutableUrl(String)}. */
-	public static File immutableUrl(String url) {
-		return Blowdryer.immutableUrl(url);
+public class 干 implements Plugin<Project> {
+	@Override
+	public void apply(Project proj) {
+		proj.getExtensions().create("干", Extension.class, proj);
 	}
 
-	/** Alias for {@link Blowdryer#file(String)}. */
-	public static File file(String resource) {
-		return Blowdryer.file(resource);
-	}
+	public static class Extension {
+		private final Project project;
 
-	/** Alias for {@link Blowdryer#prop(String, String)}. */
-	public static String prop(String propFile, String key) throws IOException {
-		return Blowdryer.prop(propFile, key);
-	}
+		public Extension(Project project) {
+			this.project = project;
+		}
 
-	/** Alias for {@link Blowdryer#cfg(Project, String, String)}. */
-	public static String cfg(Project project, String key, String descForError) {
-		return Blowdryer.cfg(project, key, descForError);
-	}
+		/** Alias for {@link Blowdryer#immutableUrl(String)}. */
+		public File immutableUrl(String url) {
+			return Blowdryer.immutableUrl(url);
+		}
 
-	/** Alias for {@link Blowdryer#cfg(Project, Class, String, String)}. */
-	public static <T> T cfg(Project project, Class<T> clazz, String key, String descForError) {
-		return Blowdryer.cfg(project, clazz, key, descForError);
+		/** Alias for {@link Blowdryer#file(String)}. */
+		public File file(String resource) {
+			return Blowdryer.file(resource);
+		}
+
+		/** Alias for {@link Blowdryer#prop(String, String)}. */
+		public String prop(String propFile, String key) throws IOException {
+			return Blowdryer.prop(propFile, key);
+		}
+
+		/** Alias for {@link Blowdryer#cfg(Project, String, String)}. */
+		public String cfg(String key, String descForError) {
+			return Blowdryer.cfg(project, key, descForError);
+		}
+
+		/** Alias for {@link Blowdryer#cfg(Project, Class, String, String)}. */
+		public <T> T cfg(Class<T> clazz, String key, String descForError) {
+			return Blowdryer.cfg(project, clazz, key, descForError);
+		}
 	}
 }
