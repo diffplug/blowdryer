@@ -18,18 +18,16 @@ package com.diffplug.blowdryer;
 
 import com.diffplug.common.base.Errors;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Objects;
-import org.gradle.api.Project;
+import org.gradle.api.initialization.Settings;
 
-public class BlowdryerExtension {
-	static final String NAME = "blowdryer";
+public class BlowdryerSetupExtension {
+	static final String NAME = "blowdryerSetup";
 
-	private final Project project;
+	private final Settings settings;
 
-	public BlowdryerExtension(Project project) {
-		this.project = Objects.requireNonNull(project);
+	public BlowdryerSetupExtension(Settings settings) {
+		this.settings = Objects.requireNonNull(settings);
 	}
 
 	private String repoSubfolder = "src/main/resources";
@@ -61,7 +59,16 @@ public class BlowdryerExtension {
 
 	/** Sets the source to be the given local folder, usually for developing changes before they are pushed to git. */
 	public void devLocal(Object devPath) {
-		File projectRoot = Errors.rethrow().get(() -> project.file(devPath).getCanonicalFile());
+		Objects.requireNonNull(devPath);
+		File devPathFile;
+		if (devPath instanceof File) {
+			devPathFile = (File) devPath;
+		} else if (devPath instanceof String) {
+			devPathFile = new File(settings.getRootDir(), (String) devPath);
+		} else {
+			throw new IllegalArgumentException("Expected a String or File, was a " + devPath.getClass());
+		}
+		File projectRoot = Errors.rethrow().get(devPathFile::getCanonicalFile);
 		File resourceRoot = new File(projectRoot, repoSubfolder);
 		Blowdryer.setResourcePlugin(new Blowdryer.DevPlugin(resourceRoot));
 	}
@@ -78,17 +85,5 @@ public class BlowdryerExtension {
 			throw new IllegalArgumentException("Remove the trailing slash");
 		}
 		return input;
-	}
-
-	public void applyFrom(String... scripts) {
-		applyFrom(Arrays.asList(scripts));
-	}
-
-	public void applyFrom(Collection<String> scripts) {
-		for (String script : scripts) {
-			project.apply(cfg -> {
-				cfg.from(Blowdryer.file(script));
-			});
-		}
 	}
 }

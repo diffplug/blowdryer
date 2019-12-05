@@ -23,35 +23,35 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public class BlowdryerPluginTest extends GradleHarness {
-	private void githubTagExtra(String path, String tag, String... extra) throws IOException {
-		write(path,
-				"plugins {",
-				"  id 'com.diffplug.blowdryer'",
-				"}",
-				"blowdryer {",
-				"  github('diffplug/blowdryer', 'tag', '" + tag + "');",
-				"}",
-				"import com.diffplug.blowdryer.Blowdryer",
-				"",
+	private void settingsGithub(String tag, String... extra) throws IOException {
+		write("settings.gradle",
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				"blowdryerSetup { github('diffplug/blowdryer', 'tag', '" + tag + "') }",
 				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
 	@Test
 	public void githubTag() throws IOException {
-		githubTagExtra("build.gradle", "test/2/a",
-				"assert Blowdryer.file('sample').text == 'a'",
-				"assert Blowdryer.prop('sample', 'name') == 'test'",
-				"assert Blowdryer.prop('sample', 'ver_spotless') == '1.2.0'");
+		settingsGithub("test/2/a");
+		write("build.gradle",
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'a'",
+				"assert 干.prop('sample', 'name') == 'test'",
+				"assert 干.prop('sample', 'ver_spotless') == '1.2.0'");
 		gradleRunner().build();
 
-		githubTagExtra("build.gradle", "test/2/b",
-				"assert Blowdryer.file('sample').text == 'b'",
-				"assert Blowdryer.prop('sample', 'name') == 'testB'",
-				"assert Blowdryer.prop('sample', 'group') == 'com.diffplug.gradleB'");
+		settingsGithub("test/2/b");
+		write("build.gradle",
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'b'",
+				"assert 干.prop('sample', 'name') == 'testB'",
+				"assert 干.prop('sample', 'group') == 'com.diffplug.gradleB'");
 		gradleRunner().build();
 
 		// double-check that failures do fail
-		githubTagExtra("build.gradle", "test/2/b",
+		settingsGithub("test/2/b");
+		write("build.gradle",
+				"plugins { id 'com.diffplug.blowdryer' }",
 				"assert Blowdryer.file('sample').text == 'a'");
 		gradleRunner().buildAndFail();
 	}
@@ -62,35 +62,31 @@ public class BlowdryerPluginTest extends GradleHarness {
 		write("../blowdryer-script/src/main/resources/sample.properties",
 				"name=test",
 				"group=com.diffplug.gradle");
+		write("settings.gradle",
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				"blowdryerSetup { devLocal('../blowdryer-script') }");
 		write("build.gradle",
-				"plugins {",
-				"  id 'com.diffplug.blowdryer'",
-				"}",
-				"blowdryer {",
-				"  devLocal('../blowdryer-script');",
-				"}",
-				"import com.diffplug.blowdryer.Blowdryer",
-				"",
-				"assert Blowdryer.file('sample').text == 'c\\n'",
-				"assert Blowdryer.prop('sample', 'name') == 'test'",
-				"assert Blowdryer.prop('sample', 'group') == 'com.diffplug.gradle'");
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'c\\n'",
+				"assert 干.prop('sample', 'name') == 'test'",
+				"assert 干.prop('sample', 'group') == 'com.diffplug.gradle'");
 		gradleRunner().build();
 	}
 
 	@Test
 	public void multiproject() throws IOException {
-		write("settings.gradle",
+		settingsGithub("test/2/a",
 				"include 'subproject'");
-		githubTagExtra("build.gradle", "test/2/a",
-				"assert Blowdryer.file('sample').text == 'a'",
-				"assert Blowdryer.prop('sample', 'name') == 'test'",
-				"assert Blowdryer.prop('sample', 'group') == 'com.diffplug.gradle'");
+		write("build.gradle",
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'a'",
+				"assert 干.prop('sample', 'name') == 'test'",
+				"assert 干.prop('sample', 'group') == 'com.diffplug.gradle'");
 		write("subproject/build.gradle",
-				"import com.diffplug.blowdryer.Blowdryer",
-				"",
-				"assert Blowdryer.file('sample').text == 'a'",
-				"assert Blowdryer.prop('sample', 'name') == 'test'",
-				"assert Blowdryer.prop('sample', 'group') == 'com.diffplug.gradle'");
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'a'",
+				"assert 干.prop('sample', 'name') == 'test'",
+				"assert 干.prop('sample', 'group') == 'com.diffplug.gradle'");
 		gradleRunner().build();
 
 		// double-check that failures do fail
@@ -103,8 +99,10 @@ public class BlowdryerPluginTest extends GradleHarness {
 
 	@Test
 	public void missingResourceThrowsError() throws IOException {
-		githubTagExtra("build.gradle", "test/2/a",
-				"Blowdryer.file('notPresent')");
+		settingsGithub("test/2/a");
+		write("build.gradle",
+				"plugins { id 'com.diffplug.blowdryer' }",
+				"干.file('notPresent')");
 		Assertions.assertThat(gradleRunner().buildAndFail().getOutput().replace("\r\n", "\n")).contains(
 				"https://raw.githubusercontent.com/diffplug/blowdryer/test/2/a/src/main/resources/notPresent\n" +
 						"  received http code 404\n" +
@@ -112,50 +110,59 @@ public class BlowdryerPluginTest extends GradleHarness {
 	}
 
 	@Test
-	public void applyOnNonRootThrowsError() throws IOException {
-		write("settings.gradle",
-				"include 'subproject'");
-		githubTagExtra("subproject/build.gradle", "test/2/a");
-		Assertions.assertThat(gradleRunner().buildAndFail().getOutput().replace("\r\n", "\n")).contains(
-				"An exception occurred applying plugin request [id: 'com.diffplug.blowdryer']\n" +
-						"> Failed to apply plugin [id 'com.diffplug.blowdryer']\n" +
-						"   > You must apply com.diffplug.blowdryer only on the root project, not :subproject");
-	}
-
-	@Test
-	public void cfgTest() throws IOException {
+	public void cfgTestGroovy() throws IOException {
 		write("../blowdryer-script/src/main/resources/sample.properties",
 				"name=test",
 				"group=com.diffplug.gradle");
+		write("settings.gradle",
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				"blowdryerSetup { devLocal('../blowdryer-script') }");
 		write("../blowdryer-script/src/main/resources/script.gradle",
-				"apply plugin: 'com.diffplug.blowdryer-import'",
-				"",
+				"apply plugin: 'com.diffplug.blowdryer'",
 				"println 干.cfg('pluginPass', 'password for the keyFile')",
 				"println 干.cfg(File.class, 'keyFile', 'location of the keyFile')",
 				"println 干.prop('sample', 'group')",
 				"");
-		//		write("../blowdryer-script/src/main/resources/script.gradle.kts",
-		//				"apply(plugin = \"com.diffplug.blowdryer\")",
-		//				"",
-		//				"import com.diffplug.blowdryer.Blowdryer",
-		//				"println(com.diffplug.blowdryer.Blowdryer.prop(\"sample\", \"group\"))",
-		//				//"干.cfg(\"pluginPass\", \"password for the keyFile\")",
-		//				//"干.cfg(javaClass<File>, \"keyFile\", \"location of the keyFile\")",
-		//				//"干.prop(\"sample\", \"group\")",
-		//				"");
 		write("build.gradle",
-				"plugins {",
-				"  id 'com.diffplug.blowdryer'",
-				"  id 'com.diffplug.blowdryer-import'",
-				"}",
-				"blowdryer {",
-				"  devLocal('../blowdryer-script');",
-				"}",
-				"",
+				"apply plugin: 'com.diffplug.blowdryer'",
 				"ext.pluginPass = 'supersecret'",
 				"ext.keyFile = new File('keyFile.txt')",
-				"apply from: 干.file('script.gradle')",
-				"apply from: 干.file('script.gradle.kts')");
+				"apply from: 干.file('script.gradle')");
+		Assertions.assertThat(gradleRunner().build().getOutput().replace("\r\n", "\n")).contains(
+				"> Configure project :\n" +
+						"supersecret\n" +
+						"keyFile.txt\n" +
+						"com.diffplug.gradle\n" +
+						"\n");
+	}
+
+	@Test
+	public void cfgTestKotlin() throws IOException {
+		write("../blowdryer-script/src/main/resources/sample.properties",
+				"name=test",
+				"group=com.diffplug.gradle");
+		write("settings.gradle.kts",
+				"plugins { id(\"com.diffplug.blowdryerSetup\") }",
+				"import com.diffplug.blowdryer.BlowdryerSetupExtension",
+				"configure<BlowdryerSetupExtension> {",
+				"  devLocal(\"../blowdryer-script\")",
+				"}");
+		write("../blowdryer-script/src/main/resources/script.gradle.kts",
+				"import com.diffplug.blowdryer.BlowdryerKotlin",
+				"apply(plugin = \"com.diffplug.blowdryer\")",
+				"configure<BlowdryerKotlin> {",
+				"  println(干.cfg(\"pluginPass\", \"password for the keyFile\"))",
+				"  println(干.cfg(File::class.java, \"keyFile\", \"location of the keyFile\"))",
+				"  println(干.prop(\"sample\", \"group\"))",
+				"}");
+		write("build.gradle.kts",
+				"import com.diffplug.blowdryer.BlowdryerKotlin",
+				"apply(plugin = \"com.diffplug.blowdryer\")",
+				"val pluginPass by extra(\"supersecret\")",
+				"val keyFile by extra(File(\"keyFile.txt\"))",
+				"configure<BlowdryerKotlin> {",
+				"  apply(from = 干.file(\"script.gradle.kts\"))",
+				"}");
 		Assertions.assertThat(gradleRunner().build().getOutput().replace("\r\n", "\n")).contains(
 				"> Configure project :\n" +
 						"supersecret\n" +

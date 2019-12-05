@@ -16,15 +16,20 @@
 package com.diffplug.blowdryer;
 
 
-import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
-public class BlowdryerPlugin implements Plugin<Project> {
-	static final String PLUGIN_ID = "com.diffplug.blowdryer";
+public class BlowdryerKotlin {
+	干 withProject;
 
-	@Override
-	public void apply(Project project) {
-		project.getExtensions().create("干", 干.class, project);
-		project.getExtensions().create("blowdryerKotlin", BlowdryerKotlin.class, project);
+	public BlowdryerKotlin(Project project) {
+		withProject = new 干(project);
+	}
+
+	public 干 get干() {
+		return withProject;
+	}
+
+	public 干 blowdryer() {
+		return withProject;
 	}
 }

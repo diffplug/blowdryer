@@ -147,9 +147,7 @@ The nice thing about the default `src/main/resources` is that if you ever want t
 
 ## Limitations
 
-If you apply any third-party plugin inside a script plugin, you cannot "see" it in any other script, including the main one. See [gradle/gradle#4007](https://github.com/gradle/gradle/issues/4007) for details.
-
-The workaround is to make sure that either:
+If you apply any third-party plugin inside a script plugin, you cannot "see" it in any other script, including the main one. See [gradle/gradle#4007](https://github.com/gradle/gradle/issues/4007) and [gradle/gradle#1262](https://github.com/gradle/gradle/issues/1262) for details.  See the "in the wild" section below for examples of workarounds, but here is the gist:
 
 - each script only uses built-in gradle plugins and classes
 - any script which applies a third-party plugin is completely "self-contained", and does not need to be referenced by any other plugins
