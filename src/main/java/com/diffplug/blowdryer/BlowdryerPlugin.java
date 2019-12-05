@@ -24,7 +24,10 @@ public class BlowdryerPlugin implements Plugin<Project> {
 
 	@Override
 	public void apply(Project project) {
-		project.getExtensions().create("干", 干.class, project);
-		project.getExtensions().create("blowdryerKotlin", BlowdryerKotlin.class, project);
+		Blowdryer.WithProject withProject = new Blowdryer.WithProject(project);
+		project.getExtensions().add("干", withProject);
+		project.getExtensions().add("blowdryer", withProject);
+		BlowdryerKotlinExtension blowdryerKotlin = new BlowdryerKotlinExtension(withProject);
+		project.getExtensions().add("blowdryerKotlin", blowdryerKotlin);
 	}
 }

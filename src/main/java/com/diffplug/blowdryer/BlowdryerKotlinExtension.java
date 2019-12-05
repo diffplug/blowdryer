@@ -15,21 +15,18 @@
  */
 package com.diffplug.blowdryer;
 
+public class BlowdryerKotlinExtension {
+	Blowdryer.WithProject withProject;
 
-import org.gradle.api.Project;
-
-public class BlowdryerKotlin {
-	干 withProject;
-
-	public BlowdryerKotlin(Project project) {
-		withProject = new 干(project);
+	public BlowdryerKotlinExtension(Blowdryer.WithProject withProject) {
+		this.withProject = withProject;
 	}
 
-	public 干 get干() {
+	public Blowdryer.WithProject get干() {
 		return withProject;
 	}
 
-	public 干 blowdryer() {
+	public Blowdryer.WithProject getBlowdryer() {
 		return withProject;
 	}
 }

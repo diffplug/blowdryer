@@ -148,19 +148,19 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"  devLocal(\"../blowdryer-script\")",
 				"}");
 		write("../blowdryer-script/src/main/resources/script.gradle.kts",
-				"import com.diffplug.blowdryer.BlowdryerKotlin",
+				"import com.diffplug.blowdryer.BlowdryerKotlinExtension",
 				"apply(plugin = \"com.diffplug.blowdryer\")",
-				"configure<BlowdryerKotlin> {",
+				"configure<BlowdryerKotlinExtension> {",
 				"  println(干.cfg(\"pluginPass\", \"password for the keyFile\"))",
 				"  println(干.cfg(File::class.java, \"keyFile\", \"location of the keyFile\"))",
 				"  println(干.prop(\"sample\", \"group\"))",
 				"}");
 		write("build.gradle.kts",
-				"import com.diffplug.blowdryer.BlowdryerKotlin",
+				"import com.diffplug.blowdryer.BlowdryerKotlinExtension",
 				"apply(plugin = \"com.diffplug.blowdryer\")",
 				"val pluginPass by extra(\"supersecret\")",
 				"val keyFile by extra(File(\"keyFile.txt\"))",
-				"configure<BlowdryerKotlin> {",
+				"configure<BlowdryerKotlinExtension> {",
 				"  apply(from = 干.file(\"script.gradle.kts\"))",
 				"}");
 		Assertions.assertThat(gradleRunner().build().getOutput().replace("\r\n", "\n")).contains(
