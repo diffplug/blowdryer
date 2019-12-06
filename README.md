@@ -57,20 +57,20 @@ Now, in any `build.gradle` throughout your project you can do this:
 ```gradle
 apply plugin: 'com.diffplug.blowdryer'
 
-apply from: blowdryer.file('someScript.gradle')
+apply from: Blowdryer.file('someScript.gradle')
 somePlugin {
-  configFile blowdryer.file('somePluginConfig.xml')
-  configProp blowdryer.prop('propfile', 'key') // key from propfile.properties
+  configFile Blowdryer.file('somePluginConfig.xml')
+  configProp Blowdryer.prop('propfile', 'key') // key from propfile.properties
 }
 ```
 
-`blowdryer.file()` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-acme`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache` TODO implement.
+`Blowdryer.file()` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-acme`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache` TODO implement.
 
-`blowdryer.prop()` parses a java `.properties` file which was downloaded using `blowdryer.file()`, and then returns the value associated with the given key.
+`Blowdryer.prop()` parses a java `.properties` file which was downloaded using `Blowdryer.file()`, and then returns the value associated with the given key.
 
 ### Chinese for "dry" (干)
 
-If you like brevity and unicode, you can replace `blowdryer` with `干`.  We'll use `干` throughout the rest of the readme, but you can find-replace `干` with `blowdryer` and get the same results.
+If you like brevity and unicode, you can replace `Blowdryer` with `干`.  We'll use `干` throughout the rest of the readme, but you can find-replace `干` with `Blowdryer` and get the same results.
 
 ```gradle
 apply plugin: 'com.diffplug.blowdryer'
@@ -113,7 +113,8 @@ Script plugins can't `import` any classes that were loaded from a third-party pl
 To change and test scripts before you push them up to GitHub, you can do this:
 
 ```gradle
-blowdryer {
+// settings.gradle
+blowdryerSetup {
   //github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
   devLocal '../path-to-local-blowdryer-acme'
 }
@@ -131,13 +132,14 @@ The call to `devLocal` means that all calls to `Blowdryer.file` will skip cachin
 If you want your scripts to come from a different subfolder, you can change it:
 
 ```gradle
-blowdryer {
+// settings.gradle
+blowdryerSetup {
   repoSubfolder 'some/other/dir/but/why'
   github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
 }
 ```
 
-The nice thing about the default `src/main/resources` is that if you ever want to, you can publish the repository as a plain-old jar and pull the resources from that jar rather than from a github repository.  That's currently unsupported in blowdryer, but it would be easy to add.
+The nice thing about the default `src/main/resources` is that if you ever want to, you can publish the repository as a plain-old jar and pull the resources from that jar rather than from a github repository.  That's currently unsupported in Blowdryer, but it would be easy to add.
 
 ## API Reference
 
@@ -184,7 +186,7 @@ somePlugin {
 
 `Blowdryer.immutableUrl` (TODO, link to javadoc) returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the content of that URL is immutable.
 
-When you setup the blowdryer plugin in your `settings.gradle`, you're telling blowdryer what URL scheme to use when resolving a call to `Blowdryer.file` (TODO, link to javadoc), for example:
+When you setup the Blowdryer plugin in your `settings.gradle`, you're telling Blowdryer what URL scheme to use when resolving a call to `Blowdryer.file` (TODO, link to javadoc), for example:
 
 ```java
 //blowdryer {
