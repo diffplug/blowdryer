@@ -27,5 +27,9 @@ public class BlowdryerPlugin implements Plugin<Project> {
 		Blowdryer.WithProject withProject = new Blowdryer.WithProject(project);
 		project.getExtensions().add("干", withProject);
 		project.getExtensions().add("blowdryer", withProject);
+
+		project.getTasks().register("blowdryerWipeEntireCache", task -> {
+			task.doFirst(unused -> Blowdryer.wipeEntireCache());
+		});
 	}
 }
