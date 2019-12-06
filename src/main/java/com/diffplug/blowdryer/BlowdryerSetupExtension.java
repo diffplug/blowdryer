@@ -17,8 +17,10 @@ package com.diffplug.blowdryer;
 
 
 import com.diffplug.common.base.Errors;
+import groovy.lang.Closure;
 import java.io.File;
 import java.util.Objects;
+import java.util.function.Function;
 import org.gradle.api.initialization.Settings;
 
 public class BlowdryerSetupExtension {
@@ -55,6 +57,14 @@ public class BlowdryerSetupExtension {
 		assertNoLeadingOrTrailingSlash(anchor);
 		String root = "https://raw.githubusercontent.com/" + repoOrg + "/" + anchor + "/" + repoSubfolder + "/";
 		Blowdryer.setResourcePlugin(resource -> root + resource);
+	}
+
+	public void experimental(Closure<String> function) {
+		experimental(function::call);
+	}
+
+	public void experimental(Function<String, String> function) {
+		Blowdryer.setResourcePlugin(function::apply);
 	}
 
 	/** Sets the source to be the given local folder, usually for developing changes before they are pushed to git. */
