@@ -95,9 +95,9 @@ apply from: Blowdryer.file('someScript.gradle')
 
 // someScript.gradle
 somePlugin {
-  pass Blowdryer.cfg(project, 'pluginPass', 'password for the keyFile')
+  pass Blowdryer.proj('pluginPass', 'password for the keyFile')
   // if the property isn't a String, you have to specify the class you
-  keyFile Blowdryer.cfg(project, File.class, 'keyFile', 'location of the keyFile')
+  keyFile Blowdryer.proj(File.class, 'keyFile', 'location of the keyFile')
 }
 ```
 
@@ -114,8 +114,8 @@ apply from: 干.file('someScript.gradle')
 somePlugin {
   configFile 干.file('somePluginConfig.xml')
   configProp 干.prop('propfile', 'key')
-  password   干.cfg(project, 'pluginPass', 'password for the keyFile')
-  keyFile    干.cfg(project, File.class, 'keyFile', 'location of the keyFile')
+  password   干.proj(project, 'pluginPass', 'password for the keyFile')
+  keyFile    干.proj(project, File.class, 'keyFile', 'location of the keyFile')
 }
 ```
 
@@ -149,7 +149,10 @@ The nice thing about the default `src/main/resources` is that if you ever want t
 
 If you apply any third-party plugin inside a script plugin, you cannot "see" it in any other script, including the main one. See [gradle/gradle#4007](https://github.com/gradle/gradle/issues/4007) and [gradle/gradle#1262](https://github.com/gradle/gradle/issues/1262) for details.  See the "in the wild" section below for examples of workarounds, but here is the gist:
 
-- each script only uses built-in gradle plugins and classes
+- you can't `import` any libraries that aren't part of gradle core
+  - unless you added them to your `settings.gradle`
+
+- if your script uses any third-party plugins,
 - any script which applies a third-party plugin is completely "self-contained", and does not need to be referenced by any other plugins
 - add that plugin as a dependency of your `blowdryer` plugin.
 

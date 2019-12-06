@@ -110,7 +110,7 @@ public class BlowdryerPluginTest extends GradleHarness {
 	}
 
 	@Test
-	public void cfgTestGroovy() throws IOException {
+	public void projTestGroovy() throws IOException {
 		write("../blowdryer-script/src/main/resources/sample.properties",
 				"name=test",
 				"group=com.diffplug.gradle");
@@ -118,9 +118,10 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"plugins { id 'com.diffplug.blowdryerSetup' }",
 				"blowdryerSetup { devLocal('../blowdryer-script') }");
 		write("../blowdryer-script/src/main/resources/script.gradle",
+				"import com.diffplug.blowdryer.Blowdryer",
 				"apply plugin: 'com.diffplug.blowdryer'",
-				"println 干.cfg('pluginPass', 'password for the keyFile')",
-				"println 干.cfg(File.class, 'keyFile', 'location of the keyFile')",
+				"println 干.proj('pluginPass', 'password for the keyFile')",
+				"println 干.proj(File.class, 'keyFile', 'location of the keyFile')",
 				"println 干.prop('sample', 'group')",
 				"");
 		write("build.gradle",
@@ -137,7 +138,7 @@ public class BlowdryerPluginTest extends GradleHarness {
 	}
 
 	@Test
-	public void cfgTestKotlin() throws IOException {
+	public void projTestKotlin() throws IOException {
 		write("../blowdryer-script/src/main/resources/sample.properties",
 				"name=test",
 				"group=com.diffplug.gradle");
@@ -151,8 +152,8 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"import com.diffplug.blowdryer.BlowdryerKotlinExtension",
 				"apply(plugin = \"com.diffplug.blowdryer\")",
 				"configure<BlowdryerKotlinExtension> {",
-				"  println(干.cfg(\"pluginPass\", \"password for the keyFile\"))",
-				"  println(干.cfg(File::class.java, \"keyFile\", \"location of the keyFile\"))",
+				"  println(干.proj(\"pluginPass\", \"password for the keyFile\"))",
+				"  println(干.proj(File::class.java, \"keyFile\", \"location of the keyFile\"))",
 				"  println(干.prop(\"sample\", \"group\"))",
 				"}");
 		write("build.gradle.kts",

@@ -268,8 +268,8 @@ public class Blowdryer {
 	 * Reads a property from the project, and throws "Undefined 'key': descForError" if it is missing.
 	 * Requires the property value to be a String.
 	 */
-	public static String cfg(Project project, String key, String descForError) {
-		return cfg(project, String.class, key, descForError);
+	public static String proj(Project project, String key, String descForError) {
+		return proj(project, String.class, key, descForError);
 	}
 
 	/**
@@ -277,7 +277,7 @@ public class Blowdryer {
 	 * or "Wrong type 'key': descForError - expected java.io.File but was java.io.String"
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T cfg(Project project, Class<T> clazz, String key, String descForError) {
+	public static <T> T proj(Project project, Class<T> clazz, String key, String descForError) {
 		Object value = project.findProperty(key);
 		if (value == null) {
 			if (clazz.equals(String.class)) {
@@ -318,14 +318,14 @@ public class Blowdryer {
 			return Blowdryer.prop(propFile, key);
 		}
 
-		/** Alias for {@link Blowdryer#cfg(Project, String, String)}. */
-		public String cfg(String key, String descForError) {
-			return Blowdryer.cfg(project, key, descForError);
+		/** Alias for {@link Blowdryer#proj(Project, String, String)}. */
+		public String proj(String key, String descForError) {
+			return Blowdryer.proj(project, key, descForError);
 		}
 
-		/** Alias for {@link Blowdryer#cfg(Project, Class, String, String)}. */
-		public <T> T cfg(Class<T> clazz, String key, String descForError) {
-			return Blowdryer.cfg(project, clazz, key, descForError);
+		/** Alias for {@link Blowdryer#proj(Project, Class, String, String)}. */
+		public <T> T proj(Class<T> clazz, String key, String descForError) {
+			return Blowdryer.proj(project, clazz, key, descForError);
 		}
 	}
 }
