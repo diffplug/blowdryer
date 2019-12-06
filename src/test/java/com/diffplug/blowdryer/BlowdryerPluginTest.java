@@ -144,8 +144,8 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"group=com.diffplug.gradle");
 		write("settings.gradle.kts",
 				"plugins { id(\"com.diffplug.blowdryerSetup\") }",
-				"import com.diffplug.blowdryer.BlowdryerSetupExtension",
-				"configure<BlowdryerSetupExtension> {",
+				"import com.diffplug.blowdryer.BlowdryerSetup",
+				"configure<BlowdryerSetup> {",
 				"  devLocal(\"../blowdryer-script\")",
 				"}");
 		write("../blowdryer-script/src/main/resources/script.gradle.kts",

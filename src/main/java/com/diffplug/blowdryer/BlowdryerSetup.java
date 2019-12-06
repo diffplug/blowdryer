@@ -21,15 +21,15 @@ import groovy.lang.Closure;
 import java.io.File;
 import java.util.Objects;
 import java.util.function.Function;
-import org.gradle.api.initialization.Settings;
 
-public class BlowdryerSetupExtension {
+public class BlowdryerSetup {
 	static final String NAME = "blowdryerSetup";
 
-	private final Settings settings;
+	private final File referenceDirectory;
 
-	public BlowdryerSetupExtension(Settings settings) {
-		this.settings = Objects.requireNonNull(settings);
+	/** Pass in the directory that will be used to resolve string arguments to devLocal. */
+	public BlowdryerSetup(File referenceDirectory) {
+		this.referenceDirectory = referenceDirectory;
 	}
 
 	private String repoSubfolder = "src/main/resources";
@@ -59,10 +59,12 @@ public class BlowdryerSetupExtension {
 		Blowdryer.setResourcePlugin(resource -> root + resource);
 	}
 
+	/** Sets the mapping from `file(String)` to `immutableUrl(String)`. */
 	public void experimental(Closure<String> function) {
 		experimental(function::call);
 	}
 
+	/** Sets the mapping from `file(String)` to `immutableUrl(String)`. */
 	public void experimental(Function<String, String> function) {
 		Blowdryer.setResourcePlugin(function::apply);
 	}
@@ -74,7 +76,7 @@ public class BlowdryerSetupExtension {
 		if (devPath instanceof File) {
 			devPathFile = (File) devPath;
 		} else if (devPath instanceof String) {
-			devPathFile = new File(settings.getRootDir(), (String) devPath);
+			devPathFile = new File(referenceDirectory, (String) devPath);
 		} else {
 			throw new IllegalArgumentException("Expected a String or File, was a " + devPath.getClass());
 		}

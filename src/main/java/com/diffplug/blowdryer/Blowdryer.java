@@ -43,7 +43,7 @@ import org.gradle.api.Project;
 
 /**
  * Public static methods which retrieve resources as
- * determined by {@link BlowdryerSetupExtension}.
+ * determined by {@link BlowdryerSetup}.
  */
 public class Blowdryer {
 	static {
