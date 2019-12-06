@@ -38,29 +38,29 @@ Blowdryer lets you centralize your build scripts, config files, and properties i
 
 First, make a public github repository ([`diffplug/blowdryer-diffplug`](https://github.com/diffplug/blowdryer-diffplug) is a good example), and push the stuff that you want to centralize into the `src/main/resources` subdirectory of that repo.
 
-Then, in the `build.gradle` for the **root** project that you want to suck these into, do this:
+Then, in the `settings.gradle` for the project that you want to suck these into, do this:
 
 ```gradle
 plugins {
   id 'com.diffplug.blowdryer' version '1.0.0'
 }
 
-blowdryer {
+blowdryerSetup {
   github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
   //   or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
   //   or 'tree', '07f588e52eb0f31e596eab0228a5df7233a98a14'
 }
 ```
 
-Now, in any other `build.gradle` throughout your project you can do this:
+Now, in any `build.gradle` throughout your project you can do this:
 
 ```gradle
-import com.diffplug.blowdryer.Blowdryer
+apply plugin: 'com.diffplug.blowdryer'
 
-apply from: Blowdryer.file('someScript.gradle')
+apply from: blowdryer.file('someScript.gradle')
 somePlugin {
-  configFile Blowdryer.file('somePluginConfig.xml')
-  configProp Blowdryer.prop('propfile', 'key') // key from propfile.properties
+  configFile blowdryer.file('somePluginConfig.xml')
+  configProp blowdryer.prop('propfile', 'key') // key from propfile.properties
 }
 ```
 
@@ -91,13 +91,13 @@ When you call into a script plugin, you might want to set some configuration val
 // build.gradle
 ext.pluginPass = 'supersecret'
 ext.keyFile = new File('keyFile')
-apply from: Blowdryer.file('someScript.gradle')
+apply from: blowdryer.file('someScript.gradle')
 
 // someScript.gradle
 somePlugin {
-  pass Blowdryer.proj('pluginPass', 'password for the keyFile')
-  // if the property isn't a String, you have to specify the class you
-  keyFile Blowdryer.proj(File.class, 'keyFile', 'location of the keyFile')
+  pass blowdryer.proj('pluginPass', 'password for the keyFile')
+  // if the property isn't a String, you have to specify the class you expect
+  keyFile blowdryer.proj(File.class, 'keyFile', 'location of the keyFile')
 }
 ```
 
@@ -105,17 +105,15 @@ If the property isn't set, you'll get a nice error message describing what was m
 
 ## Chinese for "dry" (干)
 
-If you feel like banging on the unicode drum, you can also use it like so:
+If you like brevity and unicode, you can replace `blowdryer` with `干`.
 
 ```gradle
-import com.diffplug.blowdryer.干
-
 apply from: 干.file('someScript.gradle')
 somePlugin {
   configFile 干.file('somePluginConfig.xml')
   configProp 干.prop('propfile', 'key')
-  password   干.proj(project, 'pluginPass', 'password for the keyFile')
-  keyFile    干.proj(project, File.class, 'keyFile', 'location of the keyFile')
+  password   干.proj('pluginPass', 'password for the keyFile')
+  keyFile    干.proj(File.class, 'keyFile', 'location of the keyFile')
 }
 ```
 
