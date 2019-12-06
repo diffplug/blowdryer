@@ -17,17 +17,12 @@ package com.diffplug.blowdryer;
 
 
 import org.gradle.api.Plugin;
-import org.gradle.api.Project;
+import org.gradle.api.initialization.Settings;
 
-public class BlowdryerPlugin implements Plugin<Project> {
-	static final String PLUGIN_ID = "com.diffplug.blowdryer";
-
+public class BlowdryerSetupPlugin implements Plugin<Settings> {
 	@Override
-	public void apply(Project project) {
-		Blowdryer.WithProject withProject = new Blowdryer.WithProject(project);
-		project.getExtensions().add("干", withProject);
-		project.getExtensions().add("blowdryer", withProject);
-		BlowdryerKotlinExtension blowdryerKotlin = new BlowdryerKotlinExtension(withProject);
-		project.getExtensions().add("blowdryerKotlin", blowdryerKotlin);
+	public void apply(Settings settings) {
+		Blowdryer.setResourcePluginNull(); // because of gradle daemon
+		settings.getExtensions().create(BlowdryerSetupExtension.NAME, BlowdryerSetupExtension.class, settings);
 	}
 }

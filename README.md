@@ -38,29 +38,29 @@ Blowdryer lets you centralize your build scripts, config files, and properties i
 
 First, make a public github repository ([`diffplug/blowdryer-diffplug`](https://github.com/diffplug/blowdryer-diffplug) is a good example), and push the stuff that you want to centralize into the `src/main/resources` subdirectory of that repo.
 
-Then, in the `build.gradle` for the **root** project that you want to suck these into, do this:
+Then, in the `settings.gradle` for the project that you want to suck these into, do this:
 
 ```gradle
 plugins {
   id 'com.diffplug.blowdryer' version '1.0.0'
 }
 
-blowdryer {
+blowdryerSetup {
   github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
   //   or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
   //   or 'tree', '07f588e52eb0f31e596eab0228a5df7233a98a14'
 }
 ```
 
-Now, in any other `build.gradle` throughout your project you can do this:
+Now, in any `build.gradle` throughout your project you can do this:
 
 ```gradle
-import com.diffplug.blowdryer.Blowdryer
+apply plugin: 'com.diffplug.blowdryer'
 
-apply from: Blowdryer.file('someScript.gradle')
+apply from: blowdryer.file('someScript.gradle')
 somePlugin {
-    configFile Blowdryer.file('somePluginConfig.xml')
-    configProp Blowdryer.prop('propfile', 'key') // key from propfile.properties
+  configFile blowdryer.file('somePluginConfig.xml')
+  configProp blowdryer.prop('propfile', 'key') // key from propfile.properties
 }
 ```
 
@@ -68,13 +68,13 @@ somePlugin {
 
 `Blowdryer.prop` parses a java `.properties` file which was downloaded using `Blowdryer.file`, and then returns the value associated with the given key.
 
-### Internals
+### How it works
 
 `Blowdryer.immutableUrl` (TODO, link to javadoc) is another method you can use, which returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the URL is immutable.
 
 When you setup the blowdryer plugin in your root project, you're telling blowdryer what URL scheme to use when resolving a call to `Blowdryer.file` (TODO, link to javadoc), for example:
 
-```javafea
+```java
 //blowdryer {
 //  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
 public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
@@ -83,20 +83,39 @@ public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
 }
 ```
 
-### Chinese for "dry" (干)
+### Configuring script plugins
 
-If you feel like banging on the unicode drum, you can also use it like so:
+When you call into a script plugin, you might want to set some configuration values first.  For example:
 
 ```gradle
-import com.diffplug.blowdryer.干
+// build.gradle
+ext.pluginPass = 'supersecret'
+ext.keyFile = new File('keyFile')
+apply from: blowdryer.file('someScript.gradle')
 
-apply from: 干.file('someScript.gradle')
+// someScript.gradle
 somePlugin {
-    configFile 干.file('somePluginConfig.xml')
-    configProp 干.prop('propfile', 'key') // key from propfile.properties
+  pass blowdryer.proj('pluginPass', 'password for the keyFile')
+  // if the property isn't a String, you have to specify the class you expect
+  keyFile blowdryer.proj(File.class, 'keyFile', 'location of the keyFile')
 }
 ```
 
+If the property isn't set, you'll get a nice error message describing what was missing, along with links to gradle's documentation on how to set properties.
+
+## Chinese for "dry" (干)
+
+If you like brevity and unicode, you can replace `blowdryer` with `干`.
+
+```gradle
+apply from: 干.file('someScript.gradle')
+somePlugin {
+  configFile 干.file('somePluginConfig.xml')
+  configProp 干.prop('propfile', 'key')
+  password   干.proj('pluginPass', 'password for the keyFile')
+  keyFile    干.proj(File.class, 'keyFile', 'location of the keyFile')
+}
+```
 
 ## Dev workflow
 
@@ -126,11 +145,12 @@ The nice thing about the default `src/main/resources` is that if you ever want t
 
 ## Limitations
 
-If you apply any third-party plugin inside a script plugin, you cannot "see" it in any other script, including the main one. See [gradle/gradle#4007](https://github.com/gradle/gradle/issues/4007) for details.
+If you apply any third-party plugin inside a script plugin, you cannot "see" it in any other script, including the main one. See [gradle/gradle#4007](https://github.com/gradle/gradle/issues/4007) and [gradle/gradle#1262](https://github.com/gradle/gradle/issues/1262) for details.  See the "in the wild" section below for examples of workarounds, but here is the gist:
 
-The workaround is to make sure that either:
+- you can't `import` any libraries that aren't part of gradle core
+  - unless you added them to your `settings.gradle`
 
-- each script only uses built-in gradle plugins and classes
+- if your script uses any third-party plugins,
 - any script which applies a third-party plugin is completely "self-contained", and does not need to be referenced by any other plugins
 - add that plugin as a dependency of your `blowdryer` plugin.
 

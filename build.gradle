@@ -49,6 +49,10 @@ dependencies {
 gradlePlugin {
 	plugins {
 		blowdryer {
+			id = 'com.diffplug.blowdryerSetup'
+			implementationClass = 'com.diffplug.blowdryer.BlowdryerSetupPlugin'
+		}
+		干 {
 			id = 'com.diffplug.blowdryer'
 			implementationClass = 'com.diffplug.blowdryer.BlowdryerPlugin'
 		}
