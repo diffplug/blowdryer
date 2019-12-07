@@ -1,5 +1,6 @@
 plugins {
 	id 'java-gradle-plugin'
+	id 'maven-publish'
 	id 'com.gradle.plugin-publish' version '0.10.1'
 	id 'com.github.ben-manes.versions' version '0.27.0'
 	id 'com.diffplug.gradle.spotless' version '3.26.1'
@@ -18,7 +19,7 @@ spotless {
 	}
 	java {
 		target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
-		licenseHeaderFile    rootProject.file('gradle/spotless/spotless.license.java')		// License header file
+		licenseHeaderFile	rootProject.file('gradle/spotless/spotless.license.java')		// License header file
 		eclipse().configFile rootProject.file('gradle/spotless/spotless.eclipseformat.xml')	// XML file dumped out by the Eclipse formatter
 		importOrder()
 		removeUnusedImports()
@@ -34,8 +35,8 @@ repositories {
 }
 
 dependencies {
-	implementation "com.squareup.okhttp3:okhttp:4.2.2"
-	implementation "com.squareup.okio:okio:2.4.1"
+	implementation 'com.squareup.okhttp3:okhttp:4.2.2'
+	implementation 'com.squareup.okio:okio:2.4.1'
 	implementation 'com.diffplug.durian:durian-core:1.2.0'
 	implementation 'com.diffplug.durian:durian-io:1.2.0'
 	testImplementation 'junit:junit:4.12'
@@ -62,8 +63,8 @@ gradlePlugin {
 	}
 }
 pluginBundle {
-	website = 'https://github.com/diffplug/blowdryer'
-	vcsUrl = 'https://github.com/diffplug/blowdryer'
+	website = "https://$git_url"
+	vcsUrl = "https://${git_url}.git"
 	tags = [
 		'defaults',
 		'standards',
@@ -71,4 +72,79 @@ pluginBundle {
 		'multi-project',
 		'干'
 	]
+}
+
+////////////////////////////
+// Maven publishing setup //
+////////////////////////////
+task sourceJar(type: Jar) {
+	classifier 'sources'
+	from sourceSets.main.allJava
+}
+
+
+def makeLink = { url, text -> "<a href=\"${url}\" style=\"text-transform: none;\">${text}</a>" }
+def javadocInfo = '<h2>' + makeLink("https://github.com/${maven_group}/${maven_artifact}", "${maven_group}:${maven_artifact}:${version}") +
+		' by ' + makeLink('https://www.diffplug.com', 'DiffPlug') + '</h2>'
+javadoc {
+	// Where it's possible to name parameters and methods clearly enough
+	// that javadoc is not necessary, why make the code bigger?
+	//
+	// Thus, no javadoc warnings.
+	options.addStringOption('Xdoclint:none', '-quiet')
+	// setup the header
+	options.header javadocInfo
+	options.footer javadocInfo
+	// setup links
+	options.links(
+			'https://docs.oracle.com/javase/8/docs/api/',
+			'https://docs.gradle.org/6.0/javadoc/')
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier 'javadoc'
+	from javadoc.destinationDir
+}
+artifacts {
+	archives jar
+	archives sourceJar
+	archives javadocJar
+}
+publishing {
+	publications {
+		pluginMaven(MavenPublication) {
+			groupId = maven_group
+			artifactId = maven_artifact
+			// version: TODO
+
+			artifact(sourceJar) {
+				classifier = 'sources'
+			}
+			artifact(javadocJar) {
+				classifier = 'javadoc'
+			}
+			pom {
+				name = maven_name
+				description = maven_description
+				url = "https://$git_url"
+				licenses {
+					license {
+						name = license_name
+						url = license_url
+					}
+				}
+				developers {
+					developer {
+						id = 'nedtwigg'
+						name = 'Ned Twigg'
+						email = 'ned.twigg@diffplug.com'
+					}
+				}
+				scm {
+					connection = "scm:git:git://${git_url}.git"
+					developerConnection = "scm:git:ssh://${git_url}.git"
+					url = "https://$git_url"
+				}
+			}
+		}
+	}
 }
