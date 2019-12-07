@@ -23,6 +23,6 @@ public class BlowdryerSetupPlugin implements Plugin<Settings> {
 	@Override
 	public void apply(Settings settings) {
 		Blowdryer.setResourcePluginNull(); // because of gradle daemon
-		settings.getExtensions().create(BlowdryerSetupExtension.NAME, BlowdryerSetupExtension.class, settings);
+		settings.getExtensions().create(BlowdryerSetup.NAME, BlowdryerSetup.class, settings.getRootDir());
 	}
 }
