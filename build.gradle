@@ -4,29 +4,13 @@ plugins {
 	id 'com.gradle.plugin-publish' version '0.10.1'
 	id 'com.github.ben-manes.versions' version '0.27.0'
 	id 'com.diffplug.gradle.spotless' version '3.26.1'
-}
-
-spotless {
-	groovyGradle {
-		target '*.gradle'
-		greclipse()
-	}
-	freshmark {
-		target '*.md'
-		indentWithSpaces(2)
-		trimTrailingWhitespace()
-		endWithNewline()
-	}
-	java {
-		target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
-		licenseHeaderFile	rootProject.file('gradle/spotless/spotless.license.java')		// License header file
-		eclipse().configFile rootProject.file('gradle/spotless/spotless.eclipseformat.xml')	// XML file dumped out by the Eclipse formatter
-		importOrder()
-		removeUnusedImports()
-	}
+	id 'com.diffplug.blowdryer'
 }
 
 version = '0.1.0-SNAPSHOT'
+
+apply from: 干.file('spotless/freshmark.gradle')
+apply from: 干.file('spotless/java.gradle')
 
 apply plugin: 'eclipse'
 tasks.eclipse.dependsOn(cleanEclipse)
