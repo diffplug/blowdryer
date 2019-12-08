@@ -26,6 +26,8 @@ spotless {
 	}
 }
 
+version = '0.1.0-SNAPSHOT'
+
 apply plugin: 'eclipse'
 tasks.eclipse.dependsOn(cleanEclipse)
 tasks.eclipse.dependsOn(pluginUnderTestMetadata)
@@ -72,6 +74,18 @@ pluginBundle {
 		'multi-project',
 		'干'
 	]
+	plugins {
+		blowdryerSetup {
+			id = 'com.diffplug.blowdryerSetup'
+			displayName = 'Blowdryer Setup'
+			description = 'Keep your gradle builds dry 干'
+		}
+		blowdryer {
+			id = 'com.diffplug.blowdryer'
+			displayName = 'Blowdryer'
+			description = 'Keep your gradle builds dry 干'
+		}
+	}
 }
 
 ////////////////////////////
@@ -81,7 +95,6 @@ task sourceJar(type: Jar) {
 	classifier 'sources'
 	from sourceSets.main.allJava
 }
-
 
 def makeLink = { url, text -> "<a href=\"${url}\" style=\"text-transform: none;\">${text}</a>" }
 def javadocInfo = '<h2>' + makeLink("https://github.com/${maven_group}/${maven_artifact}", "${maven_group}:${maven_artifact}:${version}") +
@@ -114,7 +127,7 @@ publishing {
 		pluginMaven(MavenPublication) {
 			groupId = maven_group
 			artifactId = maven_artifact
-			// version: TODO
+			version = project.version
 
 			artifact(sourceJar) {
 				classifier = 'sources'
