@@ -22,6 +22,8 @@ import org.gradle.api.Project;
 
 /** Alias for {@link Blowdryer}. */
 public class 干 {
+	private 干() {}
+
 	/** Alias for {@link Blowdryer#immutableUrl(String)}. */
 	public static File immutableUrl(String url) {
 		return Blowdryer.immutableUrl(url);

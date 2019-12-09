@@ -46,6 +46,8 @@ import org.gradle.api.Project;
  * determined by {@link BlowdryerSetup}.
  */
 public class Blowdryer {
+	private Blowdryer() {}
+
 	static {
 		File tmpDir = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value());
 		cacheDir = new File(tmpDir, "blowdryer-cache");
