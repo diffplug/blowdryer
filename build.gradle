@@ -7,18 +7,12 @@ plugins {
 	id 'com.diffplug.blowdryer'
 }
 
-version = '0.1.0-SNAPSHOT'
-
+apply from: 干.file('base/java8.gradle')
+apply from: 干.file('base/gradle-plugin.gradle')
 apply from: 干.file('spotless/freshmark.gradle')
 apply from: 干.file('spotless/java.gradle')
 
-apply plugin: 'eclipse'
-tasks.eclipse.dependsOn(cleanEclipse)
-tasks.eclipse.dependsOn(pluginUnderTestMetadata)
-
-repositories {
-	mavenCentral()
-}
+version = '0.1.0-SNAPSHOT'
 
 dependencies {
 	implementation 'com.squareup.okhttp3:okhttp:4.2.2'
@@ -27,49 +21,6 @@ dependencies {
 	implementation 'com.diffplug.durian:durian-io:1.2.0'
 	testImplementation 'junit:junit:4.12'
 	testImplementation 'org.assertj:assertj-core:3.14.0'
-}
-
-/////////////////////////////
-// Gradle publishing setup //
-/////////////////////////////
-gradlePlugin {
-	plugins {
-		blowdryerSetup {
-			id = 'com.diffplug.blowdryerSetup'
-			implementationClass = 'com.diffplug.blowdryer.BlowdryerSetupPlugin'
-			displayName = 'Blowdryer Setup'
-			description = 'Keep your gradle builds dry 干'
-		}
-		blowdryer {
-			id = 'com.diffplug.blowdryer'
-			implementationClass = 'com.diffplug.blowdryer.BlowdryerPlugin'
-			displayName = 'Blowdryer'
-			description = 'Keep your gradle builds dry 干'
-		}
-	}
-}
-pluginBundle {
-	website = "https://$git_url"
-	vcsUrl = "https://${git_url}.git"
-	tags = [
-		'defaults',
-		'standards',
-		'dry',
-		'multi-project',
-		'干'
-	]
-	plugins {
-		blowdryerSetup {
-			id = 'com.diffplug.blowdryerSetup'
-			displayName = 'Blowdryer Setup'
-			description = 'Keep your gradle builds dry 干'
-		}
-		blowdryer {
-			id = 'com.diffplug.blowdryer'
-			displayName = 'Blowdryer'
-			description = 'Keep your gradle builds dry 干'
-		}
-	}
 }
 
 ////////////////////////////
