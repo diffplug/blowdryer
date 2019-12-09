@@ -286,7 +286,7 @@ public class Blowdryer {
 				// https://docs.gradle.org/current/userguide/build_environment.html#sec:project_properties
 			}
 			throw new IllegalArgumentException("Undefined '" + key + "': " + descForError +
-					"\nset in gradle.properties: https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:extra_properties" +
+					"\nset in gradle.properties: https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties" +
 					"\nset in buildscript: https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:extra_properties" +
 					"\nset in environment: https://docs.gradle.org/current/userguide/build_environment.html#sec:project_properties" +
 					"\nexact search order: https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#findProperty-java.lang.String-");
