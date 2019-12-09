@@ -205,6 +205,10 @@ Here are resource repositories in the wild:
 
 - https://github.com/diffplug/blowdryer-diffplug
 
+## Blowdryer for [gulp](https://gulpjs.com/), etc.
+
+It would be very handy to have something like this for other script-based build systems.  If you find or build one, please let us know with an issue, and we'll link to it here.  It would be great to standardize on `干`, and feel free to name your project `blowdryer-foo`.
+
 ## Acknowledgements
 
 - [Gradle](https://gradle.com/) is *so* good.
