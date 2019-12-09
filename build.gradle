@@ -1,6 +1,4 @@
 plugins {
-	id 'java-gradle-plugin'
-	id 'maven-publish'
 	id 'com.gradle.plugin-publish' version '0.10.1'
 	id 'com.github.ben-manes.versions' version '0.27.0'
 	id 'com.diffplug.gradle.spotless' version '3.26.1'
@@ -9,6 +7,7 @@ plugins {
 
 apply from: 干.file('base/java8.gradle')
 apply from: 干.file('base/gradle-plugin.gradle')
+apply from: 干.file('base/maven.gradle')
 apply from: 干.file('spotless/freshmark.gradle')
 apply from: 干.file('spotless/java.gradle')
 
@@ -26,37 +25,6 @@ dependencies {
 ////////////////////////////
 // Maven publishing setup //
 ////////////////////////////
-task sourceJar(type: Jar) {
-	classifier 'sources'
-	from sourceSets.main.allJava
-}
-
-def makeLink = { url, text -> "<a href=\"${url}\" style=\"text-transform: none;\">${text}</a>" }
-def javadocInfo = '<h2>' + makeLink("https://github.com/${maven_group}/${maven_artifact}", "${maven_group}:${maven_artifact}:${version}") +
-		' by ' + makeLink('https://www.diffplug.com', 'DiffPlug') + '</h2>'
-javadoc {
-	// Where it's possible to name parameters and methods clearly enough
-	// that javadoc is not necessary, why make the code bigger?
-	//
-	// Thus, no javadoc warnings.
-	options.addStringOption('Xdoclint:none', '-quiet')
-	// setup the header
-	options.header javadocInfo
-	options.footer javadocInfo
-	// setup links
-	options.links(
-			'https://docs.oracle.com/javase/8/docs/api/',
-			'https://docs.gradle.org/6.0/javadoc/')
-}
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier 'javadoc'
-	from javadoc.destinationDir
-}
-artifacts {
-	archives jar
-	archives sourceJar
-	archives javadocJar
-}
 publishing {
 	publications {
 		pluginMaven(MavenPublication) {
@@ -64,12 +32,6 @@ publishing {
 			artifactId = maven_artifact
 			version = project.version
 
-			artifact(sourceJar) {
-				classifier = 'sources'
-			}
-			artifact(javadocJar) {
-				classifier = 'javadoc'
-			}
 			pom {
 				name = maven_name
 				description = maven_description
