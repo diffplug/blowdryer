@@ -52,11 +52,9 @@ blowdryerSetup {
 }
 ```
 
-Now, in any `build.gradle` throughout your project you can do this:
+Now, in *only* your root `build.gradle`, do this: `apply plugin: 'com.diffplug.blowdryer'`.  Now, in any project through your gradle build, you can do this:
 
 ```gradle
-apply plugin: 'com.diffplug.blowdryer'
-
 apply from: Blowdryer.file('someScript.gradle')
 somePlugin {
   configFile Blowdryer.file('somePluginConfig.xml')
@@ -73,8 +71,6 @@ somePlugin {
 If you like brevity and unicode, you can replace `Blowdryer` with `干`.  We'll use `干` throughout the rest of the readme, but you can find-replace `干` with `Blowdryer` and get the same results.
 
 ```gradle
-apply plugin: 'com.diffplug.blowdryer'
-
 apply from: 干.file('someScript.gradle')
 somePlugin {
   configFile 干.file('somePluginConfig.xml')
@@ -88,13 +84,11 @@ When you call into a script plugin, you might want to set some configuration val
 
 ```gradle
 // build.gradle
-apply plugin: 'com.diffplug.blowdryer'
 ext.pluginPass = 'supersecret'
 ext.keyFile = new File('keyFile')
 apply from: 干.file('someScript.gradle')
 
 // someScript.gradle
-apply plugin: 'com.diffplug.blowdryer'
 somePlugin {
   pass 干.proj('pluginPass', 'password for the keyFile')
   // if the property isn't a String, you have to specify the class you expect
@@ -154,7 +148,7 @@ static String 干.proj(Project proj, String String key, String description)
 static <T> T  干.proj(Project proj, Class<T> clazz, String String key, String description)
 ```
 
-If you do `apply plugin: 'com.diffplug.blowdryer'` then you get an extension object (TODO: link to code) where the project field has been filled in for you, which is why we don't pass it explicitly in the examples before this section.  If you don't apply the plugin, you can still call these static methods and pass `project` explicitly for the `proj()` methods.
+If you do `apply plugin: 'com.diffplug.blowdryer'` then every project gets an extension object (TODO: link to code) where the project field has been filled in for you, which is why we don't pass it explicitly in the examples before this section.  If you don't apply the plugin, you can still call these static methods and pass `project` explicitly for the `proj()` methods.
 
 ### Using with Kotlin
 

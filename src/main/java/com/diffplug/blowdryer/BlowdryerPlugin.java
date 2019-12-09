@@ -23,12 +23,17 @@ public class BlowdryerPlugin implements Plugin<Project> {
 	static final String PLUGIN_ID = "com.diffplug.blowdryer";
 
 	@Override
-	public void apply(Project project) {
-		Blowdryer.WithProject withProject = new Blowdryer.WithProject(project);
-		project.getExtensions().add("干", withProject);
-		project.getExtensions().add("Blowdryer", withProject);
+	public void apply(Project root) {
+		if (root != root.getRootProject()) {
+			throw new IllegalArgumentException("You must apply this plugin only to the root project.");
+		}
+		root.allprojects(p -> {
+			Blowdryer.WithProject withProject = new Blowdryer.WithProject(p);
+			p.getExtensions().add("干", withProject);
+			p.getExtensions().add("Blowdryer", withProject);
+		});
 
-		project.getTasks().register("blowdryerWipeEntireCache", task -> {
+		root.getTasks().register("blowdryerWipeEntireCache", task -> {
 			task.doFirst(unused -> Blowdryer.wipeEntireCache());
 		});
 	}

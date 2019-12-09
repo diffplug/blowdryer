@@ -83,7 +83,6 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"assert 干.prop('sample', 'name') == 'test'",
 				"assert 干.prop('sample', 'group') == 'com.diffplug.gradle'");
 		write("subproject/build.gradle",
-				"apply plugin: 'com.diffplug.blowdryer'",
 				"assert 干.file('sample').text == 'a'",
 				"assert 干.prop('sample', 'name') == 'test'",
 				"assert 干.prop('sample', 'group') == 'com.diffplug.gradle'");
