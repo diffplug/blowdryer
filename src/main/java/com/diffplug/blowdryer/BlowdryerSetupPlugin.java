@@ -19,6 +19,7 @@ package com.diffplug.blowdryer;
 import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
 
+/** Gradle settings plugin which configures the source URL and version. */
 public class BlowdryerSetupPlugin implements Plugin<Settings> {
 	@Override
 	public void apply(Settings settings) {

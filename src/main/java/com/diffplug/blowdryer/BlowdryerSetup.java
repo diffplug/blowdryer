@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.Objects;
 import java.util.function.Function;
 
+/** Configures where {@link Blowdryer#file(String)} downloads files from. */
 public class BlowdryerSetup {
 	static final String NAME = "blowdryerSetup";
 

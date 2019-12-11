@@ -204,7 +204,7 @@ public class Blowdryer {
 		}
 	}
 
-	/** Returns the given resource as a File. */
+	/** Returns the given resource as a File (as configured by {@link BlowdryerSetup}. */
 	public static File file(String resourcePath) {
 		synchronized (Blowdryer.class) {
 			assertInitialized();
@@ -297,7 +297,7 @@ public class Blowdryer {
 		}
 	}
 
-	/** Alias for {@link Blowdryer} which fills in the `project` field automatically. */
+	/** Alias for {@link Blowdryer} which fills in the `project` field of the `proj()` methods automatically. */
 	public static class WithProject {
 		private final Project project;
 

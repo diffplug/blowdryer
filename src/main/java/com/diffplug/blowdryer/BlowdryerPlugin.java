@@ -19,6 +19,7 @@ package com.diffplug.blowdryer;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
+/** Optional gradle plugin which can only be applied to the root project, and will create the 干 extension on every project. */
 public class BlowdryerPlugin implements Plugin<Project> {
 	static final String PLUGIN_ID = "com.diffplug.blowdryer";
 
