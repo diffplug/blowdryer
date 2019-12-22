@@ -11,7 +11,7 @@ apply from: 干.file('base/maven.gradle')
 apply from: 干.file('spotless/freshmark.gradle')
 apply from: 干.file('spotless/java.gradle')
 
-version = '0.1.0'
+version = '0.1.1'
 
 dependencies {
 	implementation 'com.squareup.okhttp3:okhttp:4.2.2'
