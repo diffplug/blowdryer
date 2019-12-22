@@ -2,12 +2,14 @@ plugins {
 	id 'com.gradle.plugin-publish' version '0.10.1'
 	id 'com.github.ben-manes.versions' version '0.27.0'
 	id 'com.diffplug.gradle.spotless' version '3.26.1'
+	id 'com.jfrog.bintray' version '1.8.4' apply false
 	id 'com.diffplug.blowdryer'
 }
 
 apply from: 干.file('base/java8.gradle')
 apply from: 干.file('base/gradle-plugin.gradle')
 apply from: 干.file('base/maven.gradle')
+apply from: 干.file('base/bintray.gradle')
 apply from: 干.file('spotless/freshmark.gradle')
 apply from: 干.file('spotless/java.gradle')
 
