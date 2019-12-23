@@ -209,6 +209,28 @@ Here are resource repositories in the wild:
 
 It would be very handy to have something like this for other script-based build systems.  If you find or build one, please let us know with an issue, and we'll link to it here.  It would be great to standardize on `干`, and feel free to name your project `blowdryer-foo`.
 
+## Requirements
+
+Requires Java 8+ and Gradle 6+.  It is possible to use with older versions  of Gradle all the way back to TODO with the following workaround:
+
+```gradle
+// buildSrc/build.gradle
+apply plugin: 'java'
+repositories {
+    mavenCentral()
+}
+dependencies {
+    implementation 'com.diffplug:blowdryer:0.1.1'
+}
+
+// settings.gradle
+apply plugin: 'com.diffplug.blowdryerSetup'
+blowdryerSetup { ... }
+
+// root build.gradle
+apply plugin: 'com.diffplug.blowdryer'
+```
+
 ## Acknowledgements
 
 - [Gradle](https://gradle.com/) is *so* good.
