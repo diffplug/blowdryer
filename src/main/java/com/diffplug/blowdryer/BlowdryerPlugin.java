@@ -18,10 +18,12 @@ package com.diffplug.blowdryer;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.util.GradleVersion;
 
 /** Optional gradle plugin which can only be applied to the root project, and will create the 干 extension on every project. */
 public class BlowdryerPlugin implements Plugin<Project> {
 	static final String PLUGIN_ID = "com.diffplug.blowdryer";
+	static final String WIPE_CACHE_TASK = "blowdryerWipeEntireCache";
 
 	@Override
 	public void apply(Project root) {
@@ -34,8 +36,10 @@ public class BlowdryerPlugin implements Plugin<Project> {
 			p.getExtensions().add("Blowdryer", withProject);
 		});
 
-		root.getTasks().register("blowdryerWipeEntireCache", task -> {
-			task.doFirst(unused -> Blowdryer.wipeEntireCache());
-		});
+		if (GradleVersion.current().compareTo(BlowdryerPluginLegacy.CONFIG_AVOIDANCE_INTRODUCED) >= 0) {
+			BlowdryerPluginConfigAvoidance.wipeCacheTask(root);
+		} else {
+			BlowdryerPluginLegacy.wipeCacheTask(root);
+		}
 	}
 }
