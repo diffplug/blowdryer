@@ -3,23 +3,21 @@
 <!---freshmark shields
 output = [
     link(shield('Gradle plugin', 'plugins.gradle.org', 'com.diffplug.blowdryer', 'blue'), 'https://plugins.gradle.org/plugin/com.diffplug.blowdryer'),
-    //link(shield('Maven central', 'mavencentral', 'com.diffplug:blowdryer', 'blue'), 'https://search.maven.org/search?q=g:com.diffplug%20AND%20a:blowdryer'),
-    //link(image('License Apache 2.0', 'https://img.shields.io/badge/apache--2.0-blue.svg'), 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)'),
+    link(shield('Maven central', 'mavencentral', 'available', 'blue'), 'https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22'),
     link(shield('License Apache 2.0', 'license', 'apache-2.0', 'blue'), 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)'),
     '',
-    link(image('Latest', 'https://jitpack.io/v/diffplug/blowdryer.svg'), 'https://jitpack.io/#diffplug/blowdryer'),
-    link(shield('Changelog', 'keepachangelog', 'yes', 'brightgreen'), 'CHANGELOG.md'),
-    link(shield('Javadoc', 'javadoc', 'yes', 'brightgreen'), 'https://jitpack.io/com/github/diffplug/blowdryer/latest/javadoc/'),
+    link(shield('Changelog', 'changelog', versionLast, 'brightgreen'), 'CHANGELOG.md'),
+    link(shield('Javadoc', 'javadoc', 'yes', 'brightgreen'), 'https://javadoc.io/doc/com.diffplug/blowdryer/{{versionLast}}/index.html'),
     link(shield('Live chat', 'gitter', 'chat', 'brightgreen'), 'https://gitter.im/diffplug/blowdryer'),
     link(image('JitCI', 'https://jitci.com/gh/diffplug/blowdryer/svg'), 'https://jitci.com/gh/diffplug/blowdryer')
     ].join('\n');
 -->
 [![Gradle plugin](https://img.shields.io/badge/plugins.gradle.org-com.diffplug.blowdryer-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.blowdryer)
+[![Maven central](https://img.shields.io/badge/mavencentral-available-blue.svg)](https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22)
 [![License Apache 2.0](https://img.shields.io/badge/license-apache--2.0-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 
-[![Latest](https://jitpack.io/v/diffplug/blowdryer.svg)](https://jitpack.io/#diffplug/blowdryer)
-[![Changelog](https://img.shields.io/badge/keepachangelog-yes-brightgreen.svg)](CHANGELOG.md)
-[![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://jitpack.io/com/github/diffplug/blowdryer/latest/javadoc/)
+[![Changelog](https://img.shields.io/badge/changelog-0.2.0-brightgreen.svg)](CHANGELOG.md)
+[![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/0.2.0/index.html)
 [![Live chat](https://img.shields.io/badge/gitter-chat-brightgreen.svg)](https://gitter.im/diffplug/blowdryer)
 [![JitCI](https://jitci.com/gh/diffplug/blowdryer/svg)](https://jitci.com/gh/diffplug/blowdryer)
 <!---freshmark /shields -->
@@ -33,6 +31,13 @@ If you have multiple loosely-related gradle projects in separate repositories, t
   - hard to experiment and innovate
 
 Blowdryer lets you centralize your build scripts, config files, and properties into a single repository, with an easy workflow for pulling those resources into various projects that use them, improving them in-place, then cycling those improvements back across the other projects.
+
+<!---freshmark javadoc
+output = prefixDelimiterReplace(input, "id 'com.diffplug.blowdryerSetup' version '", "'", versionLast)
+output = prefixDelimiterReplace(output, 'id("com.diffplug.blowdryerSetup") version "', '"', versionLast)
+output = prefixDelimiterReplace(output, 'https://javadoc.io/static/com.diffplug/blowdryer/', '/', versionLast)
+output = prefixDelimiterReplace(output, "'com.diffplug:blowdryer:", "'", versionLast)
+-->
 
 ## How to use it
 
@@ -148,7 +153,7 @@ static String 干.proj(Project proj, String String key, String description)
 static <T> T  干.proj(Project proj, Class<T> clazz, String String key, String description)
 ```
 
-If you do `apply plugin: 'com.diffplug.blowdryer'` then every project gets an extension object (TODO: link to code) where the project field has been filled in for you, which is why we don't pass it explicitly in the examples before this section.  If you don't apply the plugin, you can still call these static methods and pass `project` explicitly for the `proj()` methods.
+If you do `apply plugin: 'com.diffplug.blowdryer'` then every project gets an extension object ([code](https://github.com/diffplug/blowdryer/blob/master/src/main/java/com/diffplug/blowdryer/BlowdryerPlugin.java)) where the project field has been filled in for you, which is why we don't pass it explicitly in the examples before this section.  If you don't apply the plugin, you can still call these static methods and pass `project` explicitly for the `proj()` methods.
 
 ### Using with Kotlin
 
@@ -161,7 +166,6 @@ plugins {
 }
 import com.diffplug.blowdryer.BlowdryerSetup
 configure<BlowdryerSetup> {
-  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
 }
 
 // inside settings.gradle.kts, build.gradle.kts, or any-script.gradle.kts
@@ -178,9 +182,9 @@ somePlugin {
 
 ### Setup with something besides GitHub
 
-`Blowdryer.immutableUrl` (TODO, link to javadoc) returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the content of that URL is immutable.
+[`Blowdryer.immutableUrl`](https://javadoc.io/static/com.diffplug/blowdryer/0.2.0/com/diffplug/blowdryer/Blowdryer.html#immutableUrl-java.lang.String-) returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the content of that URL is immutable.
 
-When you setup the Blowdryer plugin in your `settings.gradle`, you're telling Blowdryer what URL scheme to use when resolving a call to `Blowdryer.file` (TODO, link to javadoc), for example:
+When you setup the Blowdryer plugin in your `settings.gradle`, you're telling Blowdryer what URL scheme to use when resolving a call to [`Blowdryer.file`](https://javadoc.io/static/com.diffplug/blowdryer/0.2.0/com/diffplug/blowdryer/Blowdryer.html#file-java.lang.String-), for example:
 
 ```java
 //blowdryer {
@@ -201,17 +205,17 @@ blowdryerSetup {
 
 ## In the wild
 
-Here are resource repositories in the wild:
+Here are resource repositories in the wild (PRs welcome for others!)
 
 - https://github.com/diffplug/blowdryer-diffplug
 
 ## Blowdryer for [gulp](https://gulpjs.com/), etc.
 
-It would be very handy to have something like this for other script-based build systems.  If you find or build one, please let us know with an issue, and we'll link to it here.  It would be great to standardize on `干`, and feel free to name your project `blowdryer-foo`.
+It would be handy to have something like this for other script-based build systems.  It would be great to standardize on `干`, feel free to name your project `blowdryer-foo`.  If you find or build one, whatever names it chooses, let us know with an issue, and we'll link to it here!
 
 ## Requirements
 
-Requires Java 8+, highly recommended Gradle 6+.
+Requires Java 8+, highly recommend Gradle 6+.
 
 ### Gradle 5.0+ workaround
 
@@ -234,10 +238,11 @@ blowdryerSetup { ... }
 // root build.gradle
 apply plugin: 'com.diffplug.blowdryer'
 ```
+<!---freshmark /javadoc -->
 
 ### Gradle 4.x workaround
 
-Blowdryer does not work in Gradle 4.x due to `java.lang.NoSuchMethodError: kotlin.collections.ArraysKt.copyInto([B[BIII)[B`.  If you want to try to fix it, try [this test](https://github.com/diffplug/blowdryer/blob/master/src/test/java/com/diffplug/blowdryer/BlowdryerPlugin4xTest.java).
+Blowdryer does not work in Gradle 4.x due to `java.lang.NoSuchMethodError: kotlin.collections.ArraysKt.copyInto([B[BIII)[B`.  If you want to try to fix it, try to fix [this test](https://github.com/diffplug/blowdryer/blob/master/src/test/java/com/diffplug/blowdryer/BlowdryerPlugin4xTest.java).
 
 ## Acknowledgements
 
