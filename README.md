@@ -16,8 +16,8 @@ output = [
 [![Maven central](https://img.shields.io/badge/mavencentral-available-blue.svg)](https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22)
 [![License Apache 2.0](https://img.shields.io/badge/license-apache--2.0-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 
-[![Changelog](https://img.shields.io/badge/changelog-0.2.0-brightgreen.svg)](CHANGELOG.md)
-[![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/0.2.0/index.html)
+[![Changelog](https://img.shields.io/badge/changelog-1.0.0-brightgreen.svg)](CHANGELOG.md)
+[![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/1.0.0/index.html)
 [![Live chat](https://img.shields.io/badge/gitter-chat-brightgreen.svg)](https://gitter.im/diffplug/blowdryer)
 [![JitCI](https://jitci.com/gh/diffplug/blowdryer/svg)](https://jitci.com/gh/diffplug/blowdryer)
 <!---freshmark /shields -->
@@ -47,7 +47,7 @@ Then, in the `settings.gradle` for the project that you want to suck these into,
 
 ```gradle
 plugins {
-  id 'com.diffplug.blowdryerSetup' version '0.2.0'
+  id 'com.diffplug.blowdryerSetup' version '1.0.0'
 }
 
 blowdryerSetup {
@@ -162,7 +162,7 @@ The Gradle Kotlin DSL doesn't play well with the name-based extension object tha
 ```kotlin
 // settings.gradle.kts
 plugins {
-  id("com.diffplug.blowdryerSetup") version "0.2.0"
+  id("com.diffplug.blowdryerSetup") version "1.0.0"
 }
 import com.diffplug.blowdryer.BlowdryerSetup
 configure<BlowdryerSetup> {
@@ -182,9 +182,9 @@ somePlugin {
 
 ### Setup with something besides GitHub
 
-[`Blowdryer.immutableUrl`](https://javadoc.io/static/com.diffplug/blowdryer/0.2.0/com/diffplug/blowdryer/Blowdryer.html#immutableUrl-java.lang.String-) returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the content of that URL is immutable.
+[`Blowdryer.immutableUrl`](https://javadoc.io/static/com.diffplug/blowdryer/1.0.0/com/diffplug/blowdryer/Blowdryer.html#immutableUrl-java.lang.String-) returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the content of that URL is immutable.
 
-When you setup the Blowdryer plugin in your `settings.gradle`, you're telling Blowdryer what URL scheme to use when resolving a call to [`Blowdryer.file`](https://javadoc.io/static/com.diffplug/blowdryer/0.2.0/com/diffplug/blowdryer/Blowdryer.html#file-java.lang.String-), for example:
+When you setup the Blowdryer plugin in your `settings.gradle`, you're telling Blowdryer what URL scheme to use when resolving a call to [`Blowdryer.file`](https://javadoc.io/static/com.diffplug/blowdryer/1.0.0/com/diffplug/blowdryer/Blowdryer.html#file-java.lang.String-), for example:
 
 ```java
 //blowdryer {
@@ -228,7 +228,7 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    implementation 'com.diffplug:blowdryer:0.2.0'
+    implementation 'com.diffplug:blowdryer:1.0.0'
 }
 
 // settings.gradle
