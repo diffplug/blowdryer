@@ -29,6 +29,27 @@ import org.junit.Test;
  * I can't figure out how to upgrade it.
  * 
  * But if you want to work more on it, this is a good starting point.
+ * 
+ * ```
+ * Caused by: java.lang.NoSuchMethodError: kotlin.collections.ArraysKt.copyInto([B[BIII)[B
+ *   at okio.Segment.writeTo(Segment.kt:164)
+ *   at okio.Segment.compact(Segment.kt:147)
+ *   at okio.Buffer.write(Buffer.kt:1849)
+ *   at okio.Buffer.read(Buffer.kt:1860)
+ *   at okio.Buffer.writeAll(Buffer.kt:1650)
+ *   at okio.Options$Companion.buildTrieRecursive(Options.kt:187)
+ *   at okio.Options$Companion.buildTrieRecursive(Options.kt:174)
+ *   at okio.Options$Companion.buildTrieRecursive$default(Options.kt:113)
+ *   at okio.Options$Companion.of(Options.kt:72)
+ *   at okhttp3.internal.Util.<clinit>(Util.kt:69)
+ *   at okhttp3.internal.connection.RealConnectionPool.<clinit>(RealConnectionPool.kt:263)
+ *   at okhttp3.ConnectionPool.<init>(ConnectionPool.kt:37)
+ *   at okhttp3.ConnectionPool.<init>(ConnectionPool.kt:39)
+ *   at okhttp3.OkHttpClient$Builder.<init>(OkHttpClient.kt:438)
+ *   at com.diffplug.blowdryer.Blowdryer.download(Blowdryer.java:134)
+ *   at com.diffplug.blowdryer.Blowdryer.immutableUrl(Blowdryer.java:102)
+ *   at com.diffplug.blowdryer.Blowdryer.file(Blowdryer.java:214)
+ * ```
  */
 @Ignore
 public class BlowdryerPlugin4xTest extends GradleHarness {

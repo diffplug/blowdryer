@@ -42,7 +42,7 @@ Then, in the `settings.gradle` for the project that you want to suck these into,
 
 ```gradle
 plugins {
-  id 'com.diffplug.blowdryerSetup' version '1.0.0'
+  id 'com.diffplug.blowdryerSetup' version '0.2.0'
 }
 
 blowdryerSetup {
@@ -157,7 +157,7 @@ The Gradle Kotlin DSL doesn't play well with the name-based extension object tha
 ```kotlin
 // settings.gradle.kts
 plugins {
-  id("com.diffplug.blowdryerSetup") version "1.0.0"
+  id("com.diffplug.blowdryerSetup") version "0.2.0"
 }
 import com.diffplug.blowdryer.BlowdryerSetup
 configure<BlowdryerSetup> {
@@ -211,7 +211,11 @@ It would be very handy to have something like this for other script-based build 
 
 ## Requirements
 
-Requires Java 8+ and Gradle 6+.  It is possible to use with older versions  of Gradle all the way back to TODO with the following workaround:
+Requires Java 8+, highly recommended Gradle 6+.
+
+### Gradle 5.0+ workaround
+
+There is a workaround to allow Gradle 5.0+
 
 ```gradle
 // buildSrc/build.gradle
@@ -220,7 +224,7 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    implementation 'com.diffplug:blowdryer:0.1.1'
+    implementation 'com.diffplug:blowdryer:0.2.0'
 }
 
 // settings.gradle
@@ -230,6 +234,10 @@ blowdryerSetup { ... }
 // root build.gradle
 apply plugin: 'com.diffplug.blowdryer'
 ```
+
+### Gradle 4.x workaround
+
+Blowdryer does not work in Gradle 4.x due to `java.lang.NoSuchMethodError: kotlin.collections.ArraysKt.copyInto([B[BIII)[B`.  If you want to try to fix it, try [this test](https://github.com/diffplug/blowdryer/blob/master/src/test/java/com/diffplug/blowdryer/BlowdryerPlugin4xTest.java).
 
 ## Acknowledgements
 
