@@ -21,12 +21,20 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.assertj.core.api.Assertions;
 import org.gradle.testkit.runner.GradleRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 
-public class BlowdryerPlugin5xTest extends GradleHarness {
+/**
+ * Blowdryer fails on Gradle 4.10 because the kotlin-std-lib is too old, and
+ * I can't figure out how to upgrade it.
+ * 
+ * But if you want to work more on it, this is a good starting point.
+ */
+@Ignore
+public class BlowdryerPlugin4xTest extends GradleHarness {
 	@Override
 	protected GradleRunner gradleRunner() throws IOException {
-		return super.gradleRunner().withGradleVersion("5.0");
+		return super.gradleRunner().withArguments("--stacktrace").withGradleVersion("4.10");
 	}
 
 	private void settingsGithub(String tag, String... extra) throws IOException {
@@ -36,11 +44,13 @@ public class BlowdryerPlugin5xTest extends GradleHarness {
 				"  jcenter()",
 				"}",
 				"dependencies {",
-				"  implementation 'com.diffplug:blowdryer:0.2.0'",
+				"  compile 'com.diffplug:blowdryer:0.2.0'",
 				"}");
 		write("settings.gradle",
-				"apply plugin: 'com.diffplug.blowdryerSetup'",
-				"blowdryerSetup { github('diffplug/blowdryer', 'tag', '" + tag + "') }",
+				"import com.diffplug.blowdryer.BlowdryerSetup",
+				"import com.diffplug.blowdryer.BlowdryerSetup.GitAnchorType",
+				"BlowdryerSetup setup = new BlowdryerSetup(rootDir)",
+				"setup.github('diffplug/blowdryer', GitAnchorType.TAG, '" + tag + "')",
 				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
@@ -97,7 +107,7 @@ public class BlowdryerPlugin5xTest extends GradleHarness {
 	public void missingResourceThrowsError() throws IOException {
 		settingsGithub("test/2/a");
 		write("build.gradle",
-				"plugins { id 'com.diffplug.blowdryer' }",
+				"apply plugin: 'com.diffplug.blowdryer'",
 				"干.file('notPresent')");
 		Assertions.assertThat(gradleRunner().buildAndFail().getOutput().replace("\r\n", "\n")).contains(
 				"https://raw.githubusercontent.com/diffplug/blowdryer/test/2/a/src/main/resources/notPresent\n" +
