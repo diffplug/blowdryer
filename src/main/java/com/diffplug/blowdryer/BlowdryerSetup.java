@@ -30,6 +30,7 @@ public class BlowdryerSetup {
 
 	/** Pass in the directory that will be used to resolve string arguments to devLocal. */
 	public BlowdryerSetup(File referenceDirectory) {
+		Blowdryer.setResourcePluginNull(); // because of gradle daemon
 		this.referenceDirectory = referenceDirectory;
 	}
 
