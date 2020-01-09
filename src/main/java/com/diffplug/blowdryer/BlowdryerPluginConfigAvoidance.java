@@ -16,13 +16,12 @@
 package com.diffplug.blowdryer;
 
 
-import org.gradle.api.Plugin;
-import org.gradle.api.initialization.Settings;
+import org.gradle.api.Project;
 
-/** Gradle settings plugin which configures the source URL and version. */
-public class BlowdryerSetupPlugin implements Plugin<Settings> {
-	@Override
-	public void apply(Settings settings) {
-		settings.getExtensions().create(BlowdryerSetup.NAME, BlowdryerSetup.class, settings.getRootDir());
+class BlowdryerPluginConfigAvoidance {
+	static void wipeCacheTask(Project root) {
+		root.getTasks().register(BlowdryerPlugin.WIPE_CACHE_TASK, task -> {
+			task.doFirst(unused -> Blowdryer.wipeEntireCache());
+		});
 	}
 }

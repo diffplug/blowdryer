@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2020-01-09
+### Added
+- Support for Gradle pre-4.9 (task configuration avoidance).
+
 ## [0.1.1] - 2019-12-10
 ### Fixed
 - Minor javadoc improvements.
