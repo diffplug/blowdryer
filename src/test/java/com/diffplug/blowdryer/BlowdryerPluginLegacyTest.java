@@ -26,7 +26,7 @@ import org.junit.Test;
 public class BlowdryerPluginLegacyTest extends GradleHarness {
 	@Override
 	protected GradleRunner gradleRunner() throws IOException {
-		return super.gradleRunner().withGradleVersion("5.6.2");
+		return super.gradleRunner().withGradleVersion("5.0");
 	}
 
 	private void settingsGithub(String tag, String... extra) throws IOException {
