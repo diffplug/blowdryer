@@ -1,13 +1,13 @@
 plugins {
-	id 'com.gradle.plugin-publish'
-	id 'com.github.ben-manes.versions'
-	id 'com.diffplug.gradle.spotless'
-	id 'com.jfrog.bintray'
 	id 'com.diffplug.blowdryer'
+	id 'com.diffplug.gradle.spotless'
+	id 'com.diffplug.spotless-changelog'
+	id 'com.github.ben-manes.versions'
+	id 'com.gradle.plugin-publish'
+	id 'com.jfrog.bintray'
 }
 
-version = '0.1.1'
-
+apply from: 干.file('base/changelog.gradle')
 apply from: 干.file('base/java8.gradle')
 apply from: 干.file('base/gradle-plugin.gradle')
 apply from: 干.file('base/maven.gradle')
