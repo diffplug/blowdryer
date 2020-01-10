@@ -32,7 +32,7 @@ If you have multiple loosely-related gradle projects in separate repositories, t
 
 Blowdryer lets you centralize your build scripts, config files, and properties into a single repository, with an easy workflow for pulling those resources into various projects that use them, improving them in-place, then cycling those improvements back across the other projects.
 
-<!---freshmark javadoc
+<!---freshmark version
 output = prefixDelimiterReplace(input, "id 'com.diffplug.blowdryerSetup' version '", "'", versionLast)
 output = prefixDelimiterReplace(output, 'id("com.diffplug.blowdryerSetup") version "', '"', versionLast)
 output = prefixDelimiterReplace(output, 'https://javadoc.io/static/com.diffplug/blowdryer/', '/', versionLast)
@@ -85,7 +85,7 @@ somePlugin {
 
 ### Script plugins
 
-When you call into a script plugin, you might want to set some configuration values first.  You can read them inside the script using `干.proj('propertyName', 'propertyDescriptionForErrorMessages')`:
+When you call into a script plugin, you might want to set some configuration values first.  You can read them inside the script using `干.proj('propertyName', 'property description for error message')`:
 
 ```gradle
 // build.gradle
@@ -105,7 +105,9 @@ If the property isn't set, you'll get a nice error message describing what was m
 
 #### Script plugin gotchas
 
-Script plugins can't `import` any classes that were loaded from a third-party plugin on the `build.gradle` classpath (see [gradle/gradle#4007](https://github.com/gradle/gradle/issues/4007) and [gradle/gradle#1262](https://github.com/gradle/gradle/issues/1262) for details).  One workaround is put these plugins into the `settings.gradle` with [`apply false`](https://docs.gradle.org/current/userguide/plugins.html#sec:subprojects_plugins_dsl).  See the "in the wild" section below to see how other people are working around this.
+Script plugins can't `import` any classes that were loaded from a third-party plugin on the `build.gradle` classpath<sup>[1](#myfootnote1)</sup>.  There is an easy workaround described in [#10](https://github.com/diffplug/blowdryer/issues/10), along with our long-term plans for a fix.
+
+<a name="myfootnote1">1</a>: see [gradle/gradle#4007](https://github.com/gradle/gradle/issues/4007) and [gradle/gradle#1262](https://github.com/gradle/gradle/issues/1262) for history and details
 
 ## Dev workflow
 
@@ -241,7 +243,7 @@ blowdryerSetup { ... }
 // root build.gradle
 apply plugin: 'com.diffplug.blowdryer'
 ```
-<!---freshmark /javadoc -->
+<!---freshmark /version -->
 
 ### Gradle 4.x workaround
 
