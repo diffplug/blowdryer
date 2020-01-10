@@ -57,7 +57,7 @@ blowdryerSetup {
 }
 ```
 
-Now, in *only* your root `build.gradle`, do this: `apply plugin: 'com.diffplug.blowdryer'`.  Now, in any project through your gradle build, you can do this:
+Now, in *only* your root `build.gradle`, do this: `apply plugin: 'com.diffplug.blowdryer'`.  Now, in any project throughout your gradle build (including subprojects), you can do this:
 
 ```gradle
 apply from: Blowdryer.file('someScript.gradle')
@@ -67,7 +67,7 @@ somePlugin {
 }
 ```
 
-`Blowdryer.file()` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-acme`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache` TODO implement.
+`Blowdryer.file()` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-acme`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache`.
 
 `Blowdryer.prop()` parses a java `.properties` file which was downloaded using `Blowdryer.file()`, and then returns the value associated with the given key.
 
@@ -165,7 +165,10 @@ plugins {
   id("com.diffplug.blowdryerSetup") version "1.0.0"
 }
 import com.diffplug.blowdryer.BlowdryerSetup
+import com.diffplug.blowdryer.BlowdryerSetup.GitAnchorType
 configure<BlowdryerSetup> {
+  github("acme/blowdryer-acme", GitAnchorType.TAG, "v1.4.5")
+  //devLocal("../path-to-local-blowdryer-acme")
 }
 
 // inside settings.gradle.kts, build.gradle.kts, or any-script.gradle.kts
