@@ -107,7 +107,7 @@ If the property isn't set, you'll get a nice error message describing what was m
 
 Script plugins can't `import` any classes that were loaded from a third-party plugin on the `build.gradle` classpath<sup>[1](#myfootnote1)</sup>.  There is an easy workaround described in [#10](https://github.com/diffplug/blowdryer/issues/10), along with our long-term plans for a fix.
 
-<a name="myfootnote1">1</a>: see [gradle/gradle#4007](https://github.com/gradle/gradle/issues/4007) and [gradle/gradle#1262](https://github.com/gradle/gradle/issues/1262) for history and details
+<a name="myfootnote1"><sup>1</sup></a> see [gradle/gradle#4007](https://github.com/gradle/gradle/issues/4007) and [gradle/gradle#1262](https://github.com/gradle/gradle/issues/1262) for history and details
 
 ## Dev workflow
 
