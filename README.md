@@ -251,6 +251,6 @@ Blowdryer does not work in Gradle 4.x due to `java.lang.NoSuchMethodError: kotli
 
 ## Acknowledgements
 
-- Thanks to [Zac Sweers](https://github.com/ZacSweers) for the [sparking](https://github.com/diffplug/spotless/pull/488) the idea for lightweight publishing of immutable scripts.
+- Thanks to [Zac Sweers](https://github.com/ZacSweers) for [sparking](https://github.com/diffplug/spotless/pull/488) the idea for lightweight publishing of immutable scripts.
 - [Gradle](https://gradle.com/) is *so* good.
 - Maintained by [DiffPlug](https://www.diffplug.com/).
