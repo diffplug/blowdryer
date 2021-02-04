@@ -30,6 +30,14 @@ public class BlowdryerPluginTest extends GradleHarness {
 				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
+	private void settingsGitlab(String tag, String... extra) throws IOException {
+		write("settings.gradle",
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				"blowdryerSetup { gitlab('vgropp/blowdryer-test', 'tag', '" + tag + "') }",
+				Arrays.stream(extra).collect(Collectors.joining("\n")));
+	}
+
+
 	@Test
 	public void githubTag() throws IOException {
 		settingsGithub("test/2/a");
@@ -50,6 +58,32 @@ public class BlowdryerPluginTest extends GradleHarness {
 
 		// double-check that failures do fail
 		settingsGithub("test/2/b");
+		write("build.gradle",
+				"plugins { id 'com.diffplug.blowdryer' }",
+				"assert Blowdryer.file('sample').text == 'a'");
+		gradleRunner().buildAndFail();
+	}
+
+	@Test
+	public void gitlabTag() throws IOException {
+		settingsGitlab("test/2/a");
+		write("build.gradle",
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'a'",
+				"assert 干.prop('sample', 'name') == 'test'",
+				"assert 干.prop('sample', 'ver_spotless') == '1.2.0'");
+		gradleRunner().build();
+
+		settingsGitlab("test/2/b");
+		write("build.gradle",
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'b'",
+				"assert 干.prop('sample', 'name') == 'testB'",
+				"assert 干.prop('sample', 'group') == 'com.diffplug.gradleB'");
+		gradleRunner().build();
+
+		// double-check that failures do fail
+		settingsGitlab("test/2/b");
 		write("build.gradle",
 				"plugins { id 'com.diffplug.blowdryer' }",
 				"assert Blowdryer.file('sample').text == 'a'");

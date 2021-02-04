@@ -61,6 +61,14 @@ public class BlowdryerSetup {
 		Blowdryer.setResourcePlugin(resource -> root + resource);
 	}
 
+	/** Sets the source where we will grab these scripts. */
+	public void gitlab(String repoOrg, GitAnchorType anchorType, String anchor) {
+		assertNoLeadingOrTrailingSlash(repoOrg);
+		assertNoLeadingOrTrailingSlash(anchor);
+		String root = "https://gitlab.com/" + repoOrg + "/-/raw/" + anchor + "/" + repoSubfolder + "/";
+		Blowdryer.setResourcePlugin(resource -> root + resource);
+	}
+
 	/** Sets the mapping from `file(String)` to `immutableUrl(String)`. */
 	public void experimental(Closure<String> function) {
 		experimental(function::call);
