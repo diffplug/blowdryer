@@ -18,6 +18,8 @@ package com.diffplug.blowdryer;
 
 import com.diffplug.common.base.Errors;
 import groovy.lang.Closure;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -59,8 +61,8 @@ public class BlowdryerSetup {
 	public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
 		assertNoLeadingOrTrailingSlash(repoOrg);
 		assertNoLeadingOrTrailingSlash(anchor);
-		String root = "https://raw.githubusercontent.com/" + repoOrg + "/" + anchor + "/" + repoSubfolder + "/";
-		Blowdryer.setResourcePlugin(resource -> root + resource);
+		String root = "https://raw.githubusercontent.com/" + repoOrg + "/" + anchor + "/";
+		Blowdryer.setResourcePlugin(resource -> root + getFullResourcePath(resource));
 	}
 
 	/** Sets the source where we will grab these scripts. */
@@ -74,8 +76,13 @@ public class BlowdryerSetup {
 		assertNoLeadingOrTrailingSlash(host);
 		Blowdryer.setResourcePlugin(resource -> host + "/api/v4/projects/"
 				+ encodeUrlPart(repoOrg) + "/repository/files/"
-				+ encodeUrlPart((repoSubfolder.isEmpty() ? "" : repoSubfolder + "/") + resource) + "/raw?ref="
+				+ encodeUrlPart(getFullResourcePath(resource)) + "/raw?ref="
 				+ encodeUrlPart(anchor));
+	}
+
+	@NotNull
+	private String getFullResourcePath(String resource) {
+		return (repoSubfolder.isEmpty() ? "" : repoSubfolder + "/") + resource;
 	}
 
 	/** Sets the mapping from `file(String)` to `immutableUrl(String)`. */
