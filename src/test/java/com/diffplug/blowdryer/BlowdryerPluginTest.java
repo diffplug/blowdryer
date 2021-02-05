@@ -33,10 +33,9 @@ public class BlowdryerPluginTest extends GradleHarness {
 	private void settingsGitlab(String tag, String... extra) throws IOException {
 		write("settings.gradle",
 				"plugins { id 'com.diffplug.blowdryerSetup' }",
-				"blowdryerSetup { gitlab('https://gitlab.com', 'vgropp/blowdryer-test', 'tag', '" + tag + "') }",
+				"blowdryerSetup { gitlab('vgropp/blowdryer-test', 'tag', '" + tag + "') }",
 				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
-
 
 	@Test
 	public void githubTag() throws IOException {
