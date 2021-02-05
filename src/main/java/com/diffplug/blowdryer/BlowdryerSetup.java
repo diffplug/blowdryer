@@ -65,9 +65,14 @@ public class BlowdryerSetup {
 
 	/** Sets the source where we will grab these scripts. */
 	public void gitlab(String repoOrg, GitAnchorType anchorType, String anchor) {
+		gitlab("https://gitlab.com", repoOrg, anchorType, anchor);
+	}
+
+	public void gitlab(String host, String repoOrg, GitAnchorType anchorType, String anchor) {
 		assertNoLeadingOrTrailingSlash(repoOrg);
 		assertNoLeadingOrTrailingSlash(anchor);
-		Blowdryer.setResourcePlugin(resource -> "https://gitlab.com/api/v4/projects/"
+		assertNoLeadingOrTrailingSlash(host);
+		Blowdryer.setResourcePlugin(resource -> host + "/api/v4/projects/"
 				+ encodeUrlPart(repoOrg) + "/repository/files/"
 				+ encodeUrlPart((repoSubfolder.isEmpty() ? "" : repoSubfolder + "/") + resource) + "/raw?ref="
 				+ encodeUrlPart(anchor));
