@@ -37,7 +37,6 @@ public class BlowdryerPluginTest extends GradleHarness {
 				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
-
 	@Test
 	public void githubTag() throws IOException {
 		settingsGithub("test/2/a");
