@@ -19,6 +19,8 @@ package com.diffplug.blowdryer;
 import com.diffplug.common.base.Errors;
 import groovy.lang.Closure;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -65,8 +67,10 @@ public class BlowdryerSetup {
 	public void gitlab(String repoOrg, GitAnchorType anchorType, String anchor) {
 		assertNoLeadingOrTrailingSlash(repoOrg);
 		assertNoLeadingOrTrailingSlash(anchor);
-		String root = "https://gitlab.com/" + repoOrg + "/-/raw/" + anchor + "/" + repoSubfolder + "/";
-		Blowdryer.setResourcePlugin(resource -> root + resource);
+		Blowdryer.setResourcePlugin(resource -> "https://gitlab.com/api/v4/projects/"
+				+ encodeUrlPart(repoOrg) + "/repository/files/"
+				+ encodeUrlPart((repoSubfolder.isEmpty() ? "" : repoSubfolder + "/") + resource) + "/raw?ref="
+				+ encodeUrlPart(anchor));
 	}
 
 	/** Sets the mapping from `file(String)` to `immutableUrl(String)`. */
@@ -107,5 +111,13 @@ public class BlowdryerSetup {
 			throw new IllegalArgumentException("Remove the trailing slash");
 		}
 		return input;
+	}
+
+	private static String encodeUrlPart(String part) {
+		try {
+			return URLEncoder.encode(part, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalArgumentException("error encoding part", e);
+		}
 	}
 }
