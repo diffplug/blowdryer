@@ -18,14 +18,13 @@ package com.diffplug.blowdryer;
 
 import com.diffplug.common.base.Errors;
 import groovy.lang.Closure;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Objects;
 import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
 
 /** Configures where {@link Blowdryer#file(String)} downloads files from. */
 public class BlowdryerSetup {
@@ -62,11 +61,28 @@ public class BlowdryerSetup {
 	}
 
 	/** Sets the source where we will grab these scripts. */
-	public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
-		assertNoLeadingOrTrailingSlash(repoOrg);
-		assertNoLeadingOrTrailingSlash(anchor);
-		String root = "https://" + GITHUB_HOST + "/" + repoOrg + "/" + anchor + "/";
-		Blowdryer.setResourcePlugin(resource -> root + getFullResourcePath(resource));
+	public GitHub github(String repoOrg, GitAnchorType anchorType, String anchor) {
+		// anchorType isn't used right now, but makes it easier to read what "anchor" is
+		return new GitHub(repoOrg, anchor);
+	}
+
+	public class GitHub {
+		private String repoOrg;
+		private String anchor;
+
+		private GitHub(String repoOrg, String anchor) {
+			assertNoLeadingOrTrailingSlash(repoOrg);
+			assertNoLeadingOrTrailingSlash(anchor);
+			this.repoOrg = repoOrg;
+			this.anchor = anchor;
+			setGlobals();
+		}
+
+		private GitHub setGlobals() {
+			String root = "https://" + GITHUB_HOST + "/" + repoOrg + "/" + anchor + "/";
+			Blowdryer.setResourcePlugin(resource -> root + getFullResourcePath(resource));
+			return this;
+		}
 	}
 
 	/** Sets the source where we will grab these scripts. */
