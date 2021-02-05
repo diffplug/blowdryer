@@ -18,14 +18,13 @@ package com.diffplug.blowdryer;
 
 import com.diffplug.common.base.Errors;
 import groovy.lang.Closure;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Objects;
 import java.util.function.Function;
+import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /** Configures where {@link Blowdryer#file(String)} downloads files from. */
 public class BlowdryerSetup {
@@ -62,48 +61,102 @@ public class BlowdryerSetup {
 	}
 
 	/** Sets the source where we will grab these scripts. */
-	public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
-		assertNoLeadingOrTrailingSlash(repoOrg);
-		assertNoLeadingOrTrailingSlash(anchor);
-		String root = "https://" + GITHUB_HOST + "/" + repoOrg + "/" + anchor + "/";
-		Blowdryer.setResourcePlugin(resource -> root + getFullResourcePath(resource));
+	public GitHub github(String repoOrg, GitAnchorType anchorType, String anchor) {
+		// anchorType isn't used right now, but makes it easier to read what "anchor" is
+		return new GitHub(repoOrg, anchor);
+	}
+
+	public class GitHub {
+		private String repoOrg;
+		private String anchor;
+		private @Nullable String authToken;
+
+		private GitHub(String repoOrg, String anchor) {
+			this.repoOrg = assertNoLeadingOrTrailingSlash(repoOrg);
+			this.anchor = assertNoLeadingOrTrailingSlash(anchor);
+			setGlobals();
+		}
+
+		public GitHub authToken(String authToken) {
+			this.authToken = authToken;
+			return setGlobals();
+		}
+
+		private GitHub setGlobals() {
+			String root = "https://" + GITHUB_HOST + "/" + repoOrg + "/" + anchor + "/";
+			Blowdryer.setResourcePlugin(resource -> root + getFullResourcePath(resource));
+			if (authToken != null) {
+				Blowdryer.setAuthPlugin((url, builder) -> {
+					if (url.startsWith(root)) {
+						builder.addHeader("Authorization", "Bearer " + authToken);
+					}
+					return builder;
+				});
+			} else {
+				Blowdryer.setAuthPlugin(null);
+			}
+			return this;
+		}
 	}
 
 	/** Sets the source where we will grab these scripts. */
-	public void gitlab(String repoOrg, GitAnchorType anchorType, String anchor) {
-		gitlab("https://" + GITLAB_HOST, repoOrg, anchorType, anchor);
+	public GitLab gitlab(String repoOrg, GitAnchorType anchorType, String anchor) {
+		// anchorType isn't used right now, but makes it easier to read what "anchor" is
+		return new GitLab(repoOrg, anchor);
 	}
 
-	public void gitlab(String host, String repoOrg, GitAnchorType anchorType, String anchor) {
-		assertNoLeadingOrTrailingSlash(repoOrg);
-		assertNoLeadingOrTrailingSlash(anchor);
-		assertNoLeadingOrTrailingSlash(host);
-		Blowdryer.setResourcePlugin(resource -> host + "/api/v4/projects/"
-				+ encodeUrlPart(repoOrg) + "/repository/files/"
-				+ encodeUrlPart(getFullResourcePath(resource)) + "/raw?ref="
-				+ encodeUrlPart(anchor));
+	public class GitLab {
+		private String repoOrg;
+		private String anchor;
+		private @Nullable String authToken;
+		private String protocol, host;
+
+		private GitLab(String repoOrg, String anchor) {
+			this.repoOrg = assertNoLeadingOrTrailingSlash(repoOrg);
+			this.anchor = assertNoLeadingOrTrailingSlash(anchor);
+			customDomainHttps(GITLAB_HOST);
+		}
+
+		public GitLab authToken(String authToken) {
+			this.authToken = authToken;
+			return setGlobals();
+		}
+
+		public GitLab customDomainHttp(String domain) {
+			return customProtocolAndDomain("http://", domain);
+		}
+
+		public GitLab customDomainHttps(String domain) {
+			return customProtocolAndDomain("https://", domain);
+		}
+
+		private GitLab customProtocolAndDomain(String protocol, String domain) {
+			this.protocol = protocol;
+			this.host = domain;
+			return setGlobals();
+		}
+
+		private GitLab setGlobals() {
+			String urlStart = protocol + host + "/api/v4/projects/" + encodeUrlPart(repoOrg) + "/repository/files/";
+			String urlEnd = "/raw?ref=" + encodeUrlPart(anchor);
+			Blowdryer.setResourcePlugin(resource -> urlStart + encodeUrlPart(getFullResourcePath(resource)) + urlEnd);
+			if (authToken != null) {
+				Blowdryer.setAuthPlugin((url, builder) -> {
+					if (url.startsWith(urlStart)) {
+						builder.addHeader("Authorization", "Bearer " + authToken);
+					}
+					return builder;
+				});
+			} else {
+				Blowdryer.setAuthPlugin(null);
+			}
+			return this;
+		}
 	}
 
 	@NotNull
 	private String getFullResourcePath(String resource) {
 		return (repoSubfolder.isEmpty() ? "" : repoSubfolder + "/") + resource;
-	}
-
-	public void githubAuth(String authToken) {
-		authToken(GITHUB_HOST, authToken);
-	}
-
-	public void gitlabAuth(String authToken) {
-		authToken(GITLAB_HOST, authToken);
-	}
-
-	public void authToken(String host, String authToken) {
-		Blowdryer.setAuthPlugin((url, builder) -> {
-			if (new URL(url).getHost().equals(host)) {
-				builder.addHeader("Authorization", "Bearer " + authToken);
-			}
-			return builder;
-		});
 	}
 
 	/** Sets the mapping from `file(String)` to `immutableUrl(String)`. */

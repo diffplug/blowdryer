@@ -209,11 +209,12 @@ public class Blowdryer {
 		Request.Builder addAuthToken(String url, Request.Builder builder) throws MalformedURLException;
 	}
 
-	private static AuthPlugin authPlugin = (url, builder) -> builder;
+	private static final AuthPlugin authPluginNone = (url, builder) -> builder;;
+	private static AuthPlugin authPlugin = authPluginNone;
 
 	public static void setAuthPlugin(AuthPlugin authPlugin) {
 		synchronized (Blowdryer.class) {
-			Blowdryer.authPlugin = authPlugin;
+			Blowdryer.authPlugin = authPlugin == null ? authPluginNone : authPlugin;
 		}
 	}
 
