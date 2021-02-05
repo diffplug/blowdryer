@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Base64;
@@ -132,7 +133,7 @@ public class Blowdryer {
 
 	private static void download(String url, File dst) throws IOException {
 		OkHttpClient client = new OkHttpClient.Builder().build();
-		Request req = new Request.Builder().url(url).build();
+		Request req = authPlugin.addAuthToken(url, new Request.Builder().url(url)).build();
 		try (Response response = client.newCall(req).execute()) {
 			if (!response.isSuccessful()) {
 				throw new IllegalArgumentException(url + "\nreceived http code " + response.code() + "\n" + response.body().string());
@@ -201,6 +202,18 @@ public class Blowdryer {
 	private static void assertInitialized() {
 		if (plugin == null) {
 			throw new IllegalStateException("You needed to initialize the `blowdryer` plugin in the root build.gradle first.");
+		}
+	}
+
+	static interface AuthPlugin {
+		Request.Builder addAuthToken(String url, Request.Builder builder) throws MalformedURLException;
+	}
+
+	private static AuthPlugin authPlugin = (url, builder) -> builder;
+
+	public static void setAuthPlugin(AuthPlugin authPlugin) {
+		synchronized (Blowdryer.class) {
+			Blowdryer.authPlugin = authPlugin;
 		}
 	}
 

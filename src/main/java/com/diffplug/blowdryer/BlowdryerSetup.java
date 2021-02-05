@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Objects;
 import java.util.function.Function;
@@ -29,6 +30,9 @@ import java.util.function.Function;
 /** Configures where {@link Blowdryer#file(String)} downloads files from. */
 public class BlowdryerSetup {
 	static final String NAME = "blowdryerSetup";
+
+	private static final String GITHUB_HOST = "raw.githubusercontent.com";
+	private static final String GITLAB_HOST = "gitlab.com";
 
 	private final File referenceDirectory;
 
@@ -61,13 +65,13 @@ public class BlowdryerSetup {
 	public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
 		assertNoLeadingOrTrailingSlash(repoOrg);
 		assertNoLeadingOrTrailingSlash(anchor);
-		String root = "https://raw.githubusercontent.com/" + repoOrg + "/" + anchor + "/";
+		String root = "https://" + GITHUB_HOST + "/" + repoOrg + "/" + anchor + "/";
 		Blowdryer.setResourcePlugin(resource -> root + getFullResourcePath(resource));
 	}
 
 	/** Sets the source where we will grab these scripts. */
 	public void gitlab(String repoOrg, GitAnchorType anchorType, String anchor) {
-		gitlab("https://gitlab.com", repoOrg, anchorType, anchor);
+		gitlab("https://" + GITLAB_HOST, repoOrg, anchorType, anchor);
 	}
 
 	public void gitlab(String host, String repoOrg, GitAnchorType anchorType, String anchor) {
@@ -83,6 +87,23 @@ public class BlowdryerSetup {
 	@NotNull
 	private String getFullResourcePath(String resource) {
 		return (repoSubfolder.isEmpty() ? "" : repoSubfolder + "/") + resource;
+	}
+
+	public void githubAuth(String authToken) {
+		authToken(GITHUB_HOST, authToken);
+	}
+
+	public void gitlabAuth(String authToken) {
+		authToken(GITLAB_HOST, authToken);
+	}
+
+	public void authToken(String host, String authToken) {
+		Blowdryer.setAuthPlugin((url, builder) -> {
+			if (new URL(url).getHost().equals(host)) {
+				builder.addHeader("Authorization", "Bearer " + authToken);
+			}
+			return builder;
+		});
 	}
 
 	/** Sets the mapping from `file(String)` to `immutableUrl(String)`. */
