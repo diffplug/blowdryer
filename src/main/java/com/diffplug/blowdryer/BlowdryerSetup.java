@@ -72,10 +72,8 @@ public class BlowdryerSetup {
 		private @Nullable String authToken;
 
 		private GitHub(String repoOrg, String anchor) {
-			assertNoLeadingOrTrailingSlash(repoOrg);
-			assertNoLeadingOrTrailingSlash(anchor);
-			this.repoOrg = repoOrg;
-			this.anchor = anchor;
+			this.repoOrg = assertNoLeadingOrTrailingSlash(repoOrg);
+			this.anchor = assertNoLeadingOrTrailingSlash(anchor);
 			setGlobals();
 		}
 
@@ -114,10 +112,8 @@ public class BlowdryerSetup {
 		private String protocol, host;
 
 		private GitLab(String repoOrg, String anchor) {
-			assertNoLeadingOrTrailingSlash(repoOrg);
-			assertNoLeadingOrTrailingSlash(anchor);
-			this.repoOrg = repoOrg;
-			this.anchor = anchor;
+			this.repoOrg = assertNoLeadingOrTrailingSlash(repoOrg);
+			this.anchor = assertNoLeadingOrTrailingSlash(anchor);
 			customDomainHttps(GITLAB_HOST);
 		}
 
