@@ -89,7 +89,7 @@ public class BlowdryerSetup {
 			Blowdryer.setResourcePlugin(resource -> root + getFullResourcePath(resource));
 			if (authToken != null) {
 				Blowdryer.setAuthPlugin((url, builder) -> {
-					if (builder.getUrl$okhttp().host().equals(GITHUB_HOST)) {
+					if (url.startsWith(root)) {
 						builder.addHeader("Authorization", "Bearer " + authToken);
 					}
 					return builder;
@@ -134,20 +134,19 @@ public class BlowdryerSetup {
 			return customProtocolAndDomain("https://", domain);
 		}
 
-		public GitLab customProtocolAndDomain(String protocol, String domain) {
+		private GitLab customProtocolAndDomain(String protocol, String domain) {
 			this.protocol = protocol;
 			this.host = domain;
 			return setGlobals();
 		}
 
 		private GitLab setGlobals() {
-			Blowdryer.setResourcePlugin(resource -> protocol + host + "/api/v4/projects/"
-					+ encodeUrlPart(repoOrg) + "/repository/files/"
-					+ encodeUrlPart(getFullResourcePath(resource)) + "/raw?ref="
-					+ encodeUrlPart(anchor));
+			String urlStart = protocol + host + "/api/v4/projects/" + encodeUrlPart(repoOrg) + "/repository/files/";
+			String urlEnd = "/raw?ref=" + encodeUrlPart(anchor);
+			Blowdryer.setResourcePlugin(resource -> urlStart + encodeUrlPart(getFullResourcePath(resource)) + urlEnd);
 			if (authToken != null) {
 				Blowdryer.setAuthPlugin((url, builder) -> {
-					if (builder.getUrl$okhttp().host().equals(host)) {
+					if (url.startsWith(urlStart)) {
 						builder.addHeader("Authorization", "Bearer " + authToken);
 					}
 					return builder;
