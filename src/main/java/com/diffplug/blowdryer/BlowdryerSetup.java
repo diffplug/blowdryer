@@ -108,22 +108,35 @@ public class BlowdryerSetup {
 	}
 
 	public class GitLab {
-		private String protocol = "https://";
-		private String host = GITLAB_HOST;
 		private String repoOrg;
 		private String anchor;
 		private @Nullable String authToken;
+		private String protocol, host;
 
 		private GitLab(String repoOrg, String anchor) {
 			assertNoLeadingOrTrailingSlash(repoOrg);
 			assertNoLeadingOrTrailingSlash(anchor);
 			this.repoOrg = repoOrg;
 			this.anchor = anchor;
-			setGlobals();
+			customDomainHttps(GITLAB_HOST);
 		}
 
 		public GitLab authToken(String authToken) {
 			this.authToken = authToken;
+			return setGlobals();
+		}
+
+		public GitLab customDomainHttp(String domain) {
+			return customProtocolAndDomain("http://", domain);
+		}
+
+		public GitLab customDomainHttps(String domain) {
+			return customProtocolAndDomain("https://", domain);
+		}
+
+		public GitLab customProtocolAndDomain(String protocol, String domain) {
+			this.protocol = protocol;
+			this.host = domain;
 			return setGlobals();
 		}
 
