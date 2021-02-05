@@ -24,6 +24,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Objects;
 import java.util.function.Function;
+import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 /** Configures where {@link Blowdryer#file(String)} downloads files from. */
@@ -69,6 +70,7 @@ public class BlowdryerSetup {
 	public class GitHub {
 		private String repoOrg;
 		private String anchor;
+		private @Nullable String authToken;
 
 		private GitHub(String repoOrg, String anchor) {
 			assertNoLeadingOrTrailingSlash(repoOrg);
@@ -78,9 +80,24 @@ public class BlowdryerSetup {
 			setGlobals();
 		}
 
+		public GitHub authToken(String authToken) {
+			this.authToken = authToken;
+			return setGlobals();
+		}
+
 		private GitHub setGlobals() {
 			String root = "https://" + GITHUB_HOST + "/" + repoOrg + "/" + anchor + "/";
 			Blowdryer.setResourcePlugin(resource -> root + getFullResourcePath(resource));
+			if (authToken == null) {
+				Blowdryer.setAuthPlugin((url, builder) -> {
+					if (builder.getUrl$okhttp().host().equals(GITHUB_HOST)) {
+						builder.addHeader("Authorization", "Bearer " + authToken);
+					}
+					return builder;
+				});
+			} else {
+				Blowdryer.setAuthPlugin(null);
+			}
 			return this;
 		}
 	}
