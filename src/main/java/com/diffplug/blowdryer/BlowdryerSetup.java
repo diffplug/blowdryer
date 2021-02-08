@@ -72,6 +72,7 @@ public class BlowdryerSetup {
 		private @Nullable String authToken;
 
 		private GitHub(String repoOrg, String anchor) {
+			Blowdryer.assertPluginNotSet();
 			this.repoOrg = assertNoLeadingOrTrailingSlash(repoOrg);
 			this.anchor = assertNoLeadingOrTrailingSlash(anchor);
 			setGlobals();
@@ -83,18 +84,14 @@ public class BlowdryerSetup {
 		}
 
 		private GitHub setGlobals() {
+			Blowdryer.setResourcePluginNull();
 			String root = "https://" + GITHUB_HOST + "/" + repoOrg + "/" + anchor + "/";
-			Blowdryer.setResourcePlugin(resource -> root + getFullResourcePath(resource));
-			if (authToken != null) {
-				Blowdryer.setAuthPlugin((url, builder) -> {
-					if (url.startsWith(root)) {
-						builder.addHeader("Authorization", "Bearer " + authToken);
-					}
-					return builder;
-				});
-			} else {
-				Blowdryer.setAuthPlugin(null);
-			}
+			Blowdryer.setResourcePlugin(resource -> root + getFullResourcePath(resource), authToken == null ? null : (url, builder) -> {
+				if (url.startsWith(root)) {
+					builder.addHeader("Authorization", "Bearer " + authToken);
+				}
+				return builder;
+			});
 			return this;
 		}
 	}
@@ -112,6 +109,7 @@ public class BlowdryerSetup {
 		private String protocol, host;
 
 		private GitLab(String repoOrg, String anchor) {
+			Blowdryer.assertPluginNotSet();
 			this.repoOrg = assertNoLeadingOrTrailingSlash(repoOrg);
 			this.anchor = assertNoLeadingOrTrailingSlash(anchor);
 			customDomainHttps(GITLAB_HOST);
@@ -137,19 +135,15 @@ public class BlowdryerSetup {
 		}
 
 		private GitLab setGlobals() {
+			Blowdryer.setResourcePluginNull();
 			String urlStart = protocol + host + "/api/v4/projects/" + encodeUrlPart(repoOrg) + "/repository/files/";
 			String urlEnd = "/raw?ref=" + encodeUrlPart(anchor);
-			Blowdryer.setResourcePlugin(resource -> urlStart + encodeUrlPart(getFullResourcePath(resource)) + urlEnd);
-			if (authToken != null) {
-				Blowdryer.setAuthPlugin((url, builder) -> {
-					if (url.startsWith(urlStart)) {
-						builder.addHeader("Authorization", "Bearer " + authToken);
-					}
-					return builder;
-				});
-			} else {
-				Blowdryer.setAuthPlugin(null);
-			}
+			Blowdryer.setResourcePlugin(resource -> urlStart + encodeUrlPart(getFullResourcePath(resource)) + urlEnd, authToken == null ? null : (url, builder) -> {
+				if (url.startsWith(urlStart)) {
+					builder.addHeader("Authorization", "Bearer " + authToken);
+				}
+				return builder;
+			});
 			return this;
 		}
 	}

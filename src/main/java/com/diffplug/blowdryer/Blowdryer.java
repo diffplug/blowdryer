@@ -186,16 +186,26 @@ public class Blowdryer {
 		}
 	}
 
+	static void assertPluginNotSet() {
+		assertPluginNotSet("You already initialized the `blowdryer` plugin, you can't do this twice.");
+	}
+
 	static void setResourcePluginNull() {
 		synchronized (Blowdryer.class) {
 			Blowdryer.plugin = null;
+			Blowdryer.authPlugin = authPluginNone;
 		}
 	}
 
 	static void setResourcePlugin(ResourcePlugin plugin) {
+		setResourcePlugin(plugin, null);
+	}
+
+	static void setResourcePlugin(ResourcePlugin plugin, AuthPlugin authPlugin) {
 		synchronized (Blowdryer.class) {
-			assertPluginNotSet("You already initialized the `blowdryer` plugin, you can't do this twice.");
+			assertPluginNotSet();
 			Blowdryer.plugin = plugin;
+			Blowdryer.authPlugin = authPlugin == null ? authPluginNone : authPlugin;
 		}
 	}
 
@@ -209,14 +219,8 @@ public class Blowdryer {
 		Request.Builder addAuthToken(String url, Request.Builder builder) throws MalformedURLException;
 	}
 
-	private static final AuthPlugin authPluginNone = (url, builder) -> builder;;
+	private static final AuthPlugin authPluginNone = (url, builder) -> builder;
 	private static AuthPlugin authPlugin = authPluginNone;
-
-	public static void setAuthPlugin(AuthPlugin authPlugin) {
-		synchronized (Blowdryer.class) {
-			Blowdryer.authPlugin = authPlugin == null ? authPluginNone : authPlugin;
-		}
-	}
 
 	/** Returns the given resource as a File (as configured by {@link BlowdryerSetup}. */
 	public static File file(String resourcePath) {
