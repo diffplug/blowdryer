@@ -6,8 +6,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Support for gitlab public repo #13
-- Support for gitlab custom host for self hosted
-- Support for Token based Authorization for gitlab and github private repositories #14
 
 ## [1.0.0] - 2020-01-09
 

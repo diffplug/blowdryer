@@ -37,20 +37,6 @@ public class BlowdryerPluginTest extends GradleHarness {
 				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
-	private void settingsCustomGitlab(String tag, String... extra) throws IOException {
-		write("settings.gradle",
-				"plugins { id 'com.diffplug.blowdryerSetup' }",
-				"blowdryerSetup { gitlab('vgropp/blowdryer-test', 'tag', '" + tag + "').customDomainHttps('gitlab.com') }",
-				Arrays.stream(extra).collect(Collectors.joining("\n")));
-	}
-
-	private void settingsGitlabRootFolder(String tag, String... extra) throws IOException {
-		write("settings.gradle",
-				"plugins { id 'com.diffplug.blowdryerSetup' }",
-				"blowdryerSetup { repoSubfolder(''); gitlab('vgropp/blowdryer-test', 'tag', '" + tag + "') }",
-				Arrays.stream(extra).collect(Collectors.joining("\n")));
-	}
-
 	@Test
 	public void githubTag() throws IOException {
 		settingsGithub("test/2/a");
@@ -100,58 +86,6 @@ public class BlowdryerPluginTest extends GradleHarness {
 		write("build.gradle",
 				"plugins { id 'com.diffplug.blowdryer' }",
 				"assert Blowdryer.file('sample').text == 'a'");
-		gradleRunner().buildAndFail();
-	}
-
-	@Test
-	public void customGitlabTag() throws IOException {
-		settingsCustomGitlab("test/2/a");
-		write("build.gradle",
-				"apply plugin: 'com.diffplug.blowdryer'",
-				"assert 干.file('sample').text == 'a'",
-				"assert 干.prop('sample', 'name') == 'test'",
-				"assert 干.prop('sample', 'ver_spotless') == '1.2.0'");
-		gradleRunner().build();
-
-		settingsCustomGitlab("test/2/b");
-		write("build.gradle",
-				"apply plugin: 'com.diffplug.blowdryer'",
-				"assert 干.file('sample').text == 'b'",
-				"assert 干.prop('sample', 'name') == 'testB'",
-				"assert 干.prop('sample', 'group') == 'com.diffplug.gradleB'");
-		gradleRunner().build();
-
-		// double-check that failures do fail
-		settingsCustomGitlab("test/2/b");
-		write("build.gradle",
-				"plugins { id 'com.diffplug.blowdryer' }",
-				"assert Blowdryer.file('sample').text == 'a'");
-		gradleRunner().buildAndFail();
-	}
-
-	@Test
-	public void rootfolderGitlabTag() throws IOException {
-		settingsGitlabRootFolder("test/2/a");
-		write("build.gradle",
-				"apply plugin: 'com.diffplug.blowdryer'",
-				"assert 干.file('src/main/resources/sample').text == 'a'",
-				"assert 干.prop('src/main/resources/sample', 'name') == 'test'",
-				"assert 干.prop('src/main/resources/sample', 'ver_spotless') == '1.2.0'");
-		gradleRunner().build();
-
-		settingsGitlabRootFolder("test/2/b");
-		write("build.gradle",
-				"apply plugin: 'com.diffplug.blowdryer'",
-				"assert 干.file('src/main/resources/sample').text == 'b'",
-				"assert 干.prop('src/main/resources/sample', 'name') == 'testB'",
-				"assert 干.prop('src/main/resources/sample', 'group') == 'com.diffplug.gradleB'");
-		gradleRunner().build();
-
-		// double-check that failures do fail
-		settingsGitlabRootFolder("test/2/b");
-		write("build.gradle",
-				"plugins { id 'com.diffplug.blowdryer' }",
-				"assert Blowdryer.file('src/main/resources/sample').text == 'a'");
 		gradleRunner().buildAndFail();
 	}
 
