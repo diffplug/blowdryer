@@ -90,7 +90,6 @@ public class BlowdryerSetup {
 				if (url.startsWith(root)) {
 					builder.addHeader("Authorization", "Bearer " + authToken);
 				}
-				return builder;
 			});
 			return this;
 		}
@@ -142,7 +141,6 @@ public class BlowdryerSetup {
 				if (url.startsWith(urlStart)) {
 					builder.addHeader("Authorization", "Bearer " + authToken);
 				}
-				return builder;
 			});
 			return this;
 		}

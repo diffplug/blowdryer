@@ -133,8 +133,9 @@ public class Blowdryer {
 
 	private static void download(String url, File dst) throws IOException {
 		OkHttpClient client = new OkHttpClient.Builder().build();
-		Request req = authPlugin.addAuthToken(url, new Request.Builder().url(url)).build();
-		try (Response response = client.newCall(req).execute()) {
+		Request.Builder req = new Request.Builder().url(url);
+		authPlugin.addAuthToken(url, req);
+		try (Response response = client.newCall(req.build()).execute()) {
 			if (!response.isSuccessful()) {
 				throw new IllegalArgumentException(url + "\nreceived http code " + response.code() + "\n" + response.body().string());
 			}
@@ -216,10 +217,10 @@ public class Blowdryer {
 	}
 
 	static interface AuthPlugin {
-		Request.Builder addAuthToken(String url, Request.Builder builder) throws MalformedURLException;
+		void addAuthToken(String url, Request.Builder builder) throws MalformedURLException;
 	}
 
-	private static final AuthPlugin authPluginNone = (url, builder) -> builder;
+	private static final AuthPlugin authPluginNone = (url, builder) -> {};
 	private static AuthPlugin authPlugin = authPluginNone;
 
 	/** Returns the given resource as a File (as configured by {@link BlowdryerSetup}. */
