@@ -5,9 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Support for gitlab public repo #13
+### Added
+- Support for GitLab, self-hosted and `gitlab.com` ([#18](https://github.com/diffplug/blowdryer/pull/18)).
+- Support for private GitHub and GitLab script repositories via auth tokens ([#18](https://github.com/diffplug/blowdryer/pull/18)).
 
 ## [1.0.0] - 2020-01-09
+Same as `0.2.0`, just committing to API back-compat from here.
 
 ## [0.2.0] - 2020-01-09
 ### Added

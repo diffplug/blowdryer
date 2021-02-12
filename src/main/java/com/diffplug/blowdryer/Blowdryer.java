@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Base64;
@@ -132,8 +133,9 @@ public class Blowdryer {
 
 	private static void download(String url, File dst) throws IOException {
 		OkHttpClient client = new OkHttpClient.Builder().build();
-		Request req = new Request.Builder().url(url).build();
-		try (Response response = client.newCall(req).execute()) {
+		Request.Builder req = new Request.Builder().url(url);
+		authPlugin.addAuthToken(url, req);
+		try (Response response = client.newCall(req.build()).execute()) {
 			if (!response.isSuccessful()) {
 				throw new IllegalArgumentException(url + "\nreceived http code " + response.code() + "\n" + response.body().string());
 			}
@@ -185,16 +187,26 @@ public class Blowdryer {
 		}
 	}
 
+	static void assertPluginNotSet() {
+		assertPluginNotSet("You already initialized the `blowdryer` plugin, you can't do this twice.");
+	}
+
 	static void setResourcePluginNull() {
 		synchronized (Blowdryer.class) {
 			Blowdryer.plugin = null;
+			Blowdryer.authPlugin = authPluginNone;
 		}
 	}
 
 	static void setResourcePlugin(ResourcePlugin plugin) {
+		setResourcePlugin(plugin, null);
+	}
+
+	static void setResourcePlugin(ResourcePlugin plugin, AuthPlugin authPlugin) {
 		synchronized (Blowdryer.class) {
-			assertPluginNotSet("You already initialized the `blowdryer` plugin, you can't do this twice.");
+			assertPluginNotSet();
 			Blowdryer.plugin = plugin;
+			Blowdryer.authPlugin = authPlugin == null ? authPluginNone : authPlugin;
 		}
 	}
 
@@ -203,6 +215,13 @@ public class Blowdryer {
 			throw new IllegalStateException("You needed to initialize the `blowdryer` plugin in the root build.gradle first.");
 		}
 	}
+
+	static interface AuthPlugin {
+		void addAuthToken(String url, Request.Builder builder) throws MalformedURLException;
+	}
+
+	private static final AuthPlugin authPluginNone = (url, builder) -> {};
+	private static AuthPlugin authPlugin = authPluginNone;
 
 	/** Returns the given resource as a File (as configured by {@link BlowdryerSetup}. */
 	public static File file(String resourcePath) {

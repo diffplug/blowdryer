@@ -2,7 +2,6 @@ plugins {
 	id 'com.diffplug.blowdryer'
 	id 'com.diffplug.gradle.spotless'
 	id 'com.diffplug.spotless-changelog'
-	id 'com.github.ben-manes.versions'
 	id 'com.gradle.plugin-publish'
 	id 'com.jfrog.bintray'
 }
