@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 DiffPlug
+ * Copyright (C) 2019-2021 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,5 +29,13 @@ public class BlowdryerTest {
 
 	private void filenameSafe(String url, String safe) {
 		Assertions.assertThat(Blowdryer.filenameSafe(url)).isEqualTo(safe);
+	}
+
+	@Test
+	public void cachedFileDeleted_issue_11() {
+		String test = "https://raw.githubusercontent.com/diffplug/blowdryer/test/2/b/src/main/resources/sample";
+		Assertions.assertThat(Blowdryer.immutableUrl(test)).hasContent("b");
+		Blowdryer.immutableUrl(test).delete();
+		Assertions.assertThat(Blowdryer.immutableUrl(test)).hasContent("b");
 	}
 }
