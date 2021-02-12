@@ -51,9 +51,10 @@ plugins {
 }
 
 blowdryerSetup {
-  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
-  //   or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
-  //   or 'tree', '07f588e52eb0f31e596eab0228a5df7233a98a14'
+  github('acme/blowdryer-acme', 'tag', 'v1.4.5')
+  //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
+  //                         or 'tree',   'a5df7233a98a1407f588e52eb0f31e596eab0228'
+  // or gitlab('acme/blowdryer-acme', 'tag', 'v1.4.5').customDomainHttp('acme.org').authToken('abc123')
 }
 ```
 
@@ -155,6 +156,9 @@ static String 干.proj(Project proj, String String key, String description)
 static <T> T  干.proj(Project proj, Class<T> clazz, String String key, String description)
 ```
 
+- [javadoc `BlowdryerSetup`](https://javadoc.io/static/com.diffplug/blowdryer/1.1.0/com/diffplug/blowdryer/BlowdryerSetup.html)
+- [javadoc `Blowdryer`](https://javadoc.io/static/com.diffplug/blowdryer/1.1.0/com/diffplug/blowdryer/Blowdryer.html)
+
 If you do `apply plugin: 'com.diffplug.blowdryer'` then every project gets an extension object ([code](https://github.com/diffplug/blowdryer/blob/master/src/main/java/com/diffplug/blowdryer/BlowdryerPlugin.java)) where the project field has been filled in for you, which is why we don't pass it explicitly in the examples before this section.  If you don't apply the plugin, you can still call these static methods and pass `project` explicitly for the `proj()` methods.
 
 ### Using with Kotlin
@@ -194,9 +198,10 @@ When you setup the Blowdryer plugin in your `settings.gradle`, you're telling Bl
 ```java
 //blowdryer {
 //  github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
-public void github(String repoOrg, GitAnchorType anchorType, String anchor) {
+public GitHub github(String repoOrg, GitAnchorType anchorType, String anchor) {
   String root = "https://raw.githubusercontent.com/" + repoOrg + "/" + anchor + "/" + repoSubfolder + "/";
   Blowdryer.setResourcePlugin(resource -> root + resource);
+  return <fluent_configurator_for_optional_auth_token>;
 }
 ```
 
