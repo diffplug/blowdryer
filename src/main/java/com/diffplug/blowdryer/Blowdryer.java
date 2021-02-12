@@ -80,7 +80,7 @@ public class Blowdryer {
 	public static File immutableUrl(String url) {
 		synchronized (Blowdryer.class) {
 			File result = urlToContent.get(url);
-			if (result != null) {
+			if (result != null && result.isFile()) {
 				return result;
 			}
 
