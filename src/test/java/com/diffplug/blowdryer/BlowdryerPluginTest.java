@@ -33,21 +33,21 @@ public class BlowdryerPluginTest extends GradleHarness {
 	private void settingsGitlab(String tag, String... extra) throws IOException {
 		write("settings.gradle",
 				"plugins { id 'com.diffplug.blowdryerSetup' }",
-				"blowdryerSetup { gitlab('diffplug/blowdryer-test', 'tag', '" + tag + "') }",
+				"blowdryerSetup { gitlab('diffplug/blowdryer', 'tag', '" + tag + "') }",
 				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
 	private void settingsCustomGitlab(String tag, String... extra) throws IOException {
 		write("settings.gradle",
 				"plugins { id 'com.diffplug.blowdryerSetup' }",
-				"blowdryerSetup { gitlab('diffplug/blowdryer-test', 'tag', '" + tag + "').customDomainHttps('gitlab.com') }",
+				"blowdryerSetup { gitlab('diffplug/blowdryer', 'tag', '" + tag + "').customDomainHttps('gitlab.com') }",
 				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
 	private void settingsGitlabRootFolder(String tag, String... extra) throws IOException {
 		write("settings.gradle",
 				"plugins { id 'com.diffplug.blowdryerSetup' }",
-				"blowdryerSetup { repoSubfolder(''); gitlab('diffplug/blowdryer-test', 'tag', '" + tag + "') }",
+				"blowdryerSetup { repoSubfolder(''); gitlab('diffplug/blowdryer', 'tag', '" + tag + "') }",
 				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
