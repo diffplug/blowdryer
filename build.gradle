@@ -4,6 +4,7 @@ plugins {
 	id 'com.diffplug.spotless-changelog'
 	id 'com.gradle.plugin-publish'
 	id 'com.jfrog.bintray'
+	id "com.palantir.idea-test-fix" version "0.1.0" // Added to run tests successfully in IntelliJ
 }
 
 apply from: 干.file('base/changelog.gradle')

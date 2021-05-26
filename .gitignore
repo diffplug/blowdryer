@@ -14,3 +14,4 @@ bin/
 
 # IntelliJ
 .idea/
+out/
