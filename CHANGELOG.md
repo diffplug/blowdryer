@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2021-05-26
+### Added
+- Support for local JAR file ([#20](https://github.com/diffplug/blowdryer/pull/20))
+
 ## [1.1.1] - 2021-02-12
 ### Fixed
 - Occasionally a file would be deleted from temp storage while a long-lived gradle daemon kept it in cache ([#11](https://github.com/diffplug/blowdryer/pull/18)).
