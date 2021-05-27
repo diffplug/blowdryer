@@ -290,13 +290,25 @@ public class BlowdryerPluginTest extends GradleHarness {
 
 	@Test
 	public void localJarFileDownloadExists() throws IOException {
-		String jarFile = BlowdryerPluginTest.class.getResource("test-dependency.jar").getFile();
+		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
 		settingsLocalJar(jarFile);
 
 		write(BUILD_GRADLE,
 				"apply plugin: 'com.diffplug.blowdryer'",
-				"assert 干.file('spotless/license-header.java').exists()");
+				"assert 干.file('sample').exists()");
 
 		gradleRunner().build();
+	}
+
+	@Test
+	public void localJarFileDownloadDoesNotExist() throws IOException {
+		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
+		settingsLocalJar(jarFile);
+
+		write(BUILD_GRADLE,
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('invalid-file.txt').exists()");
+
+		gradleRunner().buildAndFail();
 	}
 }

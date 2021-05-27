@@ -41,7 +41,7 @@ public class BlowdryerTest {
 
 	@Test
 	public void immutableUrlOfLocalJar() {
-		String jarFile = BlowdryerPluginTest.class.getResource("test-dependency.jar").getFile();
-		Assertions.assertThat(Blowdryer.immutableUrl("file:///" + jarFile + "!/spotless/license-header.java")).exists();
+		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
+		Assertions.assertThat(Blowdryer.immutableUrl("file:///" + jarFile + "!/sample")).exists();
 	}
 }
