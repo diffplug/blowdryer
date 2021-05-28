@@ -52,6 +52,10 @@ import org.gradle.api.Project;
  * determined by {@link BlowdryerSetup}.
  */
 public class Blowdryer {
+
+	private static final String FILE_PROTOCOL = "file:///";
+	private static final String JAR_FILE_RESOURCE_SEPARATOR = "!/";
+
 	private Blowdryer() {}
 
 	static {
@@ -137,7 +141,7 @@ public class Blowdryer {
 	private static final String PROP_URL = "url";
 
 	private static void download(String url, File dst) throws IOException, URISyntaxException {
-		if (url != null && url.startsWith("file:///")) {
+		if (url.startsWith(FILE_PROTOCOL)) {
 			downloadLocal(url, dst);
 		} else {
 			downloadRemote(url, dst);
@@ -146,7 +150,7 @@ public class Blowdryer {
 
 	private static void downloadLocal(String url, File dst) throws IOException, URISyntaxException {
 
-		String[] splitUrl = url.split("!/");
+		String[] splitUrl = url.split(JAR_FILE_RESOURCE_SEPARATOR);
 		if (splitUrl.length != 2) {
 			throw new IllegalArgumentException("Expected a file URL in the format: file:///path-to-dependency.jar!/path-to-file.ext");
 		}

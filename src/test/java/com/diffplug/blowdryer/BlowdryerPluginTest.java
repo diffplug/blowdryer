@@ -58,7 +58,7 @@ public class BlowdryerPluginTest extends GradleHarness {
 	private void settingsLocalJar(String dependency) throws IOException {
 		write(SETTINGS_GRADLE,
 				"plugins { id 'com.diffplug.blowdryerSetup' }",
-				"blowdryerSetup { localJar('" + dependency + "') }");
+				"blowdryerSetup { localJar(file('" + dependency + "')) }");
 	}
 
 	@Test
