@@ -20,6 +20,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public class BlowdryerTest {
+	private static final String JAR_FILE_RESOURCE_SEPARATOR = "!/";
+	private static final String FILE_PROTOCOL = "file:///";
+
 	@Test
 	public void filenameSafe() {
 		filenameSafe("http://shortName.com/a+b-0-9~Z", "http-shortName.com-a+b-0-9-Z");
@@ -37,5 +40,11 @@ public class BlowdryerTest {
 		Assertions.assertThat(Blowdryer.immutableUrl(test)).hasContent("b");
 		Blowdryer.immutableUrl(test).delete();
 		Assertions.assertThat(Blowdryer.immutableUrl(test)).hasContent("b");
+	}
+
+	@Test
+	public void immutableUrlOfLocalJar() {
+		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
+		Assertions.assertThat(Blowdryer.immutableUrl(FILE_PROTOCOL + jarFile + JAR_FILE_RESOURCE_SEPARATOR + "sample")).exists();
 	}
 }

@@ -146,6 +146,18 @@ public class BlowdryerSetup {
 		}
 	}
 
+	/**
+	 * Uses the provided {@code jarFile} to extract a file resource.
+	 * @param jarFile Absolute path to JAR on the file system.
+	 */
+	public void localJar(File jarFile) {
+		Objects.requireNonNull(jarFile, "jarFile must not be null.");
+		Blowdryer.setResourcePluginNull();
+
+		String rootUrl = "file:///" + jarFile.getAbsolutePath() + "!/";
+		Blowdryer.setResourcePlugin(resource -> rootUrl + resource);
+	}
+
 	@NotNull
 	private String getFullResourcePath(String resource) {
 		return (repoSubfolder.isEmpty() ? "" : repoSubfolder + "/") + resource;

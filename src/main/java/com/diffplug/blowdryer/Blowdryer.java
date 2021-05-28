@@ -21,10 +21,13 @@ import com.diffplug.common.base.StandardSystemProperty;
 import com.diffplug.common.hash.Hashing;
 import com.diffplug.common.io.Files;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Base64;
@@ -34,6 +37,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -47,6 +52,10 @@ import org.gradle.api.Project;
  * determined by {@link BlowdryerSetup}.
  */
 public class Blowdryer {
+
+	private static final String FILE_PROTOCOL = "file:///";
+	private static final String JAR_FILE_RESOURCE_SEPARATOR = "!/";
+
 	private Blowdryer() {}
 
 	static {
@@ -111,7 +120,7 @@ public class Blowdryer {
 					urlToContent.put(url, dataFile);
 					return dataFile;
 				}
-			} catch (IOException e) {
+			} catch (IOException | URISyntaxException e) {
 				throw Errors.asRuntime(e);
 			}
 		}
@@ -131,7 +140,35 @@ public class Blowdryer {
 
 	private static final String PROP_URL = "url";
 
-	private static void download(String url, File dst) throws IOException {
+	private static void download(String url, File dst) throws IOException, URISyntaxException {
+		if (url.startsWith(FILE_PROTOCOL)) {
+			downloadLocal(url, dst);
+		} else {
+			downloadRemote(url, dst);
+		}
+	}
+
+	private static void downloadLocal(String url, File dst) throws IOException, URISyntaxException {
+
+		String[] splitUrl = url.split(JAR_FILE_RESOURCE_SEPARATOR);
+		if (splitUrl.length != 2) {
+			throw new IllegalArgumentException("Expected a file URL in the format: file:///path-to-dependency.jar!/path-to-file.ext");
+		}
+
+		String jarPath = splitUrl[0];
+		String filename = splitUrl[1];
+
+		URI jarPathUri = new URI(jarPath);
+		try (ZipFile jar = new ZipFile(new File(jarPathUri))) {
+			ZipEntry foundEntry = jar.stream()
+					.filter(s -> s.getName().equals(filename)).findAny()
+					.orElseThrow(() -> new FileNotFoundException("Could not find '" + filename + "' in '" + jarPath + "'"));
+
+			java.nio.file.Files.copy(jar.getInputStream(foundEntry), dst.toPath());
+		}
+	}
+
+	private static void downloadRemote(String url, File dst) throws IOException {
 		OkHttpClient client = new OkHttpClient.Builder().build();
 		Request.Builder req = new Request.Builder().url(url);
 		authPlugin.addAuthToken(url, req);
@@ -154,7 +191,7 @@ public class Blowdryer {
 
 	/** Returns either the filename safe URL, or (first40)--(Base64 filenamesafe)(last40). */
 	static String filenameSafe(String url) {
-		String allSafeCharacters = url.replaceAll("[^a-zA-Z0-9-+_\\.]", "-");
+		String allSafeCharacters = url.replaceAll("[^a-zA-Z0-9-+_.]", "-");
 		String noDuplicateDash = allSafeCharacters.replaceAll("-+", "-");
 		if (noDuplicateDash.length() <= MAX_FILE_LENGTH) {
 			return noDuplicateDash;
