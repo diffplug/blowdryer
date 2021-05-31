@@ -41,23 +41,15 @@ output = prefixDelimiterReplace(output, "'com.diffplug:blowdryer:", "'", version
 
 ## How to use it
 
-### `settings.gradle`
+First, make a public github repository ([`diffplug/blowdryer-diffplug`](https://github.com/diffplug/blowdryer-diffplug) is a good example), and push the stuff that you want to centralize into the `src/main/resources` subdirectory of that repo.
 
-For the project that you want to suck these into, first add the plugin:
+Then, in the `settings.gradle` for the project that you want to suck these into, do this:
 
 ```gradle
 plugins {
   id 'com.diffplug.blowdryerSetup' version '1.1.1'
 }
-```
 
-Then, continuing in `settings.gradle`, configure `blowdryerSetup` closure with your preferred method of retrieval:
-
-#### GitHub/GitLab
-
-First, make a public GitHub repository ([`diffplug/blowdryer-diffplug`](https://github.com/diffplug/blowdryer-diffplug) is a good example), and push the stuff that you want to centralize into the `src/main/resources` subdirectory of that repo.
-
-```gradle
 blowdryerSetup {
   github('acme/blowdryer-acme', 'tag', 'v1.4.5')
   //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
@@ -65,18 +57,6 @@ blowdryerSetup {
   // or gitlab('acme/blowdryer-acme', 'tag', 'v1.4.5').customDomainHttp('acme.org').authToken('abc123')
 }
 ```
-
-#### Local JAR
-
-For this approach, you will need to path the full, absolute path to the JAR file.
-
-```gradle
-blowdryerSetup {
-  localJar(file('/path/to/dependency.jar'))
-}
-```
-
-### `build.gradle`
 
 Now, in *only* your root `build.gradle`, do this: `apply plugin: 'com.diffplug.blowdryer'`.  Now, in any project throughout your gradle build (including subprojects), you can do this:
 
@@ -151,7 +131,7 @@ The call to `devLocal` means that all calls to `Blowdryer.file` will skip cachin
 
 ### `repoSubfolder`
 
-If using the GitHub/GitLab retrieval approach, and you want your scripts to come from a different subfolder, you can change it:
+If you want your scripts to come from a different subfolder, you can change it:
 
 ```gradle
 // settings.gradle
@@ -161,7 +141,7 @@ blowdryerSetup {
 }
 ```
 
-The Local JAR approach does not consider `repoSubFolder`, as the `src/main/resources` folder structure is not retained.
+The nice thing about the default `src/main/resources` is that if you ever want to, you can publish the repository as a plain-old jar and pull the resources from that jar rather than from a github repository.  That's currently unsupported in Blowdryer, but it would be easy to add.
 
 ## API Reference
 
