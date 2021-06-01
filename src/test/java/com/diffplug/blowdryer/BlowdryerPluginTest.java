@@ -301,6 +301,18 @@ public class BlowdryerPluginTest extends GradleHarness {
 	}
 
 	@Test
+	public void localJarRepoSubfolderException() throws IOException {
+		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
+		write(SETTINGS_GRADLE,
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				"blowdryerSetup {",
+				"  repoSubfolder('blah')",
+				"  localJar(file('" + jarFile + "'))",
+				"}");
+		Assertions.assertThat(gradleRunner().buildAndFail().getOutput().replace("\r\n", "\n")).contains("repoSubfolder has no effect when reading from a jar");
+	}
+
+	@Test
 	public void localJarFileDownloadDoesNotExist() throws IOException {
 		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
 		settingsLocalJar(jarFile);

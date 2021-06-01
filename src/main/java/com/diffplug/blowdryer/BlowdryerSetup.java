@@ -41,7 +41,8 @@ public class BlowdryerSetup {
 		this.referenceDirectory = referenceDirectory;
 	}
 
-	private String repoSubfolder = "src/main/resources";
+	private static final String REPO_SUBFOLDER_DEFAULT = "src/main/resources";
+	private String repoSubfolder = REPO_SUBFOLDER_DEFAULT;
 
 	/**
 	 * Default value is `src/main/resources`.  If you change, you must change as the *first* call.
@@ -153,6 +154,9 @@ public class BlowdryerSetup {
 	public void localJar(File jarFile) {
 		Objects.requireNonNull(jarFile, "jarFile must not be null.");
 		Blowdryer.setResourcePluginNull();
+		if (!repoSubfolder.equals(REPO_SUBFOLDER_DEFAULT)) {
+			throw new IllegalArgumentException("repoSubfolder has no effect when reading from a jar, delete the call to repoSubfolder.");
+		}
 
 		String rootUrl = "file:///" + jarFile.getAbsolutePath() + "!/";
 		Blowdryer.setResourcePlugin(resource -> rootUrl + resource);
