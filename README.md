@@ -141,7 +141,18 @@ blowdryerSetup {
 }
 ```
 
-The nice thing about the default `src/main/resources` is that if you ever want to, you can publish the repository as a plain-old jar and pull the resources from that jar rather than from a github repository.  That's currently unsupported in Blowdryer, but it would be easy to add.
+The nice thing about the default `src/main/resources` is that if you ever want to, you can package the files into a plain-old jar and pull the resources from that jar rather than from a github repository.
+
+### Packaging as jar
+
+```gradle
+// settings.gradle
+blowdryerSetup {
+  localJar(file('/absolute/path/to/dependency.jar'))
+}
+```
+
+To pull this jar from a maven repository, see [#21](https://github.com/diffplug/blowdryer/issues/21).
 
 ## API Reference
 
@@ -189,7 +200,9 @@ somePlugin {
 }
 ```
 
-### Setup with something besides GitHub
+<a name="setup-with-something-besides-github"></a>
+
+### Other packaging options
 
 [`Blowdryer.immutableUrl`](https://javadoc.io/static/com.diffplug/blowdryer/1.1.1/com/diffplug/blowdryer/Blowdryer.html#immutableUrl-java.lang.String-) returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the content of that URL is immutable.
 
@@ -218,6 +231,7 @@ blowdryerSetup {
 Here are resource repositories in the wild (PRs welcome for others!)
 
 - https://github.com/diffplug/blowdryer-diffplug
+- https://github.com/mytakedotorg/blowdryer-mtdo
 
 ## Blowdryer for [gulp](https://gulpjs.com/), etc.
 
