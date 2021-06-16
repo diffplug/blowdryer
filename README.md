@@ -9,8 +9,8 @@ output = [
     link(shield('Changelog', 'changelog', versionLast, 'brightgreen'), 'CHANGELOG.md'),
     link(shield('Javadoc', 'javadoc', 'yes', 'brightgreen'), 'https://javadoc.io/doc/com.diffplug/blowdryer/{{versionLast}}/index.html'),
     link(shield('Live chat', 'gitter', 'chat', 'brightgreen'), 'https://gitter.im/diffplug/blowdryer'),
-    link(image('JitCI', 'https://jitci.com/gh/diffplug/blowdryer/svg'), 'https://jitci.com/gh/diffplug/blowdryer')
-    ].join('\n');
+    link(image('CircleCI', 'https://circleci.com/gh/diffplug/blowdryer.svg?style=shield'), 'https://circleci.com/gh/diffplug/blowdryer')
+].join('\n');
 -->
 [![Gradle plugin](https://img.shields.io/badge/plugins.gradle.org-com.diffplug.blowdryer-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.blowdryer)
 [![Maven central](https://img.shields.io/badge/mavencentral-available-blue.svg)](https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22)
@@ -19,7 +19,7 @@ output = [
 [![Changelog](https://img.shields.io/badge/changelog-1.2.1-brightgreen.svg)](CHANGELOG.md)
 [![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/1.2.1/index.html)
 [![Live chat](https://img.shields.io/badge/gitter-chat-brightgreen.svg)](https://gitter.im/diffplug/blowdryer)
-[![JitCI](https://jitci.com/gh/diffplug/blowdryer/svg)](https://jitci.com/gh/diffplug/blowdryer)
+[![CircleCI](https://circleci.com/gh/diffplug/blowdryer.svg?style=shield)](https://circleci.com/gh/diffplug/blowdryer)
 <!---freshmark /shields -->
 
 If you have multiple loosely-related gradle projects in separate repositories, then you probably have these problems:
