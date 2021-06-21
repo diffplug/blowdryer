@@ -24,4 +24,9 @@ public class GradleHarness extends ResourceHarness {
 	protected GradleRunner gradleRunner() throws IOException {
 		return GradleRunner.create().withProjectDir(rootFolder()).withPluginClasspath();
 	}
+
+	/** A GradleRunner with debugger attached. */
+	protected GradleRunner gradleRunnerDebug() throws IOException {
+		return GradleRunner.create().withProjectDir(rootFolder()).withDebug(true).withPluginClasspath();
+	}
 }

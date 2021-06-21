@@ -47,6 +47,8 @@ import okio.BufferedSink;
 import okio.Okio;
 import org.gradle.api.Project;
 
+import static com.diffplug.blowdryer.BlowdryerSetup.BITBUCKET_COMMIT_HASH_CACHE;
+
 /**
  * Public static methods which retrieve resources as
  * determined by {@link BlowdryerSetup}.
@@ -72,6 +74,7 @@ public class Blowdryer {
 			try {
 				urlToContent.clear();
 				fileToProps.clear();
+				BITBUCKET_COMMIT_HASH_CACHE.clear();
 				java.nio.file.Files.walk(cacheDir.toPath())
 						.sorted(Comparator.reverseOrder())
 						.forEach(Errors.rethrow().wrap((Path path) -> java.nio.file.Files.delete(path)));
@@ -191,6 +194,11 @@ public class Blowdryer {
 
 	/** Returns either the filename safe URL, or (first40)--(Base64 filenamesafe)(last40). */
 	static String filenameSafe(String url) {
+		//preserve the filename and extension if query parameters are present in original url.
+		if (url.contains("?at")) {
+			String fileNameWithoutQuery = url.substring(0, url.indexOf("?at"));
+			url = String.format("%s-%s", url, fileNameWithoutQuery.substring(fileNameWithoutQuery.lastIndexOf("/") + 1));
+		}
 		String allSafeCharacters = url.replaceAll("[^a-zA-Z0-9-+_.]", "-");
 		String noDuplicateDash = allSafeCharacters.replaceAll("-+", "-");
 		if (noDuplicateDash.length() <= MAX_FILE_LENGTH) {
@@ -253,7 +261,8 @@ public class Blowdryer {
 		}
 	}
 
-	static interface AuthPlugin {
+	@FunctionalInterface
+	interface AuthPlugin {
 		void addAuthToken(String url, Request.Builder builder) throws MalformedURLException;
 	}
 

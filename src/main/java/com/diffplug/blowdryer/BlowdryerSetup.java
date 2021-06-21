@@ -17,13 +17,27 @@ package com.diffplug.blowdryer;
 
 
 import com.diffplug.common.base.Errors;
+import com.google.gson.Gson;
 import groovy.lang.Closure;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Request.Builder;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.jetbrains.annotations.NotNull;
 
 /** Configures where {@link Blowdryer#file(String)} downloads files from. */
@@ -32,6 +46,12 @@ public class BlowdryerSetup {
 
 	private static final String GITHUB_HOST = "raw.githubusercontent.com";
 	private static final String GITLAB_HOST = "gitlab.com";
+	private static final String BITBUCKET_HOST = "api.bitbucket.org/2.0/repositories";
+
+	static final Map<String, String> BITBUCKET_COMMIT_HASH_CACHE = new HashMap<>();
+
+	private static final String HTTP_PROTOCOL = "http://";
+	private static final String HTTPS_PROTOCOL = "https://";
 
 	private final File referenceDirectory;
 
@@ -46,7 +66,7 @@ public class BlowdryerSetup {
 
 	/**
 	 * Default value is `src/main/resources`.  If you change, you must change as the *first* call.
-	 * 
+	 *
 	 * The nice thing about the default `src/main/resources` is that if you ever want to, you could
 	 * copy the blowdryer code into your blowdryer repo, and deploy your own plugin that pulls resources
 	 * from the local jar rather than from github.  Keeping the default lets you switch to that approach
@@ -58,7 +78,7 @@ public class BlowdryerSetup {
 	}
 
 	public enum GitAnchorType {
-		TAG, COMMIT, TREE
+		TAG, COMMIT, TREE, BRANCH
 	}
 
 	/** Sets the source where we will grab these scripts. */
@@ -68,8 +88,8 @@ public class BlowdryerSetup {
 	}
 
 	public class GitHub {
-		private String repoOrg;
-		private String anchor;
+		private final String repoOrg;
+		private final String anchor;
 		private @Nullable String authToken;
 
 		private GitHub(String repoOrg, String anchor) {
@@ -86,7 +106,7 @@ public class BlowdryerSetup {
 
 		private GitHub setGlobals() {
 			Blowdryer.setResourcePluginNull();
-			String root = "https://" + GITHUB_HOST + "/" + repoOrg + "/" + anchor + "/";
+			String root = HTTPS_PROTOCOL + GITHUB_HOST + "/" + repoOrg + "/" + anchor + "/";
 			Blowdryer.setResourcePlugin(resource -> root + getFullResourcePath(resource), authToken == null ? null : (url, builder) -> {
 				if (url.startsWith(root)) {
 					builder.addHeader("Authorization", "Bearer " + authToken);
@@ -103,8 +123,8 @@ public class BlowdryerSetup {
 	}
 
 	public class GitLab {
-		private String repoOrg;
-		private String anchor;
+		private final String repoOrg;
+		private final String anchor;
 		private @Nullable String authToken;
 		private String protocol, host;
 
@@ -121,11 +141,11 @@ public class BlowdryerSetup {
 		}
 
 		public GitLab customDomainHttp(String domain) {
-			return customProtocolAndDomain("http://", domain);
+			return customProtocolAndDomain(HTTP_PROTOCOL, domain);
 		}
 
 		public GitLab customDomainHttps(String domain) {
-			return customProtocolAndDomain("https://", domain);
+			return customProtocolAndDomain(HTTPS_PROTOCOL, domain);
 		}
 
 		private GitLab customProtocolAndDomain(String protocol, String domain) {
@@ -146,6 +166,195 @@ public class BlowdryerSetup {
 			return this;
 		}
 	}
+
+	public enum BitbucketType {
+		CLOUD, SERVER
+	}
+
+	/** Sets the source where we will grab these scripts. */
+	public Bitbucket bitbucket(String repoOrg, GitAnchorType anchorType, String anchor) {
+		return new Bitbucket(repoOrg, anchorType, anchor, BitbucketType.CLOUD);
+	}
+
+	public class Bitbucket {
+
+		private final String repoOrg;
+		private final String repoName;
+		private final String anchor;
+		private final GitAnchorType anchorType;
+		private BitbucketType bitbucketType;
+		private @Nullable String authToken;
+		private String protocol, host;
+
+		private Bitbucket(String repoOrg, GitAnchorType anchorType, String anchor, BitbucketType bitbucketType) {
+			Blowdryer.assertPluginNotSet();
+			final String[] repoOrgAndName = assertNoLeadingOrTrailingSlash(repoOrg).split("/");
+			if (repoOrgAndName.length != 2) {
+				throw new IllegalArgumentException("repoOrg must be in format 'repoOrg/repoName'");
+			}
+			this.repoOrg = repoOrgAndName[0];
+			this.repoName = repoOrgAndName[1];
+			this.anchorType = anchorType;
+			this.bitbucketType = bitbucketType;
+			this.anchor = assertNoLeadingOrTrailingSlash(anchor);
+			customDomainHttps(BITBUCKET_HOST);
+		}
+
+		/**
+		 * Only supported for Bitbucket Server 5.5+
+		 * Format: "personalAccessToken"
+		 */
+		public Bitbucket server() {
+			this.bitbucketType = BitbucketType.SERVER;
+			return setGlobals();
+		}
+
+		public Bitbucket serverAuth(String personalAccessToken) {
+			this.authToken = String.format("Bearer %s", personalAccessToken);
+			this.bitbucketType = BitbucketType.SERVER;
+			return setGlobals();
+		}
+
+		/**
+		 * Only available for Bitbucket Cloud.
+		 * Format: "username:appPassword"
+		 */
+		public Bitbucket cloudAuth(String usernameAndAppPassword) {
+			final String encoding = Base64.getEncoder().encodeToString((usernameAndAppPassword)
+          .getBytes(StandardCharsets.UTF_8));
+			this.authToken = String.format("Basic %s", encoding);
+			this.bitbucketType = BitbucketType.CLOUD;
+			return setGlobals();
+		}
+
+		public Bitbucket customDomainHttp(String domain) {
+			return customProtocolAndDomain(HTTP_PROTOCOL, domain);
+		}
+
+		public Bitbucket customDomainHttps(String domain) {
+			return customProtocolAndDomain(HTTPS_PROTOCOL, domain);
+		}
+
+		private Bitbucket customProtocolAndDomain(String protocol, String domain) {
+			this.protocol = protocol;
+			this.host = domain;
+			return setGlobals();
+		}
+
+		private Bitbucket setGlobals() {
+			Blowdryer.setResourcePluginNull();
+			String urlStart = getUrlStart();
+
+			Blowdryer.setResourcePlugin(resource -> getFullUrl(urlStart, encodeUrlParts(getFullResourcePath(resource))), (url, builder) -> {
+				if (authToken != null) {
+					builder.addHeader("Authorization", authToken);
+				}
+			});
+			return this;
+		}
+
+		// Bitbucket Cloud and Bitbucket Server (premium, company hosted) has different url structures.
+		// Bitbucket Cloud uses "org/repo" in URLs, where org is your (or someone else's) account name.
+		// Bitbucket Server uses "projects/PROJECT_KEY/repos/REPO_NAME" in urls.
+
+		private String getUrlStart() {
+			if (isServer()) {
+				return String.format("%s%s/projects/%s/repos/%s", protocol, host, repoOrg, repoName);
+			} else {
+				return String.format("%s%s/%s/%s", protocol, host, repoOrg, repoName);
+			}
+		}
+
+		private String getFullUrl(String urlStart, String filePath) {
+			if (isServer()) {
+				return String.format("%s/raw/%s?at=%s", urlStart, filePath, encodeUrlPart(getAnchor()));
+			} else {
+				return String.format("%s/src/%s/%s", urlStart, encodeUrlParts(getAnchorForCloudAsHash()), filePath);
+			}
+		}
+
+		private boolean isServer() {
+			return BitbucketType.SERVER.equals(this.bitbucketType);
+		}
+
+		private String getAnchor() {
+			switch (anchorType) {
+				case TAG:
+					return String.format("refs/tags/%s", anchor);
+				case BRANCH:
+					return String.format("refs/heads/%s", anchor);
+				case TREE:
+					throw new UnsupportedOperationException("TREE hash resolution is not supported.");
+				case COMMIT:
+				default:
+					return anchor;
+			}
+		}
+
+    private String getAnchorForCloudAsHash() {
+      switch (anchorType) {
+        case TAG:
+          return getCommitHash("refs/tags/");
+        case BRANCH:
+          return getCommitHash("refs/branches/");
+				case TREE:
+					throw new UnsupportedOperationException("TREE hash resolution is not supported.");
+        case COMMIT:
+        default:
+        	return anchor;
+      }
+    }
+
+		// Bitbucket API: https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Bworkspace%7D/%7Brepo_slug%7D/src/%7Bcommit%7D/%7Bpath%7D
+		private String getCommitHash(String baseRefs) {
+			String requestUrl = String.format("%s/%s%s", getUrlStart(), baseRefs, encodeUrlParts(anchor));
+
+      return BITBUCKET_COMMIT_HASH_CACHE.computeIfAbsent(requestUrl, url -> getCommitHashFromBitbucket(requestUrl));
+    }
+
+		private String getCommitHashFromBitbucket(String requestUrl) {
+			OkHttpClient client = new OkHttpClient.Builder().build();
+			Builder requestBuilder = new Builder()
+				.url(requestUrl);
+			if (authToken != null) {
+				requestBuilder
+					.addHeader("Authorization", authToken);
+			}
+			Request request = requestBuilder.build();
+
+			try (Response response = client.newCall(request).execute()) {
+				if (!response.isSuccessful()) {
+					throw new IllegalArgumentException(String.format("%s\nreceived http code %s \n %s", request.url(), response.code(),
+						Objects.requireNonNull(response.body()).string()));
+				}
+				try (ResponseBody body = response.body()) {
+					RefsTarget refsTarget = new Gson().fromJson(Objects.requireNonNull(body).string(), RefsTarget.class);
+					return refsTarget.target.hash;
+				}
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Body was expected to be non-null");
+			}
+		}
+
+		private class RefsTarget {
+
+		    private final Target target;
+
+        private RefsTarget(Target target) {
+            this.target = target;
+        }
+
+        private class Target {
+
+		        private final String hash;
+
+            private Target(String hash) {
+                this.hash = hash;
+            }
+
+        }
+    }
+  }
 
 	/**
 	 * Uses the provided {@code jarFile} to extract a file resource.
@@ -213,5 +422,11 @@ public class BlowdryerSetup {
 		} catch (UnsupportedEncodingException e) {
 			throw new IllegalArgumentException("error encoding part", e);
 		}
+	}
+
+	private static String encodeUrlParts(String part) {
+			return Arrays.stream(part.split("/"))
+				.map(BlowdryerSetup::encodeUrlPart)
+				.collect(Collectors.joining("/"));
 	}
 }

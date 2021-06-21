@@ -72,6 +72,67 @@ somePlugin {
 
 `Blowdryer.prop()` parses a java `.properties` file which was downloaded using `Blowdryer.file()`, and then returns the value associated with the given key.
 
+### Bitbucket support
+#### Bitbucket Cloud
+
+For public Bitbucket Cloud repo, use such configuration:
+```gradle
+plugins {
+  id 'com.diffplug.blowdryerSetup' version '1.2.2'
+}
+
+blowdryerSetup {
+  bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5')
+  //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
+  //                         or 'branch',   'feature/branch'
+}
+```
+
+For private Bitbucket Cloud repo, use such configuration:
+```gradle
+plugins {
+  id 'com.diffplug.blowdryerSetup' version '1.2.2'
+}
+
+blowdryerSetup {
+  bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').cloudAuth("username:appPassword")
+  //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
+  //                         or 'branch',   'feature/branch'
+}
+```
+Reference on how to create [application password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/).
+
+#### Bitbucket Server
+
+For public Bitbucket Server repo, use such configuration:
+```gradle
+plugins {
+  id 'com.diffplug.blowdryerSetup' version '1.2.2'
+}
+
+blowdryerSetup {
+  bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').server()
+  // or bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').server().customDomainHttps('my.bitbucket.company.domain.com')
+  //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
+  //                         or 'branch',   'feature/branch'
+}
+```
+
+For private Bitbucket Server repo, use such configuration:
+```gradle
+plugins {
+  id 'com.diffplug.blowdryerSetup' version '1.2.2'
+}
+
+blowdryerSetup {
+  bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').serverAuth('personalAccessToken')
+  // or bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').serverAuth('personalAccessToken').customDomainHttps('my.bitbucket.company.domain.com')
+  //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
+  //                         or 'branch',   'feature/branch'
+}
+```
+Reference on how to create [personal access token](https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html).
+
 ### Chinese for "dry" (干)
 
 If you like brevity and unicode, you can replace `Blowdryer` with `干`.  We'll use `干` throughout the rest of the readme, but you can find-replace `干` with `Blowdryer` and get the same results.
