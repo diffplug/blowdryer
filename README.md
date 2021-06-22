@@ -54,9 +54,21 @@ blowdryerSetup {
   github('acme/blowdryer-acme', 'tag', 'v1.4.5')
   //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
   //                         or 'tree',   'a5df7233a98a1407f588e52eb0f31e596eab0228'
+  
   // or gitlab('acme/blowdryer-acme', 'tag', 'v1.4.5').customDomainHttp('acme.org').authToken('abc123')
+  
+  // Public/Private Bitbucket Cloud repo configuration. Add .cloudAuth only for private repos. 
+  // bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').cloudAuth("username:appPassword")
+  
+  // Public/Private Bitbucket Server repo configurations. User .server for public repos. Use .serverAuth for private repos.
+  // bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').server().customDomainHttps('my.bitbucket.company.domain.com')
+  // or bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').serverAuth('personalAccessToken').customDomainHttps('my.bitbucket.company.domain.com')
 }
 ```
+* Reference on how to create [application password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) 
+for Bitbucket Cloud private repo access.<br/>
+* Reference on how to create [personal access token](https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html) 
+for Bitbucket Server private repo access.
 
 Now, in *only* your root `build.gradle`, do this: `apply plugin: 'com.diffplug.blowdryer'`.  Now, in any project throughout your gradle build (including subprojects), you can do this:
 
@@ -71,67 +83,6 @@ somePlugin {
 `Blowdryer.file()` returns a `File` which was downloaded to your system temp directory, from the `src/main/resources` folder of `acme/blowdryer-acme`, at the `v1.4.5` tag.  Only one download will ever happen for the entire machine, and it will cache it until your system temp directory is cleaned.  To force a clean, you can run `gradlew blowdryerWipeEntireCache`.
 
 `Blowdryer.prop()` parses a java `.properties` file which was downloaded using `Blowdryer.file()`, and then returns the value associated with the given key.
-
-### Bitbucket support
-#### Bitbucket Cloud
-
-For public Bitbucket Cloud repo, use such configuration:
-```gradle
-plugins {
-  id 'com.diffplug.blowdryerSetup' version '1.2.2'
-}
-
-blowdryerSetup {
-  bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5')
-  //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
-  //                         or 'branch',   'feature/branch'
-}
-```
-
-For private Bitbucket Cloud repo, use such configuration:
-```gradle
-plugins {
-  id 'com.diffplug.blowdryerSetup' version '1.2.2'
-}
-
-blowdryerSetup {
-  bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').cloudAuth("username:appPassword")
-  //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
-  //                         or 'branch',   'feature/branch'
-}
-```
-Reference on how to create [application password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/).
-
-#### Bitbucket Server
-
-For public Bitbucket Server repo, use such configuration:
-```gradle
-plugins {
-  id 'com.diffplug.blowdryerSetup' version '1.2.2'
-}
-
-blowdryerSetup {
-  bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').server()
-  // or bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').server().customDomainHttps('my.bitbucket.company.domain.com')
-  //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
-  //                         or 'branch',   'feature/branch'
-}
-```
-
-For private Bitbucket Server repo, use such configuration:
-```gradle
-plugins {
-  id 'com.diffplug.blowdryerSetup' version '1.2.2'
-}
-
-blowdryerSetup {
-  bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').serverAuth('personalAccessToken')
-  // or bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').serverAuth('personalAccessToken').customDomainHttps('my.bitbucket.company.domain.com')
-  //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
-  //                         or 'branch',   'feature/branch'
-}
-```
-Reference on how to create [personal access token](https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html).
 
 ### Chinese for "dry" (干)
 

@@ -16,6 +16,7 @@
 package com.diffplug.blowdryer;
 
 
+import com.diffplug.common.annotations.VisibleForTesting;
 import com.diffplug.common.base.Errors;
 import com.google.gson.Gson;
 import groovy.lang.Closure;
@@ -25,8 +26,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -47,8 +46,6 @@ public class BlowdryerSetup {
 	private static final String GITHUB_HOST = "raw.githubusercontent.com";
 	private static final String GITLAB_HOST = "gitlab.com";
 	private static final String BITBUCKET_HOST = "api.bitbucket.org/2.0/repositories";
-
-	static final Map<String, String> BITBUCKET_COMMIT_HASH_CACHE = new HashMap<>();
 
 	private static final String HTTP_PROTOCOL = "http://";
 	private static final String HTTPS_PROTOCOL = "https://";
@@ -78,7 +75,7 @@ public class BlowdryerSetup {
 	}
 
 	public enum GitAnchorType {
-		TAG, COMMIT, TREE, BRANCH
+		TAG, COMMIT, TREE
 	}
 
 	/** Sets the source where we will grab these scripts. */
@@ -88,8 +85,8 @@ public class BlowdryerSetup {
 	}
 
 	public class GitHub {
-		private final String repoOrg;
-		private final String anchor;
+		private String repoOrg;
+		private String anchor;
 		private @Nullable String authToken;
 
 		private GitHub(String repoOrg, String anchor) {
@@ -123,8 +120,8 @@ public class BlowdryerSetup {
 	}
 
 	public class GitLab {
-		private final String repoOrg;
-		private final String anchor;
+		private String repoOrg;
+		private String anchor;
 		private @Nullable String authToken;
 		private String protocol, host;
 
@@ -178,10 +175,10 @@ public class BlowdryerSetup {
 
 	public class Bitbucket {
 
-		private final String repoOrg;
-		private final String repoName;
-		private final String anchor;
-		private final GitAnchorType anchorType;
+		private String repoOrg;
+		private String repoName;
+		private String anchor;
+		private GitAnchorType anchorType;
 		private BitbucketType bitbucketType;
 		private @Nullable String authToken;
 		private String protocol, host;
@@ -279,29 +276,25 @@ public class BlowdryerSetup {
 
 		private String getAnchor() {
 			switch (anchorType) {
+				case COMMIT:
+					return anchor;
 				case TAG:
 					return String.format("refs/tags/%s", anchor);
-				case BRANCH:
-					return String.format("refs/heads/%s", anchor);
-				case TREE:
-					throw new UnsupportedOperationException("TREE hash resolution is not supported.");
-				case COMMIT:
 				default:
-					return anchor;
+					throw new UnsupportedOperationException(String.format("%s hash resolution is not supported.", anchorType));
 			}
 		}
 
     private String getAnchorForCloudAsHash() {
       switch (anchorType) {
+				case COMMIT:
+					return anchor;
         case TAG:
-          return getCommitHash("refs/tags/");
-        case BRANCH:
-          return getCommitHash("refs/branches/");
-				case TREE:
-					throw new UnsupportedOperationException("TREE hash resolution is not supported.");
-        case COMMIT:
+          anchor = getCommitHash("refs/tags/");
+					anchorType = GitAnchorType.COMMIT;
+					return anchor;
         default:
-        	return anchor;
+					throw new UnsupportedOperationException("TREE hash resolution is not supported.");
       }
     }
 
@@ -309,10 +302,11 @@ public class BlowdryerSetup {
 		private String getCommitHash(String baseRefs) {
 			String requestUrl = String.format("%s/%s%s", getUrlStart(), baseRefs, encodeUrlParts(anchor));
 
-      return BITBUCKET_COMMIT_HASH_CACHE.computeIfAbsent(requestUrl, url -> getCommitHashFromBitbucket(requestUrl));
+      return getCommitHashFromBitbucket(requestUrl);
     }
 
-		private String getCommitHashFromBitbucket(String requestUrl) {
+    @VisibleForTesting
+		String getCommitHashFromBitbucket(String requestUrl) {
 			OkHttpClient client = new OkHttpClient.Builder().build();
 			Builder requestBuilder = new Builder()
 				.url(requestUrl);
@@ -332,8 +326,15 @@ public class BlowdryerSetup {
 					return refsTarget.target.hash;
 				}
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Body was expected to be non-null");
+				throw new IllegalArgumentException("Body was expected to be non-null", e);
 			}
+		}
+
+		// Do not encode '/'.
+		private String encodeUrlParts(String part) {
+			return Arrays.stream(part.split("/"))
+				.map(BlowdryerSetup::encodeUrlPart)
+				.collect(Collectors.joining("/"));
 		}
 
 		private class RefsTarget {
@@ -424,9 +425,4 @@ public class BlowdryerSetup {
 		}
 	}
 
-	private static String encodeUrlParts(String part) {
-			return Arrays.stream(part.split("/"))
-				.map(BlowdryerSetup::encodeUrlPart)
-				.collect(Collectors.joining("/"));
-	}
 }
