@@ -15,24 +15,22 @@
  */
 package com.diffplug.blowdryer;
 
-import com.diffplug.blowdryer.Blowdryer.AuthPlugin;
-import com.diffplug.blowdryer.Blowdryer.ResourcePlugin;
-import com.diffplug.blowdryer.BlowdryerSetup.Bitbucket;
-import com.diffplug.blowdryer.BlowdryerSetup.GitAnchorType;
-import okhttp3.Request;
-import okhttp3.Request.Builder;
-import org.junit.Test;
-
-import java.lang.reflect.Field;
-import java.util.Base64;
-import java.util.UUID;
-
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import com.diffplug.blowdryer.Blowdryer.AuthPlugin;
+import com.diffplug.blowdryer.Blowdryer.ResourcePlugin;
+import com.diffplug.blowdryer.BlowdryerSetup.Bitbucket;
+import com.diffplug.blowdryer.BlowdryerSetup.GitAnchorType;
+import java.lang.reflect.Field;
+import java.util.Base64;
+import java.util.UUID;
+import okhttp3.Request;
+import okhttp3.Request.Builder;
+import org.junit.Test;
 
 public class BlowdryerTest {
 	private static final String JAR_FILE_RESOURCE_SEPARATOR = "!/";
@@ -44,9 +42,9 @@ public class BlowdryerTest {
 		filenameSafe("https://raw.githubusercontent.com/diffplug/durian-build/07f588e52eb0f31e596eab0228a5df7233a98a14/gradle/spotless/spotless.license.java",
 				"https-raw.githubusercontent.com-diffplug--3vpUTw--14-gradle-spotless-spotless.license.java");
 		filenameSafe("https://mycompany.bitbucket.com/projects/PRJ/repos/my-repo/raw/src/main/resources/checkstyle/spotless.gradle?at=refs%2Fheads%2Fmaster",
-			"https-mycompany.bitbucket.com-projects-P--7T3UGg--at-refs-2Fheads-2Fmaster-spotless.gradle");
+				"https-mycompany.bitbucket.com-projects-P--7T3UGg--at-refs-2Fheads-2Fmaster-spotless.gradle");
 		filenameSafe("https://mycompany.bitbucket.com/projects/PRJ/repos/my-repo/raw/src/main/resources/checkstyle/spotless.gradle?at=07f588e52eb0f31e596eab0228a5df7233a98a14",
-			"https-mycompany.bitbucket.com-projects-P--K+HRow--596eab0228a5df7233a98a14-spotless.gradle");
+				"https-mycompany.bitbucket.com-projects-P--K+HRow--596eab0228a5df7233a98a14-spotless.gradle");
 	}
 
 	private void filenameSafe(String url, String safe) {
@@ -95,8 +93,8 @@ public class BlowdryerTest {
 		final ResourcePlugin target = getResourcePlugin();
 
 		assertThatThrownBy(() -> target.toImmutableUrl("test.properties"))
-			.isInstanceOf(UnsupportedOperationException.class)
-			.hasMessage("TREE hash resolution is not supported.");
+				.isInstanceOf(UnsupportedOperationException.class)
+				.hasMessage("TREE hash resolution is not supported.");
 	}
 
 	@Test
@@ -123,14 +121,14 @@ public class BlowdryerTest {
 		final ResourcePlugin target = getResourcePlugin();
 
 		assertThatThrownBy(() -> target.toImmutableUrl("test.properties"))
-			.isInstanceOf(UnsupportedOperationException.class)
-			.hasMessage("TREE hash resolution is not supported.");
+				.isInstanceOf(UnsupportedOperationException.class)
+				.hasMessage("TREE hash resolution is not supported.");
 	}
 
 	@Test
 	public void bitbucketCloudAuth() throws Exception {
 		final String expected = "https://api.bitbucket.org/2.0/repositories/testOrg/testRepo/src/testAnchor/src/main/resources/test.properties";
-    final String usernameAndAppPassword = String.format("%s:%s", randomUUID(), randomUUID());
+		final String usernameAndAppPassword = String.format("%s:%s", randomUUID(), randomUUID());
 		setupBitbucketTestTarget(GitAnchorType.COMMIT).cloudAuth(usernameAndAppPassword);
 
 		final ResourcePlugin target = getResourcePlugin();
@@ -141,7 +139,7 @@ public class BlowdryerTest {
 
 		assertThat(target.toImmutableUrl("test.properties")).isEqualTo(expected);
 		final String encoded = Base64.getEncoder().encodeToString((usernameAndAppPassword)
-			.getBytes(UTF_8));
+				.getBytes(UTF_8));
 		assertThat(request.header("Authorization")).isEqualTo(String.format("Basic %s", encoded));
 	}
 

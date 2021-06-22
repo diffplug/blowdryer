@@ -54,20 +54,20 @@ blowdryerSetup {
   github('acme/blowdryer-acme', 'tag', 'v1.4.5')
   //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
   //                         or 'tree',   'a5df7233a98a1407f588e52eb0f31e596eab0228'
-  
+
   // or gitlab('acme/blowdryer-acme', 'tag', 'v1.4.5').customDomainHttp('acme.org').authToken('abc123')
-  
-  // Public/Private Bitbucket Cloud repo configuration. Add .cloudAuth only for private repos. 
+
+  // Public/Private Bitbucket Cloud repo configuration. Add .cloudAuth only for private repos.
   // bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').cloudAuth("username:appPassword")
-  
+
   // Public/Private Bitbucket Server repo configurations. User .server for public repos. Use .serverAuth for private repos.
   // bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').server().customDomainHttps('my.bitbucket.company.domain.com')
   // or bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').serverAuth('personalAccessToken').customDomainHttps('my.bitbucket.company.domain.com')
 }
 ```
-* Reference on how to create [application password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) 
+* Reference on how to create [application password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/)
 for Bitbucket Cloud private repo access.<br/>
-* Reference on how to create [personal access token](https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html) 
+* Reference on how to create [personal access token](https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html)
 for Bitbucket Server private repo access.
 
 Now, in *only* your root `build.gradle`, do this: `apply plugin: 'com.diffplug.blowdryer'`.  Now, in any project throughout your gradle build (including subprojects), you can do this:

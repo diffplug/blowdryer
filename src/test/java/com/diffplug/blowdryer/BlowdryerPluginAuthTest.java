@@ -15,6 +15,7 @@
  */
 package com.diffplug.blowdryer;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -54,20 +55,20 @@ public class BlowdryerPluginAuthTest extends GradleHarness {
 
 	private void settingsBitbucketBasicAuth(String tag, String... extra) throws IOException {
 		write("settings.gradle",
-			"plugins { id 'com.diffplug.blowdryerSetup' }",
-			String.format("blowdryerSetup { bitbucket('%s', 'commit', '%s').cloudAuth('%s:%s');",
-				BITBUCKET_REPO_ORG, tag, BITBUCKET_REPO_USER, BITBUCKET_REPO_APP_PW)
-				+ " }",
-			Arrays.stream(extra).collect(Collectors.joining("\n")));
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				String.format("blowdryerSetup { bitbucket('%s', 'commit', '%s').cloudAuth('%s:%s');",
+						BITBUCKET_REPO_ORG, tag, BITBUCKET_REPO_USER, BITBUCKET_REPO_APP_PW)
+						+ " }",
+				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
 	private void settingsBitbucketPersonalAccessTokenAuth(String tag, String... extra) throws IOException {
 		write("settings.gradle",
-			"plugins { id 'com.diffplug.blowdryerSetup' }",
-			String.format("blowdryerSetup { bitbucket('%s', 'commit', '%s').customDomainHttps('%s')"
-				+ ".serverAuth('%s');", BITBUCKET_REPO_PAT_REPO_ORG, tag, BITBUCKET_PRIVATE_SERVER_HOST, BITBUCKET_REPO_PAT)
-				+ " }",
-			Arrays.stream(extra).collect(Collectors.joining("\n")));
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				String.format("blowdryerSetup { bitbucket('%s', 'commit', '%s').customDomainHttps('%s')"
+						+ ".serverAuth('%s');", BITBUCKET_REPO_PAT_REPO_ORG, tag, BITBUCKET_PRIVATE_SERVER_HOST, BITBUCKET_REPO_PAT)
+						+ " }",
+				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
 	@Test
@@ -92,8 +93,8 @@ public class BlowdryerPluginAuthTest extends GradleHarness {
 	public void bitbucketCloudAuth() throws IOException {
 		settingsBitbucketBasicAuth("master");
 		write("build.gradle",
-			"apply plugin: 'com.diffplug.blowdryer'",
-			"assert 干.file('sample').text == 'a'");
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'a'");
 		gradleRunner().build();
 	}
 
@@ -101,8 +102,8 @@ public class BlowdryerPluginAuthTest extends GradleHarness {
 	public void bitbucketServerAuth() throws IOException {
 		settingsBitbucketPersonalAccessTokenAuth("master");
 		write("build.gradle",
-			"apply plugin: 'com.diffplug.blowdryer'",
-			"assert 干.file('checkstyle/spotless.gradle').text == 'a'");
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('checkstyle/spotless.gradle').text == 'a'");
 		gradleRunner().build();
 	}
 

@@ -59,24 +59,24 @@ public class BlowdryerPluginTest extends GradleHarness {
 
 	private void settingsBitbucket(String tag, String... extra) throws IOException {
 		write(SETTINGS_GRADLE,
-			"plugins { id 'com.diffplug.blowdryerSetup' }",
-			String.format("blowdryerSetup { bitbucket('%s/blowdryer', 'tag', '%s') }", BITBUCKET_REPO_ORG, tag),
-			Arrays.stream(extra).collect(Collectors.joining("\n")));
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				String.format("blowdryerSetup { bitbucket('%s/blowdryer', 'tag', '%s') }", BITBUCKET_REPO_ORG, tag),
+				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
 	private void settingsCustomBitbucket(String tag, String... extra) throws IOException {
 		write(SETTINGS_GRADLE,
-			"plugins { id 'com.diffplug.blowdryerSetup' }",
-			String.format("blowdryerSetup { bitbucket('%s/blowdryer', 'tag', '%s').customDomainHttps('api.bitbucket.org/2.0/repositories') }",
-				BITBUCKET_REPO_ORG, tag),
-			Arrays.stream(extra).collect(Collectors.joining("\n")));
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				String.format("blowdryerSetup { bitbucket('%s/blowdryer', 'tag', '%s').customDomainHttps('api.bitbucket.org/2.0/repositories') }",
+						BITBUCKET_REPO_ORG, tag),
+				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
 	private void settingsCustomBitbucket(String tag, int host, String... extra) throws IOException {
 		write(SETTINGS_GRADLE,
-			"plugins { id 'com.diffplug.blowdryerSetup' }",
-			String.format("blowdryerSetup { bitbucket('%s/blowdryer', 'tag', '%s').customDomainHttps('%s') }", BITBUCKET_REPO_ORG, tag, host),
-			Arrays.stream(extra).collect(Collectors.joining("\n")));
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				String.format("blowdryerSetup { bitbucket('%s/blowdryer', 'tag', '%s').customDomainHttps('%s') }", BITBUCKET_REPO_ORG, tag, host),
+				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
 	private void settingsLocalJar(String dependency) throws IOException {
@@ -141,25 +141,25 @@ public class BlowdryerPluginTest extends GradleHarness {
 	public void bitbucketTag() throws IOException {
 		settingsBitbucket("test/2/a");
 		write(BUILD_GRADLE,
-			"apply plugin: 'com.diffplug.blowdryer'",
-			"assert 干.file('sample').text == 'a'",
-			"assert 干.prop('sample', 'name') == 'test'",
-			"assert 干.prop('sample', 'ver_spotless') == '1.2.0'");
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'a'",
+				"assert 干.prop('sample', 'name') == 'test'",
+				"assert 干.prop('sample', 'ver_spotless') == '1.2.0'");
 		gradleRunner().build();
 
 		settingsBitbucket("test/2/b");
 		write(BUILD_GRADLE,
-			"apply plugin: 'com.diffplug.blowdryer'",
-			"assert 干.file('sample').text == 'b'",
-			"assert 干.prop('sample', 'name') == 'testB'",
-			"assert 干.prop('sample', 'group') == 'com.diffplug.gradleB'");
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'b'",
+				"assert 干.prop('sample', 'name') == 'testB'",
+				"assert 干.prop('sample', 'group') == 'com.diffplug.gradleB'");
 		gradleRunner().build();
 
 		// double-check that failures do fail
 		settingsBitbucket("test/2/b");
 		write(BUILD_GRADLE,
-			"plugins { id 'com.diffplug.blowdryer' }",
-			"assert Blowdryer.file('sample').text == 'a'");
+				"plugins { id 'com.diffplug.blowdryer' }",
+				"assert Blowdryer.file('sample').text == 'a'");
 		gradleRunner().buildAndFail();
 	}
 
@@ -193,32 +193,32 @@ public class BlowdryerPluginTest extends GradleHarness {
 	public void customBitbucketTag() throws IOException {
 		settingsCustomBitbucket("test/2/a");
 		write(BUILD_GRADLE,
-			"apply plugin: 'com.diffplug.blowdryer'",
-			"assert 干.file('sample').text == 'a'",
-			"assert 干.prop('sample', 'name') == 'test'",
-			"assert 干.prop('sample', 'ver_spotless') == '1.2.0'");
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'a'",
+				"assert 干.prop('sample', 'name') == 'test'",
+				"assert 干.prop('sample', 'ver_spotless') == '1.2.0'");
 		gradleRunner().build();
 
 		settingsCustomBitbucket("test/2/b");
 		write(BUILD_GRADLE,
-			"apply plugin: 'com.diffplug.blowdryer'",
-			"assert 干.file('sample').text == 'b'",
-			"assert 干.prop('sample', 'name') == 'testB'",
-			"assert 干.prop('sample', 'group') == 'com.diffplug.gradleB'");
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'b'",
+				"assert 干.prop('sample', 'name') == 'testB'",
+				"assert 干.prop('sample', 'group') == 'com.diffplug.gradleB'");
 		gradleRunner().build();
 
 		// double-check that failures do fail
 		settingsCustomBitbucket("test/2/b");
 		write(BUILD_GRADLE,
-			"plugins { id 'com.diffplug.blowdryer' }",
-			"assert Blowdryer.file('sample').text == 'a'");
+				"plugins { id 'com.diffplug.blowdryer' }",
+				"assert Blowdryer.file('sample').text == 'a'");
 		gradleRunner().buildAndFail();
 
 		// unresolved host
 		settingsCustomBitbucket("test/2/b", 123);
 		write(BUILD_GRADLE,
-			"plugins { id 'com.diffplug.blowdryer' }",
-			"assert Blowdryer.file('sample').text == 'a'");
+				"plugins { id 'com.diffplug.blowdryer' }",
+				"assert Blowdryer.file('sample').text == 'a'");
 		gradleRunner().buildAndFail();
 	}
 

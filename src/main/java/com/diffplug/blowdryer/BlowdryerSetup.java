@@ -29,9 +29,7 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
@@ -218,7 +216,7 @@ public class BlowdryerSetup {
 		 */
 		public Bitbucket cloudAuth(String usernameAndAppPassword) {
 			final String encoding = Base64.getEncoder().encodeToString((usernameAndAppPassword)
-          .getBytes(StandardCharsets.UTF_8));
+					.getBytes(StandardCharsets.UTF_8));
 			this.authToken = String.format("Basic %s", encoding);
 			this.bitbucketType = BitbucketType.CLOUD;
 			return setGlobals();
@@ -276,50 +274,50 @@ public class BlowdryerSetup {
 
 		private String getAnchor() {
 			switch (anchorType) {
-				case COMMIT:
-					return anchor;
-				case TAG:
-					return String.format("refs/tags/%s", anchor);
-				default:
-					throw new UnsupportedOperationException(String.format("%s hash resolution is not supported.", anchorType));
+			case COMMIT:
+				return anchor;
+			case TAG:
+				return String.format("refs/tags/%s", anchor);
+			default:
+				throw new UnsupportedOperationException(String.format("%s hash resolution is not supported.", anchorType));
 			}
 		}
 
-    private String getAnchorForCloudAsHash() {
-      switch (anchorType) {
-				case COMMIT:
-					return anchor;
-        case TAG:
-          anchor = getCommitHash("refs/tags/");
-					anchorType = GitAnchorType.COMMIT;
-					return anchor;
-        default:
-					throw new UnsupportedOperationException("TREE hash resolution is not supported.");
-      }
-    }
+		private String getAnchorForCloudAsHash() {
+			switch (anchorType) {
+			case COMMIT:
+				return anchor;
+			case TAG:
+				anchor = getCommitHash("refs/tags/");
+				anchorType = GitAnchorType.COMMIT;
+				return anchor;
+			default:
+				throw new UnsupportedOperationException("TREE hash resolution is not supported.");
+			}
+		}
 
 		// Bitbucket API: https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Bworkspace%7D/%7Brepo_slug%7D/src/%7Bcommit%7D/%7Bpath%7D
 		private String getCommitHash(String baseRefs) {
 			String requestUrl = String.format("%s/%s%s", getUrlStart(), baseRefs, encodeUrlParts(anchor));
 
-      return getCommitHashFromBitbucket(requestUrl);
-    }
+			return getCommitHashFromBitbucket(requestUrl);
+		}
 
-    @VisibleForTesting
+		@VisibleForTesting
 		String getCommitHashFromBitbucket(String requestUrl) {
 			OkHttpClient client = new OkHttpClient.Builder().build();
 			Builder requestBuilder = new Builder()
-				.url(requestUrl);
+					.url(requestUrl);
 			if (authToken != null) {
 				requestBuilder
-					.addHeader("Authorization", authToken);
+						.addHeader("Authorization", authToken);
 			}
 			Request request = requestBuilder.build();
 
 			try (Response response = client.newCall(request).execute()) {
 				if (!response.isSuccessful()) {
 					throw new IllegalArgumentException(String.format("%s\nreceived http code %s \n %s", request.url(), response.code(),
-						Objects.requireNonNull(response.body()).string()));
+							Objects.requireNonNull(response.body()).string()));
 				}
 				try (ResponseBody body = response.body()) {
 					RefsTarget refsTarget = new Gson().fromJson(Objects.requireNonNull(body).string(), RefsTarget.class);
@@ -333,29 +331,29 @@ public class BlowdryerSetup {
 		// Do not encode '/'.
 		private String encodeUrlParts(String part) {
 			return Arrays.stream(part.split("/"))
-				.map(BlowdryerSetup::encodeUrlPart)
-				.collect(Collectors.joining("/"));
+					.map(BlowdryerSetup::encodeUrlPart)
+					.collect(Collectors.joining("/"));
 		}
 
 		private class RefsTarget {
 
-		    private final Target target;
+			private final Target target;
 
-        private RefsTarget(Target target) {
-            this.target = target;
-        }
+			private RefsTarget(Target target) {
+				this.target = target;
+			}
 
-        private class Target {
+			private class Target {
 
-		        private final String hash;
+				private final String hash;
 
-            private Target(String hash) {
-                this.hash = hash;
-            }
+				private Target(String hash) {
+					this.hash = hash;
+				}
 
-        }
-    }
-  }
+			}
+		}
+	}
 
 	/**
 	 * Uses the provided {@code jarFile} to extract a file resource.
