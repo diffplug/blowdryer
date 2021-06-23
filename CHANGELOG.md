@@ -7,7 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- `filenameSafe` now, if required, removes query parameters (for Bitbucket) and appends file name to the end of the link to preserve its original file extension.
 - Support for Bitbucket Cloud and Server ([#23](https://github.com/diffplug/blowdryer/pull/23)).
 
 ## [1.2.1] - 2021-06-01
