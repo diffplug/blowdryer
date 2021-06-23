@@ -18,6 +18,7 @@ package com.diffplug.blowdryer;
 
 import com.diffplug.common.annotations.VisibleForTesting;
 import com.diffplug.common.base.Errors;
+import com.diffplug.common.base.Unhandled;
 import com.google.gson.Gson;
 import groovy.lang.Closure;
 import java.io.File;
@@ -178,6 +179,7 @@ public class BlowdryerSetup {
 		private String anchor;
 		private GitAnchorType anchorType;
 		private BitbucketType bitbucketType;
+		private @Nullable String auth;
 		private @Nullable String authToken;
 		private String protocol, host;
 
@@ -195,30 +197,13 @@ public class BlowdryerSetup {
 			customDomainHttps(BITBUCKET_HOST);
 		}
 
-		/**
-		 * Only supported for Bitbucket Server 5.5+
-		 * Format: "personalAccessToken"
-		 */
 		public Bitbucket server() {
 			this.bitbucketType = BitbucketType.SERVER;
 			return setGlobals();
 		}
 
-		public Bitbucket serverAuth(String personalAccessToken) {
-			this.authToken = String.format("Bearer %s", personalAccessToken);
-			this.bitbucketType = BitbucketType.SERVER;
-			return setGlobals();
-		}
-
-		/**
-		 * Only available for Bitbucket Cloud.
-		 * Format: "username:appPassword"
-		 */
-		public Bitbucket cloudAuth(String usernameAndAppPassword) {
-			final String encoding = Base64.getEncoder().encodeToString((usernameAndAppPassword)
-					.getBytes(StandardCharsets.UTF_8));
-			this.authToken = String.format("Basic %s", encoding);
-			this.bitbucketType = BitbucketType.CLOUD;
+		public Bitbucket auth(String auth) {
+			this.auth = auth;
 			return setGlobals();
 		}
 
@@ -237,9 +222,23 @@ public class BlowdryerSetup {
 		}
 
 		private Bitbucket setGlobals() {
+			if (auth == null) {
+				authToken = null;
+			} else {
+				switch (bitbucketType) {
+				case SERVER:
+					authToken = String.format("Bearer %s", auth);
+					break;
+				case CLOUD:
+					String base64 = Base64.getEncoder().encodeToString((auth).getBytes(StandardCharsets.UTF_8));
+					authToken = String.format("Basic %s", base64);
+					break;
+				default:
+					throw Unhandled.enumException(bitbucketType);
+				}
+			}
 			Blowdryer.setResourcePluginNull();
 			String urlStart = getUrlStart();
-
 			Blowdryer.setResourcePlugin(resource -> getFullUrl(urlStart, encodeUrlParts(getFullResourcePath(resource))), (url, builder) -> {
 				if (authToken != null) {
 					builder.addHeader("Authorization", authToken);
@@ -248,11 +247,10 @@ public class BlowdryerSetup {
 			return this;
 		}
 
-		// Bitbucket Cloud and Bitbucket Server (premium, company hosted) has different url structures.
-		// Bitbucket Cloud uses "org/repo" in URLs, where org is your (or someone else's) account name.
-		// Bitbucket Server uses "projects/PROJECT_KEY/repos/REPO_NAME" in urls.
-
 		private String getUrlStart() {
+			// Bitbucket Cloud and Bitbucket Server (premium, company hosted) has different url structures.
+			// Bitbucket Cloud uses "org/repo" in URLs, where org is your (or someone else's) account name.
+			// Bitbucket Server uses "projects/PROJECT_KEY/repos/REPO_NAME" in urls.
 			if (isServer()) {
 				return String.format("%s%s/projects/%s/repos/%s", protocol, host, repoOrg, repoName);
 			} else {
@@ -262,9 +260,9 @@ public class BlowdryerSetup {
 
 		private String getFullUrl(String urlStart, String filePath) {
 			if (isServer()) {
-				return String.format("%s/raw/%s?at=%s", urlStart, filePath, encodeUrlPart(getAnchor()));
+				return String.format("%s/raw/%s?at=%s", urlStart, filePath, encodeUrlPart(getAnchorForServer()));
 			} else {
-				return String.format("%s/src/%s/%s", urlStart, encodeUrlParts(getAnchorForCloudAsHash()), filePath);
+				return String.format("%s/src/%s/%s", urlStart, encodeUrlParts(getAnchorForCloud()), filePath);
 			}
 		}
 
@@ -272,27 +270,28 @@ public class BlowdryerSetup {
 			return BitbucketType.SERVER.equals(this.bitbucketType);
 		}
 
-		private String getAnchor() {
+		private String getAnchorForServer() {
 			switch (anchorType) {
 			case COMMIT:
 				return anchor;
 			case TAG:
-				return String.format("refs/tags/%s", anchor);
+				return "refs/tags/" + anchor;
 			default:
-				throw new UnsupportedOperationException(String.format("%s hash resolution is not supported.", anchorType));
+				throw new UnsupportedOperationException(anchorType + " not supported for Bitbucket");
 			}
 		}
 
-		private String getAnchorForCloudAsHash() {
+		private String getAnchorForCloud() {
 			switch (anchorType) {
 			case COMMIT:
 				return anchor;
 			case TAG:
+				// rewrite the tag into the commit it points to
 				anchor = getCommitHash("refs/tags/");
 				anchorType = GitAnchorType.COMMIT;
 				return anchor;
 			default:
-				throw new UnsupportedOperationException("TREE hash resolution is not supported.");
+				throw new UnsupportedOperationException(anchorType + " not supported for Bitbucket");
 			}
 		}
 
@@ -306,11 +305,9 @@ public class BlowdryerSetup {
 		@VisibleForTesting
 		String getCommitHashFromBitbucket(String requestUrl) {
 			OkHttpClient client = new OkHttpClient.Builder().build();
-			Builder requestBuilder = new Builder()
-					.url(requestUrl);
+			Builder requestBuilder = new Builder().url(requestUrl);
 			if (authToken != null) {
-				requestBuilder
-						.addHeader("Authorization", authToken);
+				requestBuilder.addHeader("Authorization", authToken);
 			}
 			Request request = requestBuilder.build();
 
@@ -336,7 +333,6 @@ public class BlowdryerSetup {
 		}
 
 		private class RefsTarget {
-
 			private final Target target;
 
 			private RefsTarget(Target target) {
@@ -344,13 +340,11 @@ public class BlowdryerSetup {
 			}
 
 			private class Target {
-
 				private final String hash;
 
 				private Target(String hash) {
 					this.hash = hash;
 				}
-
 			}
 		}
 	}
