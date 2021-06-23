@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2021-06-23
+
 ### Added
 - Support for Bitbucket Cloud and Server ([#23](https://github.com/diffplug/blowdryer/pull/23)).
 
