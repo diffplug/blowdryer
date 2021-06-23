@@ -194,28 +194,24 @@ public class BlowdryerSetup {
 			this.anchorType = anchorType;
 			this.bitbucketType = bitbucketType;
 			this.anchor = assertNoLeadingOrTrailingSlash(anchor);
-			customDomainHttps(BITBUCKET_HOST);
+			customProtocolAndDomain(BitbucketType.CLOUD, HTTPS_PROTOCOL, BITBUCKET_HOST);
 		}
 
-		public Bitbucket server() {
-			this.bitbucketType = BitbucketType.SERVER;
-			return setGlobals();
-		}
-
-		public Bitbucket auth(String auth) {
+		public Bitbucket authToken(String auth) {
 			this.auth = auth;
 			return setGlobals();
 		}
 
 		public Bitbucket customDomainHttp(String domain) {
-			return customProtocolAndDomain(HTTP_PROTOCOL, domain);
+			return customProtocolAndDomain(BitbucketType.SERVER, HTTP_PROTOCOL, domain);
 		}
 
 		public Bitbucket customDomainHttps(String domain) {
-			return customProtocolAndDomain(HTTPS_PROTOCOL, domain);
+			return customProtocolAndDomain(BitbucketType.SERVER, HTTPS_PROTOCOL, domain);
 		}
 
-		private Bitbucket customProtocolAndDomain(String protocol, String domain) {
+		private Bitbucket customProtocolAndDomain(BitbucketType type, String protocol, String domain) {
+			this.bitbucketType = type;
 			this.protocol = protocol;
 			this.host = domain;
 			return setGlobals();
