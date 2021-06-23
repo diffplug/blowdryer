@@ -39,6 +39,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import javax.annotation.Nullable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -87,6 +88,18 @@ public class Blowdryer {
 	 * This is appropriate only for immutable URLs, such as specific hashes from Git.
 	 */
 	public static File immutableUrl(String url) {
+		return immutableUrl(url, null);
+	}
+
+	/**
+	 * Downloads the given url to a local file in the system temporary directory.
+	 * It will only be downloaded once, system-wide, and it will not be checked for updates.
+	 * This is appropriate only for immutable URLs, such as specific hashes from Git.
+	 * 
+	 * If requiredSuffix is non-null, it is guaranteed that the returned filename will end
+	 * with that string.
+	 */
+	public static File immutableUrl(String url, @Nullable String requiredSuffix) {
 		synchronized (Blowdryer.class) {
 			File result = urlToContent.get(url);
 			if (result != null && result.isFile()) {
@@ -94,7 +107,10 @@ public class Blowdryer {
 			}
 
 			String safe = filenameSafe(url);
-			File metaFile = new File(cacheDir, safe + ".properties");
+			if (requiredSuffix != null && !safe.endsWith(requiredSuffix)) {
+				safe = safe + requiredSuffix;
+			}
+			File metaFile = new File(cacheDir, "meta_" + safe + ".properties");
 			File dataFile = new File(cacheDir, safe);
 
 			try {
