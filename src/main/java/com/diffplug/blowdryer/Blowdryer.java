@@ -101,11 +101,14 @@ public class Blowdryer {
 				if (metaFile.exists() && dataFile.exists()) {
 					Map<String, String> props = loadPropertyFile(metaFile);
 					String propUrl = props.get(PROP_URL);
+					if (propUrl == null) {
+						throw new IllegalArgumentException("Unexpected content, recommend deleting file at " + metaFile);
+					}
 					if (propUrl.equals(url)) {
 						urlToContent.put(url, dataFile);
 						return dataFile;
 					} else {
-						throw new IllegalStateException("Expected url " + url + " but was " + propUrl + " for " + metaFile.getAbsolutePath());
+						throw new IllegalStateException("Expected url " + url + " but was " + propUrl + ", recommend deleting file at " + metaFile.getAbsolutePath());
 					}
 				} else {
 					Files.createParentDirs(dataFile);
