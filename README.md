@@ -55,14 +55,8 @@ blowdryerSetup {
   //                         or 'commit', '07f588e52eb0f31e596eab0228a5df7233a98a14'
   //                         or 'tree',   'a5df7233a98a1407f588e52eb0f31e596eab0228'
 
-  // or gitlab('acme/blowdryer-acme', 'tag', 'v1.4.5').customDomainHttp('acme.org').authToken('abc123')
-
-  // Public/Private Bitbucket Cloud repo configuration. Add .cloudAuth only for private repos.
-  // bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').cloudAuth("username:appPassword")
-
-  // Public/Private Bitbucket Server repo configurations. User .server for public repos. Use .serverAuth for private repos.
-  // bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').server().customDomainHttps('my.bitbucket.company.domain.com')
-  // or bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').serverAuth('personalAccessToken').customDomainHttps('my.bitbucket.company.domain.com')
+  // or gitlab('acme/blowdryer-acme', 'tag', 'v1.4.5').authToken('abc123').customDomainHttp('acme.org')
+  // or bitbucket('acme/blowdryer-acme', 'tag', 'v1.4.5').authToken('abc123').customDomainHttps('acme.org')
 }
 ```
 * Reference on how to create [application password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/)
