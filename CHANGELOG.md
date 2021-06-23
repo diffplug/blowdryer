@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.4.0] - 2021-06-23
 ### Added
 - `干.file('blah.foo')` now preserves `.foo` extension in the returned file ([#23](https://github.com/diffplug/blowdryer/pull/23)).
   - also, `干.immutableUrl(String url)` can take an optional second argument for specifying the file extension, e.g.
