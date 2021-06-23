@@ -101,7 +101,8 @@ public class Blowdryer {
 	 */
 	public static File immutableUrl(String url, @Nullable String requiredSuffix) {
 		synchronized (Blowdryer.class) {
-			File result = urlToContent.get(url);
+			String cacheKey = requiredSuffix == null ? url : url + "|" + requiredSuffix; // | is illegal in URLs
+			File result = urlToContent.get(cacheKey);
 			if (result != null && result.isFile()) {
 				return result;
 			}
@@ -121,7 +122,7 @@ public class Blowdryer {
 						throw new IllegalArgumentException("Unexpected content, recommend deleting file at " + metaFile);
 					}
 					if (propUrl.equals(url)) {
-						urlToContent.put(url, dataFile);
+						urlToContent.put(cacheKey, dataFile);
 						return dataFile;
 					} else {
 						throw new IllegalStateException("Expected url " + url + " but was " + propUrl + ", recommend deleting file at " + metaFile.getAbsolutePath());
@@ -142,7 +143,7 @@ public class Blowdryer {
 					try (OutputStream output = Files.asByteSink(metaFile).openBufferedStream()) {
 						props.store(output, "");
 					}
-					urlToContent.put(url, dataFile);
+					urlToContent.put(cacheKey, dataFile);
 					return dataFile;
 				}
 			} catch (IOException | URISyntaxException e) {
