@@ -71,7 +71,7 @@ public class BlowdryerTest {
 		final String hash = UUID.randomUUID().toString();
 		final String expected = "https://api.bitbucket.org/2.0/repositories/testOrg/testRepo/src/" + hash + "/src/main/resources/test.properties";
 
-		Bitbucket spy = spy(setupBitbucketTestTarget(GitAnchorType.TAG)).cloudAuth("un:pw");
+		Bitbucket spy = spy(setupBitbucketTestTarget(GitAnchorType.TAG)).authToken("un:pw");
 		doReturn(hash).when(spy).getCommitHashFromBitbucket(hashRequestUrl);
 		final ResourcePlugin target = getResourcePlugin();
 
@@ -94,13 +94,13 @@ public class BlowdryerTest {
 
 		assertThatThrownBy(() -> target.toImmutableUrl("test.properties"))
 				.isInstanceOf(UnsupportedOperationException.class)
-				.hasMessage("TREE hash resolution is not supported.");
+				.hasMessage("TREE not supported for Bitbucket");
 	}
 
 	@Test
 	public void bitbucketServer_tagAnchorType() throws Exception {
 		final String expected = "https://my.bitbucket.com/projects/testOrg/repos/testRepo/raw/src/main/resources/test.properties?at=refs%2Ftags%2FtestAnchor";
-		setupBitbucketTestTarget(GitAnchorType.TAG).server().customDomainHttps("my.bitbucket.com");
+		setupBitbucketTestTarget(GitAnchorType.TAG).customDomainHttps("my.bitbucket.com");
 		final ResourcePlugin target = getResourcePlugin();
 
 		assertThat(target.toImmutableUrl("test.properties")).isEqualTo(expected);
@@ -109,7 +109,7 @@ public class BlowdryerTest {
 	@Test
 	public void bitbucketServer_commitAnchorType() throws Exception {
 		final String expected = "https://my.bitbucket.com/projects/testOrg/repos/testRepo/raw/src/main/resources/test.properties?at=testAnchor";
-		setupBitbucketTestTarget(GitAnchorType.COMMIT).server().customDomainHttps("my.bitbucket.com");
+		setupBitbucketTestTarget(GitAnchorType.COMMIT).customDomainHttps("my.bitbucket.com");
 		final ResourcePlugin target = getResourcePlugin();
 
 		assertThat(target.toImmutableUrl("test.properties")).isEqualTo(expected);
@@ -117,19 +117,19 @@ public class BlowdryerTest {
 
 	@Test
 	public void bitbucketServer_treeAnchorType() throws Exception {
-		setupBitbucketTestTarget(GitAnchorType.TREE).server().customDomainHttps("my.bitbucket.com");
+		setupBitbucketTestTarget(GitAnchorType.TREE).customDomainHttps("my.bitbucket.com");
 		final ResourcePlugin target = getResourcePlugin();
 
 		assertThatThrownBy(() -> target.toImmutableUrl("test.properties"))
 				.isInstanceOf(UnsupportedOperationException.class)
-				.hasMessage("TREE hash resolution is not supported.");
+				.hasMessage("TREE not supported for Bitbucket");
 	}
 
 	@Test
 	public void bitbucketCloudAuth() throws Exception {
 		final String expected = "https://api.bitbucket.org/2.0/repositories/testOrg/testRepo/src/testAnchor/src/main/resources/test.properties";
 		final String usernameAndAppPassword = String.format("%s:%s", randomUUID(), randomUUID());
-		setupBitbucketTestTarget(GitAnchorType.COMMIT).cloudAuth(usernameAndAppPassword);
+		setupBitbucketTestTarget(GitAnchorType.COMMIT).authToken(usernameAndAppPassword);
 
 		final ResourcePlugin target = getResourcePlugin();
 		final AuthPlugin otherTarget = getAuthPlugin();
