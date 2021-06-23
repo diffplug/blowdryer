@@ -25,7 +25,6 @@ import com.diffplug.blowdryer.Blowdryer.AuthPlugin;
 import com.diffplug.blowdryer.Blowdryer.ResourcePlugin;
 import com.diffplug.blowdryer.BlowdryerSetup.Bitbucket;
 import com.diffplug.blowdryer.BlowdryerSetup.GitAnchorType;
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Base64;
 import java.util.UUID;
@@ -65,8 +64,8 @@ public class BlowdryerTest {
 	@Test
 	public void requiredSuffix() {
 		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
-		File fileWithSuffix = Blowdryer.immutableUrl(FILE_PROTOCOL + jarFile + JAR_FILE_RESOURCE_SEPARATOR + "sample", ".suffix");
-		assertThat(fileWithSuffix.getName()).endsWith(".suffix");
+		assertThat(Blowdryer.immutableUrl(FILE_PROTOCOL + jarFile + JAR_FILE_RESOURCE_SEPARATOR + "sample", ".suffix").getName()).endsWith(".suffix");
+		assertThat(Blowdryer.immutableUrl(FILE_PROTOCOL + jarFile + JAR_FILE_RESOURCE_SEPARATOR + "sample", ".suffix2").getName()).endsWith(".suffix2");
 	}
 
 	@Test
