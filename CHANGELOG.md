@@ -5,9 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `干.file('blah.foo')` now preserves `.foo` extension in the returned file ([#23](https://github.com/diffplug/blowdryer/pull/23)).
+  - also, `干.immutableUrl(String url)` can take an optional second argument for specifying the file extension, e.g.
+    - `干.immutableUrl('https://foo.org/?file=blah.foo&rev=7')` returns a file which ends in `.foo-rev-7`
+    - `干.immutableUrl('https://foo.org/?file=blah.foo&rev=7', '.foo')` returns a file which ends in `.foo`
 
 ## [1.3.0] - 2021-06-23
-
 ### Added
 - Support for Bitbucket Cloud and Server ([#23](https://github.com/diffplug/blowdryer/pull/23)).
 

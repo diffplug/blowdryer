@@ -166,11 +166,14 @@ You have to apply the `com.diffplug.blowdryerSetup` plugin in your `settings.gra
 
 ```gradle
 // com.diffplug.blowdryer.干 is alias of com.diffplug.blowdryer.Blowdryer
-static File   干.immutableUrl(String guaranteedImmutableUrl)
 static File   干.file(String resource)
 static String 干.prop(String propFile, String key)
 static String 干.proj(Project proj, String String key, String description)
 static <T> T  干.proj(Project proj, Class<T> clazz, String String key, String description)
+static File   干.immutableUrl(String guaranteedImmutableUrl)
+static File   干.immutableUrl(String guaranteedImmutableUrl, String fileSuffix)
+  // 干.immutableUrl('https://foo.org/?file=blah.foo&rev=7') returns a file which ends in `.foo-rev-7`
+  // 干.immutableUrl('https://foo.org/?file=blah.foo&rev=7', '.foo') returns a file which ends in `.foo`
 ```
 
 - [javadoc `BlowdryerSetup`](https://javadoc.io/static/com.diffplug/blowdryer/1.3.0/com/diffplug/blowdryer/BlowdryerSetup.html)
