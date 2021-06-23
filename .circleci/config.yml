@@ -33,6 +33,8 @@ jobs:
       - run:
           name: gradlew check
           command: ./gradlew check --build-cache
+      - store_test_results:
+          path: build/test-results/test
       - save_cache:
           paths:
             - ~/.gradle/wrapper

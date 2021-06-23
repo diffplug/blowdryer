@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 DiffPlug
+ * Copyright (C) 2019-2021 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.diffplug.blowdryer;
 
 import java.io.File;
 import java.io.IOException;
+import javax.annotation.Nullable;
 import org.gradle.api.Project;
 
 /** Alias for {@link Blowdryer}. */
@@ -27,6 +28,11 @@ public class 干 {
 	/** Alias for {@link Blowdryer#immutableUrl(String)}. */
 	public static File immutableUrl(String url) {
 		return Blowdryer.immutableUrl(url);
+	}
+
+	/** Alias for {@link Blowdryer#immutableUrl(String, String)}. */
+	public File immutableUrl(String url, @Nullable String requiredSuffix) {
+		return Blowdryer.immutableUrl(url, requiredSuffix);
 	}
 
 	/** Alias for {@link Blowdryer#file(String)}. */

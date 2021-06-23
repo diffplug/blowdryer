@@ -39,6 +39,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import javax.annotation.Nullable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -87,14 +88,30 @@ public class Blowdryer {
 	 * This is appropriate only for immutable URLs, such as specific hashes from Git.
 	 */
 	public static File immutableUrl(String url) {
+		return immutableUrl(url, null);
+	}
+
+	/**
+	 * Downloads the given url to a local file in the system temporary directory.
+	 * It will only be downloaded once, system-wide, and it will not be checked for updates.
+	 * This is appropriate only for immutable URLs, such as specific hashes from Git.
+	 * 
+	 * If requiredSuffix is non-null, it is guaranteed that the returned filename will end
+	 * with that string.
+	 */
+	public static File immutableUrl(String url, @Nullable String requiredSuffix) {
 		synchronized (Blowdryer.class) {
-			File result = urlToContent.get(url);
+			String cacheKey = requiredSuffix == null ? url : url + "|" + requiredSuffix; // | is illegal in URLs
+			File result = urlToContent.get(cacheKey);
 			if (result != null && result.isFile()) {
 				return result;
 			}
 
 			String safe = filenameSafe(url);
-			File metaFile = new File(cacheDir, safe + ".properties");
+			if (requiredSuffix != null && !safe.endsWith(requiredSuffix)) {
+				safe = safe + requiredSuffix;
+			}
+			File metaFile = new File(cacheDir, "meta_" + safe + ".properties");
 			File dataFile = new File(cacheDir, safe);
 
 			try {
@@ -105,12 +122,18 @@ public class Blowdryer {
 						throw new IllegalArgumentException("Unexpected content, recommend deleting file at " + metaFile);
 					}
 					if (propUrl.equals(url)) {
-						urlToContent.put(url, dataFile);
+						urlToContent.put(cacheKey, dataFile);
 						return dataFile;
 					} else {
 						throw new IllegalStateException("Expected url " + url + " but was " + propUrl + ", recommend deleting file at " + metaFile.getAbsolutePath());
 					}
 				} else {
+					if (metaFile.exists()) {
+						metaFile.delete();
+					}
+					if (dataFile.exists()) {
+						dataFile.delete();
+					}
 					Files.createParentDirs(dataFile);
 					download(url, dataFile);
 					Properties props = new Properties();
@@ -120,7 +143,7 @@ public class Blowdryer {
 					try (OutputStream output = Files.asByteSink(metaFile).openBufferedStream()) {
 						props.store(output, "");
 					}
-					urlToContent.put(url, dataFile);
+					urlToContent.put(cacheKey, dataFile);
 					return dataFile;
 				}
 			} catch (IOException | URISyntaxException e) {
@@ -194,7 +217,6 @@ public class Blowdryer {
 
 	/** Returns either the filename safe URL, or (first40)--(Base64 filenamesafe)(last40). */
 	static String filenameSafe(String url) {
-		url = preserveFileExtensionBitbucket(url);
 		String allSafeCharacters = url.replaceAll("[^a-zA-Z0-9-+_.]", "-");
 		String noDuplicateDash = allSafeCharacters.replaceAll("-+", "-");
 		if (noDuplicateDash.length() <= MAX_FILE_LENGTH) {
@@ -211,19 +233,6 @@ public class Blowdryer {
 					.replace('/', '-').replace('=', '-');
 			return first + "--" + hashed + end;
 		}
-	}
-
-	// preserve the filename and extension if query parameters are present in original url.
-	// required to retrieve XML files.
-	// From: https://mycompany.bitbucket.com/projects/PRJ/repos/my-repo/raw/src/main/resources/checkstyle/spotless.gradle?at=07f588e52eb0f31e596eab0228a5df7233a98a14
-	// To:   https://mycompany.bitbucket.com/projects/PRJ/repos/my-repo/raw/src/main/resources/checkstyle/spotless.gradle?at=07f588e52eb0f31e596eab0228a5df7233a98a14-spotless.gradle
-	private static String preserveFileExtensionBitbucket(String url) {
-		int atIdx = url.indexOf("?at=");
-		if (atIdx != -1) {
-			String fileNameWithoutQuery = url.substring(0, atIdx);
-			url = String.format("%s-%s", url, fileNameWithoutQuery.substring(fileNameWithoutQuery.lastIndexOf("/") + 1));
-		}
-		return url;
 	}
 
 	//////////////////////
@@ -285,7 +294,9 @@ public class Blowdryer {
 			if (plugin instanceof DevPlugin) {
 				return new File(((DevPlugin) plugin).root, resourcePath);
 			} else {
-				return immutableUrl(plugin.toImmutableUrl(resourcePath));
+				int lastDot = resourcePath.lastIndexOf('.');
+				String preserveExtension = lastDot == -1 ? null : resourcePath.substring(lastDot);
+				return immutableUrl(plugin.toImmutableUrl(resourcePath), preserveExtension);
 			}
 		}
 	}
@@ -382,6 +393,11 @@ public class Blowdryer {
 		/** Alias for {@link Blowdryer#immutableUrl(String)}. */
 		public File immutableUrl(String url) {
 			return Blowdryer.immutableUrl(url);
+		}
+
+		/** Alias for {@link Blowdryer#immutableUrl(String, String)}. */
+		public File immutableUrl(String url, @Nullable String requiredSuffix) {
+			return Blowdryer.immutableUrl(url, requiredSuffix);
 		}
 
 		/** Alias for {@link Blowdryer#file(String)}. */

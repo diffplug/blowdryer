@@ -38,13 +38,10 @@ public class BlowdryerTest {
 
 	@Test
 	public void filenameSafe() {
+		filenameSafe("https://foo.org/?file=blah.foo&rev=7", "https-foo.org-file-blah.foo-rev-7");
 		filenameSafe("http://shortName.com/a+b-0-9~Z", "http-shortName.com-a+b-0-9-Z");
 		filenameSafe("https://raw.githubusercontent.com/diffplug/durian-build/07f588e52eb0f31e596eab0228a5df7233a98a14/gradle/spotless/spotless.license.java",
 				"https-raw.githubusercontent.com-diffplug--3vpUTw--14-gradle-spotless-spotless.license.java");
-		filenameSafe("https://mycompany.bitbucket.com/projects/PRJ/repos/my-repo/raw/src/main/resources/checkstyle/spotless.gradle?at=refs%2Fheads%2Fmaster",
-				"https-mycompany.bitbucket.com-projects-P--7T3UGg--at-refs-2Fheads-2Fmaster-spotless.gradle");
-		filenameSafe("https://mycompany.bitbucket.com/projects/PRJ/repos/my-repo/raw/src/main/resources/checkstyle/spotless.gradle?at=07f588e52eb0f31e596eab0228a5df7233a98a14",
-				"https-mycompany.bitbucket.com-projects-P--K+HRow--596eab0228a5df7233a98a14-spotless.gradle");
 	}
 
 	private void filenameSafe(String url, String safe) {
@@ -63,6 +60,13 @@ public class BlowdryerTest {
 	public void immutableUrlOfLocalJar() {
 		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
 		assertThat(Blowdryer.immutableUrl(FILE_PROTOCOL + jarFile + JAR_FILE_RESOURCE_SEPARATOR + "sample")).exists();
+	}
+
+	@Test
+	public void requiredSuffix() {
+		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
+		assertThat(Blowdryer.immutableUrl(FILE_PROTOCOL + jarFile + JAR_FILE_RESOURCE_SEPARATOR + "sample", ".suffix").getName()).endsWith(".suffix");
+		assertThat(Blowdryer.immutableUrl(FILE_PROTOCOL + jarFile + JAR_FILE_RESOURCE_SEPARATOR + "sample", ".suffix2").getName()).endsWith(".suffix2");
 	}
 
 	@Test
