@@ -127,6 +127,12 @@ public class Blowdryer {
 						throw new IllegalStateException("Expected url " + url + " but was " + propUrl + ", recommend deleting file at " + metaFile.getAbsolutePath());
 					}
 				} else {
+					if (metaFile.exists()) {
+						metaFile.delete();
+					}
+					if (dataFile.exists()) {
+						dataFile.delete();
+					}
 					Files.createParentDirs(dataFile);
 					download(url, dataFile);
 					Properties props = new Properties();
