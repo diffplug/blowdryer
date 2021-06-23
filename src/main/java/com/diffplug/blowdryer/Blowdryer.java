@@ -287,7 +287,9 @@ public class Blowdryer {
 			if (plugin instanceof DevPlugin) {
 				return new File(((DevPlugin) plugin).root, resourcePath);
 			} else {
-				return immutableUrl(plugin.toImmutableUrl(resourcePath));
+				int lastDot = resourcePath.lastIndexOf('.');
+				String preserveExtension = lastDot == -1 ? null : resourcePath.substring(lastDot);
+				return immutableUrl(plugin.toImmutableUrl(resourcePath), preserveExtension);
 			}
 		}
 	}
@@ -384,6 +386,11 @@ public class Blowdryer {
 		/** Alias for {@link Blowdryer#immutableUrl(String)}. */
 		public File immutableUrl(String url) {
 			return Blowdryer.immutableUrl(url);
+		}
+
+		/** Alias for {@link Blowdryer#immutableUrl(String, String)}. */
+		public File immutableUrl(String url, @Nullable String requiredSuffix) {
+			return Blowdryer.immutableUrl(url, requiredSuffix);
 		}
 
 		/** Alias for {@link Blowdryer#file(String)}. */
