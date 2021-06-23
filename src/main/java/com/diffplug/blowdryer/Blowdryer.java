@@ -191,7 +191,7 @@ public class Blowdryer {
 
 	/** Returns either the filename safe URL, or (first40)--(Base64 filenamesafe)(last40). */
 	static String filenameSafe(String url) {
-		url = detectAndRewriteBitbucketUrlIfRequired(url);
+		url = preserveFileExtensionBitbucket(url);
 		String allSafeCharacters = url.replaceAll("[^a-zA-Z0-9-+_.]", "-");
 		String noDuplicateDash = allSafeCharacters.replaceAll("-+", "-");
 		if (noDuplicateDash.length() <= MAX_FILE_LENGTH) {
@@ -214,9 +214,10 @@ public class Blowdryer {
 	// required to retrieve XML files.
 	// From: https://mycompany.bitbucket.com/projects/PRJ/repos/my-repo/raw/src/main/resources/checkstyle/spotless.gradle?at=07f588e52eb0f31e596eab0228a5df7233a98a14
 	// To:   https://mycompany.bitbucket.com/projects/PRJ/repos/my-repo/raw/src/main/resources/checkstyle/spotless.gradle?at=07f588e52eb0f31e596eab0228a5df7233a98a14-spotless.gradle
-	private static String detectAndRewriteBitbucketUrlIfRequired(String url) {
-		if (url.contains("?at")) {
-			String fileNameWithoutQuery = url.substring(0, url.indexOf("?at"));
+	private static String preserveFileExtensionBitbucket(String url) {
+		int atIdx = url.indexOf("?at=");
+		if (atIdx != -1) {
+			String fileNameWithoutQuery = url.substring(0, atIdx);
 			url = String.format("%s-%s", url, fileNameWithoutQuery.substring(fileNameWithoutQuery.lastIndexOf("/") + 1));
 		}
 		return url;
