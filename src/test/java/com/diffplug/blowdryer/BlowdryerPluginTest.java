@@ -26,6 +26,7 @@ public class BlowdryerPluginTest extends GradleHarness {
 
 	private static final String SETTINGS_GRADLE = "settings.gradle";
 	private static final String BUILD_GRADLE = "build.gradle";
+	private static final String BITBUCKET_REPO_ORG = "diffplug";
 
 	private void settingsGithub(String tag, String... extra) throws IOException {
 		write(SETTINGS_GRADLE,
@@ -52,6 +53,13 @@ public class BlowdryerPluginTest extends GradleHarness {
 		write(SETTINGS_GRADLE,
 				"plugins { id 'com.diffplug.blowdryerSetup' }",
 				"blowdryerSetup { repoSubfolder(''); gitlab('diffplug/blowdryer', 'tag', '" + tag + "') }",
+				Arrays.stream(extra).collect(Collectors.joining("\n")));
+	}
+
+	private void settingsBitbucket(String tag, String... extra) throws IOException {
+		write(SETTINGS_GRADLE,
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				String.format("blowdryerSetup { bitbucket('%s/blowdryer', 'tag', '%s') }", BITBUCKET_REPO_ORG, tag),
 				Arrays.stream(extra).collect(Collectors.joining("\n")));
 	}
 
@@ -107,6 +115,32 @@ public class BlowdryerPluginTest extends GradleHarness {
 
 		// double-check that failures do fail
 		settingsGitlab("test/2/b");
+		write(BUILD_GRADLE,
+				"plugins { id 'com.diffplug.blowdryer' }",
+				"assert Blowdryer.file('sample').text == 'a'");
+		gradleRunner().buildAndFail();
+	}
+
+	@Test
+	public void bitbucketTag() throws IOException {
+		settingsBitbucket("test/2/a");
+		write(BUILD_GRADLE,
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'a'",
+				"assert 干.prop('sample', 'name') == 'test'",
+				"assert 干.prop('sample', 'ver_spotless') == '1.2.0'");
+		gradleRunner().build();
+
+		settingsBitbucket("test/2/b");
+		write(BUILD_GRADLE,
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').text == 'b'",
+				"assert 干.prop('sample', 'name') == 'testB'",
+				"assert 干.prop('sample', 'group') == 'com.diffplug.gradleB'");
+		gradleRunner().build();
+
+		// double-check that failures do fail
+		settingsBitbucket("test/2/b");
 		write(BUILD_GRADLE,
 				"plugins { id 'com.diffplug.blowdryer' }",
 				"assert Blowdryer.file('sample').text == 'a'");

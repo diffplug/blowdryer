@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Support for Bitbucket Cloud and Server ([#23](https://github.com/diffplug/blowdryer/pull/23)).
+
 ## [1.2.1] - 2021-06-01
 ### Fixed
 - `repoSubfolder` doesn't do anything in `localJar` mode, so setting `repoSubfolder` ought to be an error, and now it is ([#22](https://github.com/diffplug/blowdryer/pull/22)).

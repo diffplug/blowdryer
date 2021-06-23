@@ -15,8 +15,21 @@
  */
 package com.diffplug.blowdryer;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
-import org.assertj.core.api.Assertions;
+import com.diffplug.blowdryer.Blowdryer.AuthPlugin;
+import com.diffplug.blowdryer.Blowdryer.ResourcePlugin;
+import com.diffplug.blowdryer.BlowdryerSetup.Bitbucket;
+import com.diffplug.blowdryer.BlowdryerSetup.GitAnchorType;
+import java.lang.reflect.Field;
+import java.util.Base64;
+import java.util.UUID;
+import okhttp3.Request;
+import okhttp3.Request.Builder;
 import org.junit.Test;
 
 public class BlowdryerTest {
@@ -28,23 +41,128 @@ public class BlowdryerTest {
 		filenameSafe("http://shortName.com/a+b-0-9~Z", "http-shortName.com-a+b-0-9-Z");
 		filenameSafe("https://raw.githubusercontent.com/diffplug/durian-build/07f588e52eb0f31e596eab0228a5df7233a98a14/gradle/spotless/spotless.license.java",
 				"https-raw.githubusercontent.com-diffplug--3vpUTw--14-gradle-spotless-spotless.license.java");
+		filenameSafe("https://mycompany.bitbucket.com/projects/PRJ/repos/my-repo/raw/src/main/resources/checkstyle/spotless.gradle?at=refs%2Fheads%2Fmaster",
+				"https-mycompany.bitbucket.com-projects-P--7T3UGg--at-refs-2Fheads-2Fmaster-spotless.gradle");
+		filenameSafe("https://mycompany.bitbucket.com/projects/PRJ/repos/my-repo/raw/src/main/resources/checkstyle/spotless.gradle?at=07f588e52eb0f31e596eab0228a5df7233a98a14",
+				"https-mycompany.bitbucket.com-projects-P--K+HRow--596eab0228a5df7233a98a14-spotless.gradle");
 	}
 
 	private void filenameSafe(String url, String safe) {
-		Assertions.assertThat(Blowdryer.filenameSafe(url)).isEqualTo(safe);
+		assertThat(Blowdryer.filenameSafe(url)).isEqualTo(safe);
 	}
 
 	@Test
 	public void cachedFileDeleted_issue_11() {
 		String test = "https://raw.githubusercontent.com/diffplug/blowdryer/test/2/b/src/main/resources/sample";
-		Assertions.assertThat(Blowdryer.immutableUrl(test)).hasContent("b");
+		assertThat(Blowdryer.immutableUrl(test)).hasContent("b");
 		Blowdryer.immutableUrl(test).delete();
-		Assertions.assertThat(Blowdryer.immutableUrl(test)).hasContent("b");
+		assertThat(Blowdryer.immutableUrl(test)).hasContent("b");
 	}
 
 	@Test
 	public void immutableUrlOfLocalJar() {
 		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
-		Assertions.assertThat(Blowdryer.immutableUrl(FILE_PROTOCOL + jarFile + JAR_FILE_RESOURCE_SEPARATOR + "sample")).exists();
+		assertThat(Blowdryer.immutableUrl(FILE_PROTOCOL + jarFile + JAR_FILE_RESOURCE_SEPARATOR + "sample")).exists();
 	}
+
+	@Test
+	public void bitbucketCloud_tagAnchorType() throws Exception {
+		final String hashRequestUrl = "https://api.bitbucket.org/2.0/repositories/testOrg/testRepo/refs/tags/testAnchor";
+		final String hash = UUID.randomUUID().toString();
+		final String expected = "https://api.bitbucket.org/2.0/repositories/testOrg/testRepo/src/" + hash + "/src/main/resources/test.properties";
+
+		Bitbucket spy = spy(setupBitbucketTestTarget(GitAnchorType.TAG)).authToken("un:pw");
+		doReturn(hash).when(spy).getCommitHashFromBitbucket(hashRequestUrl);
+		final ResourcePlugin target = getResourcePlugin();
+
+		assertThat(target.toImmutableUrl("test.properties")).isEqualTo(expected);
+	}
+
+	@Test
+	public void bitbucketCloud_commitAnchorType() throws Exception {
+		final String expected = "https://api.bitbucket.org/2.0/repositories/testOrg/testRepo/src/testAnchor/src/main/resources/test.properties";
+		setupBitbucketTestTarget(GitAnchorType.COMMIT);
+		final ResourcePlugin target = getResourcePlugin();
+
+		assertThat(target.toImmutableUrl("test.properties")).isEqualTo(expected);
+	}
+
+	@Test
+	public void bitbucketCloud_treeAnchorType() throws Exception {
+		setupBitbucketTestTarget(GitAnchorType.TREE);
+		final ResourcePlugin target = getResourcePlugin();
+
+		assertThatThrownBy(() -> target.toImmutableUrl("test.properties"))
+				.isInstanceOf(UnsupportedOperationException.class)
+				.hasMessage("TREE not supported for Bitbucket");
+	}
+
+	@Test
+	public void bitbucketServer_tagAnchorType() throws Exception {
+		final String expected = "https://my.bitbucket.com/projects/testOrg/repos/testRepo/raw/src/main/resources/test.properties?at=refs%2Ftags%2FtestAnchor";
+		setupBitbucketTestTarget(GitAnchorType.TAG).customDomainHttps("my.bitbucket.com");
+		final ResourcePlugin target = getResourcePlugin();
+
+		assertThat(target.toImmutableUrl("test.properties")).isEqualTo(expected);
+	}
+
+	@Test
+	public void bitbucketServer_commitAnchorType() throws Exception {
+		final String expected = "https://my.bitbucket.com/projects/testOrg/repos/testRepo/raw/src/main/resources/test.properties?at=testAnchor";
+		setupBitbucketTestTarget(GitAnchorType.COMMIT).customDomainHttps("my.bitbucket.com");
+		final ResourcePlugin target = getResourcePlugin();
+
+		assertThat(target.toImmutableUrl("test.properties")).isEqualTo(expected);
+	}
+
+	@Test
+	public void bitbucketServer_treeAnchorType() throws Exception {
+		setupBitbucketTestTarget(GitAnchorType.TREE).customDomainHttps("my.bitbucket.com");
+		final ResourcePlugin target = getResourcePlugin();
+
+		assertThatThrownBy(() -> target.toImmutableUrl("test.properties"))
+				.isInstanceOf(UnsupportedOperationException.class)
+				.hasMessage("TREE not supported for Bitbucket");
+	}
+
+	@Test
+	public void bitbucketCloudAuth() throws Exception {
+		final String expected = "https://api.bitbucket.org/2.0/repositories/testOrg/testRepo/src/testAnchor/src/main/resources/test.properties";
+		final String usernameAndAppPassword = String.format("%s:%s", randomUUID(), randomUUID());
+		setupBitbucketTestTarget(GitAnchorType.COMMIT).authToken(usernameAndAppPassword);
+
+		final ResourcePlugin target = getResourcePlugin();
+		final AuthPlugin otherTarget = getAuthPlugin();
+		final Builder requestBuilder = new Builder().url(expected);
+		otherTarget.addAuthToken(expected, requestBuilder);
+		final Request request = requestBuilder.build();
+
+		assertThat(target.toImmutableUrl("test.properties")).isEqualTo(expected);
+		final String encoded = Base64.getEncoder().encodeToString((usernameAndAppPassword)
+				.getBytes(UTF_8));
+		assertThat(request.header("Authorization")).isEqualTo(String.format("Basic %s", encoded));
+	}
+
+	private Bitbucket setupBitbucketTestTarget(final GitAnchorType anchorType) {
+		final String repoOrg = "testOrg/testRepo";
+		final String anchor = "testAnchor";
+		return new BlowdryerSetup(null).bitbucket(repoOrg, anchorType, anchor);
+	}
+
+	private ResourcePlugin getResourcePlugin() throws Exception {
+		final Field field = Blowdryer.class.getDeclaredField("plugin");
+		field.setAccessible(true);
+		return (ResourcePlugin) field.get(null);
+	}
+
+	private AuthPlugin getAuthPlugin() throws Exception {
+		final Field field = Blowdryer.class.getDeclaredField("authPlugin");
+		field.setAccessible(true);
+		return (AuthPlugin) field.get(null);
+	}
+
+	private String randomUUID() {
+		return UUID.randomUUID().toString();
+	}
+
 }
