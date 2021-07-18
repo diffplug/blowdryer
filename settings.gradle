@@ -21,6 +21,6 @@ plugins {
 }
 rootProject.name = 'blowdryer'
 blowdryerSetup {
-	github 'diffplug/blowdryer-diffplug', 'tag', '5.0.2'
+	github 'diffplug/blowdryer-diffplug', 'tag', '5.0.4'
 	//devLocal '../blowdryer-diffplug'
 }
