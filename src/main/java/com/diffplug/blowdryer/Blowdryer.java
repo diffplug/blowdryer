@@ -17,7 +17,7 @@ package com.diffplug.blowdryer;
 
 
 import com.diffplug.common.base.Errors;
-import com.diffplug.common.base.StandardSystemProperty;
+import com.diffplug.common.base.Preconditions;
 import com.diffplug.common.hash.Hashing;
 import com.diffplug.common.io.Files;
 import java.io.File;
@@ -59,12 +59,21 @@ public class Blowdryer {
 
 	private Blowdryer() {}
 
-	static {
-		File tmpDir = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value());
-		cacheDir = new File(tmpDir, "blowdryer-cache");
+	static void initTempDir(String tempDirPath) {
+		File tempDir = new File(tempDirPath);
+		if (cacheTempDir == null) {
+			cacheTempDir = tempDir;
+		} else {
+			Preconditions.checkArgument(cacheTempDir.equals(tempDir));
+		}
 	}
 
-	private static final File cacheDir;
+	static File cacheDir() {
+		Preconditions.checkArgument(cacheTempDir != null, "Call initTempDir first");
+		return new File(cacheTempDir, "blowdryer-cache");
+	}
+
+	private static File cacheTempDir;
 	private static final Map<String, File> urlToContent = new HashMap<>();
 	private static final Map<File, Map<String, String>> fileToProps = new HashMap<>();
 
@@ -73,7 +82,7 @@ public class Blowdryer {
 			try {
 				urlToContent.clear();
 				fileToProps.clear();
-				java.nio.file.Files.walk(cacheDir.toPath())
+				java.nio.file.Files.walk(cacheDir().toPath())
 						.sorted(Comparator.reverseOrder())
 						.forEach(Errors.rethrow().wrap((Path path) -> java.nio.file.Files.delete(path)));
 			} catch (IOException e) {
@@ -111,8 +120,8 @@ public class Blowdryer {
 			if (requiredSuffix != null && !safe.endsWith(requiredSuffix)) {
 				safe = safe + requiredSuffix;
 			}
-			File metaFile = new File(cacheDir, "meta_" + safe + ".properties");
-			File dataFile = new File(cacheDir, safe);
+			File metaFile = new File(cacheDir(), "meta_" + safe + ".properties");
+			File dataFile = new File(cacheDir(), safe);
 
 			try {
 				if (metaFile.exists() && dataFile.exists()) {

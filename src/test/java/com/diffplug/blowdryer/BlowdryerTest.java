@@ -25,6 +25,7 @@ import com.diffplug.blowdryer.Blowdryer.AuthPlugin;
 import com.diffplug.blowdryer.Blowdryer.ResourcePlugin;
 import com.diffplug.blowdryer.BlowdryerSetup.Bitbucket;
 import com.diffplug.blowdryer.BlowdryerSetup.GitAnchorType;
+import com.diffplug.common.base.StandardSystemProperty;
 import java.lang.reflect.Field;
 import java.util.Base64;
 import java.util.UUID;
@@ -35,6 +36,10 @@ import org.junit.Test;
 public class BlowdryerTest {
 	private static final String JAR_FILE_RESOURCE_SEPARATOR = "!/";
 	private static final String FILE_PROTOCOL = "file:///";
+
+	static {
+		Blowdryer.initTempDir(StandardSystemProperty.JAVA_IO_TMPDIR.value());
+	}
 
 	@Test
 	public void filenameSafe() {
