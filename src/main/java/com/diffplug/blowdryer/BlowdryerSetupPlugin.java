@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2020 DiffPlug
+ * Copyright (C) 2018-2021 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.diffplug.blowdryer;
 
 
+import java.io.File;
 import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
 
@@ -23,6 +24,7 @@ import org.gradle.api.initialization.Settings;
 public class BlowdryerSetupPlugin implements Plugin<Settings> {
 	@Override
 	public void apply(Settings settings) {
+		Blowdryer.initTempDir(new File(settings.getProviders().systemProperty("java.io.tmpdir").forUseAtConfigurationTime().get()));
 		settings.getExtensions().create(BlowdryerSetup.NAME, BlowdryerSetup.class, settings.getRootDir());
 	}
 }
