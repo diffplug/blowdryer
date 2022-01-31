@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- `干.projOptional('JRE_TARGET', 'Sets the target JRE')` which returns null if it's not present.
+- `干.projOptional('JRE_TARGET', 'Sets the target JRE')` which returns null if it's not present. ([#28](https://github.com/diffplug/blowdryer/pull/28)).
 
 ## [1.4.1] - 2021-09-03
 ### Fixed
