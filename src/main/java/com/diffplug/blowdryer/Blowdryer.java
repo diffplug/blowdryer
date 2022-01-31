@@ -401,9 +401,9 @@ public class Blowdryer {
 		}
 	}
 
-	/** Alias for {@link #projOptional(Project, String, String)}. */
+	/** Alias for {@link #projOptional(Project, String, String)} with {@code String.class}. */
 	public static @Nullable String projOptional(Project project, String key, String descForError) {
-		return projOptional(project, key, descForError);
+		return projOptional(project, String.class, key, descForError);
 	}
 
 	/** Alias for {@link Blowdryer} which fills in the `project` field of the `proj()` methods automatically. */
