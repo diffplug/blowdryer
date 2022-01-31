@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 DiffPlug
+ * Copyright (C) 2019-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,5 +53,15 @@ public class 干 {
 	/** Alias for {@link Blowdryer#proj(Project, Class, String, String)}. */
 	public static <T> T proj(Project project, Class<T> clazz, String key, String descForError) {
 		return Blowdryer.proj(project, clazz, key, descForError);
+	}
+
+	/** Alias for {@link Blowdryer#projOptional(Project, Class, String, String)} with {@code String.class}. */
+	public static @Nullable String projOptional(Project project, String key, String descForError) {
+		return Blowdryer.projOptional(project, key, descForError);
+	}
+
+	/** Alias for {@link Blowdryer#projOptional(Project, Class, String, String)}. */
+	public static @Nullable <T> T projOptional(Project project, Class<T> clazz, String key, String descForError) {
+		return Blowdryer.projOptional(project, clazz, key, descForError);
 	}
 }

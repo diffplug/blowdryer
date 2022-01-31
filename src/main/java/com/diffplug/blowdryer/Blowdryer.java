@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 DiffPlug
+ * Copyright (C) 2019-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -374,21 +374,36 @@ public class Blowdryer {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T proj(Project project, Class<T> clazz, String key, String descForError) {
-		Object value = project.findProperty(key);
+		T value = projOptional(project, clazz, key, descForError);
 		if (value == null) {
-			if (clazz.equals(String.class)) {
-				// https://docs.gradle.org/current/userguide/build_environment.html#sec:project_properties
-			}
 			throw new IllegalArgumentException("Undefined '" + key + "': " + descForError +
 					"\nset in gradle.properties: https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties" +
 					"\nset in buildscript: https://docs.gradle.org/current/userguide/writing_build_scripts.html#sec:extra_properties" +
 					"\nset in environment: https://docs.gradle.org/current/userguide/build_environment.html#sec:project_properties" +
 					"\nexact search order: https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#findProperty-java.lang.String-");
+		} else {
+			return value;
+		}
+	}
+
+	/**
+	 * Reads a property from the project, returns null if it is not present.
+	 */
+	@SuppressWarnings("unchecked")
+	public static @Nullable <T> T projOptional(Project project, Class<T> clazz, String key, String descForError) {
+		Object value = project.findProperty(key);
+		if (value == null) {
+			return null;
 		} else if (!(clazz.isInstance(value))) {
 			throw new IllegalArgumentException("Wrong type '" + key + "': " + descForError + " - expected " + clazz + " but was " + value.getClass());
 		} else {
 			return (T) value;
 		}
+	}
+
+	/** Alias for {@link #projOptional(Project, String, String)}. */
+	public static @Nullable String projOptional(Project project, String key, String descForError) {
+		return projOptional(project, key, descForError);
 	}
 
 	/** Alias for {@link Blowdryer} which fills in the `project` field of the `proj()` methods automatically. */
@@ -427,6 +442,16 @@ public class Blowdryer {
 		/** Alias for {@link Blowdryer#proj(Project, Class, String, String)}. */
 		public <T> T proj(Class<T> clazz, String key, String descForError) {
 			return Blowdryer.proj(project, clazz, key, descForError);
+		}
+
+		/** Alias for {@link Blowdryer#proj(Project, String, String)}. */
+		public @Nullable String projOptional(String key, String descForError) {
+			return Blowdryer.projOptional(project, key, descForError);
+		}
+
+		/** Alias for {@link Blowdryer#proj(Project, Class, String, String)}. */
+		public @Nullable <T> T projOptional(Class<T> clazz, String key, String descForError) {
+			return Blowdryer.projOptional(project, clazz, key, descForError);
 		}
 	}
 }
