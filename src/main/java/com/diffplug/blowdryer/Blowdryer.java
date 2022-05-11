@@ -40,6 +40,7 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.annotation.Nullable;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -58,6 +59,10 @@ public class Blowdryer {
 	private static final String JAR_FILE_RESOURCE_SEPARATOR = "!/";
 
 	private Blowdryer() {}
+
+	static void setTempDirNull() {
+		cacheTempDir = null;
+	}
 
 	static void initTempDir(String tempDirPath) {
 		File tempDir = new File(tempDirPath);
@@ -104,7 +109,7 @@ public class Blowdryer {
 	 * Downloads the given url to a local file in the system temporary directory.
 	 * It will only be downloaded once, system-wide, and it will not be checked for updates.
 	 * This is appropriate only for immutable URLs, such as specific hashes from Git.
-	 * 
+	 *
 	 * If requiredSuffix is non-null, it is guaranteed that the returned filename will end
 	 * with that string.
 	 */
@@ -204,7 +209,9 @@ public class Blowdryer {
 	}
 
 	private static void downloadRemote(String url, File dst) throws IOException {
-		OkHttpClient client = new OkHttpClient.Builder().build();
+		OkHttpClient client = new OkHttpClient.Builder()
+				.addInterceptor(rateLimitPlugin.createRateLimitInterceptor() == null ? new BlowdryerSetup.EmptyInterceptor() : rateLimitPlugin.createRateLimitInterceptor())
+				.build();
 		Request.Builder req = new Request.Builder().url(url);
 		authPlugin.addAuthToken(url, req);
 		try (Response response = client.newCall(req.build()).execute()) {
@@ -271,14 +278,15 @@ public class Blowdryer {
 	}
 
 	static void setResourcePlugin(ResourcePlugin plugin) {
-		setResourcePlugin(plugin, null);
+		setResourcePlugin(plugin, null, null);
 	}
 
-	static void setResourcePlugin(ResourcePlugin plugin, AuthPlugin authPlugin) {
+	static void setResourcePlugin(ResourcePlugin plugin, AuthPlugin authPlugin, RateLimitPlugin rateLimitPlugin) {
 		synchronized (Blowdryer.class) {
 			assertPluginNotSet();
 			Blowdryer.plugin = plugin;
 			Blowdryer.authPlugin = authPlugin == null ? authPluginNone : authPlugin;
+			Blowdryer.rateLimitPlugin = rateLimitPlugin;
 		}
 	}
 
@@ -295,6 +303,13 @@ public class Blowdryer {
 
 	private static final AuthPlugin authPluginNone = (url, builder) -> {};
 	private static AuthPlugin authPlugin = authPluginNone;
+
+	@FunctionalInterface
+	interface RateLimitPlugin {
+		Interceptor createRateLimitInterceptor();
+	}
+
+	private static RateLimitPlugin rateLimitPlugin;
 
 	/** Returns the given resource as a File (as configured by {@link BlowdryerSetup}. */
 	public static File file(String resourcePath) {

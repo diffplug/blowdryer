@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 DiffPlug
+ * Copyright (C) 2019-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.diffplug.common.base.Unhandled;
 import com.google.gson.Gson;
 import groovy.lang.Closure;
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +32,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
@@ -107,7 +109,7 @@ public class BlowdryerSetup {
 				if (url.startsWith(root)) {
 					builder.addHeader("Authorization", "Bearer " + authToken);
 				}
-			});
+			}, EmptyInterceptor::new);
 			return this;
 		}
 	}
@@ -158,7 +160,7 @@ public class BlowdryerSetup {
 				if (url.startsWith(urlStart)) {
 					builder.addHeader("Authorization", "Bearer " + authToken);
 				}
-			});
+			}, RateLimitInterceptor::new);
 			return this;
 		}
 	}
@@ -239,7 +241,7 @@ public class BlowdryerSetup {
 				if (authToken != null) {
 					builder.addHeader("Authorization", authToken);
 				}
-			});
+			}, EmptyInterceptor::new);
 			return this;
 		}
 
@@ -342,6 +344,37 @@ public class BlowdryerSetup {
 					this.hash = hash;
 				}
 			}
+		}
+	}
+
+	public static class EmptyInterceptor implements Interceptor {
+		@Override
+		public Response intercept(Chain chain) throws IOException {
+			return chain.proceed(chain.request());
+		}
+	}
+
+	public static class RateLimitInterceptor implements Interceptor {
+
+		@Override
+		public Response intercept(Chain chain) throws IOException {
+			Response response = chain.proceed(chain.request());
+			if (response.code() == 429) {
+				String retryAfter = response.header("Retry-After");
+				if (retryAfter == null) {
+					retryAfter = "1";
+				}
+
+				response.close();
+				try {
+					Thread.sleep(1000 * Long.parseLong(retryAfter));
+				} catch (InterruptedException e) {
+					throw new IllegalStateException("interrupted while waiting due to rate limiting", e);
+				}
+				response = chain.proceed(chain.request());
+			}
+
+			return response;
 		}
 	}
 
