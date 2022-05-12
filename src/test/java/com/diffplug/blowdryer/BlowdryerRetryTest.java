@@ -60,7 +60,33 @@ public class BlowdryerRetryTest extends GradleHarness {
 				.inScenario(RETRY_SCENARIO)
 				.whenScenarioStateIs(STARTED)
 				.willReturn(aResponse()
-						.withHeader("Retry-After", "0")
+						.withHeader("Retry-After", "1")
+						.withStatus(429))
+				.willSetStateTo(CAUSE_LIMIT_FAILED));
+
+		wireMockRule.stubFor(WireMock.get(WireMock.urlEqualTo("/bar"))
+				.inScenario(RETRY_SCENARIO)
+				.whenScenarioStateIs(CAUSE_LIMIT_FAILED)
+				.willReturn(aResponse()
+						.withStatus(200)
+						.withBody(fileContent)));
+
+		File downloadedFile = Blowdryer.immutableUrl("http://localhost:" + wireMockRule.port() + "/bar");
+
+		verify(2, getRequestedFor(urlEqualTo("/bar")));
+		assertThat(downloadedFile).hasContent(fileContent);
+	}
+
+	@Test
+	public void gitlabTriggersRateLimitNoHeader() throws IOException {
+		BlowdryerSetup blowdryerSetup = new BlowdryerSetup(new File("."));
+		blowdryerSetup.gitlab("foo/bar", BlowdryerSetup.GitAnchorType.TAG, "1.0");
+		String fileContent = "foobar";
+
+		wireMockRule.stubFor(WireMock.get(WireMock.urlEqualTo("/bar"))
+				.inScenario(RETRY_SCENARIO)
+				.whenScenarioStateIs(STARTED)
+				.willReturn(aResponse()
 						.withStatus(429))
 				.willSetStateTo(CAUSE_LIMIT_FAILED));
 
