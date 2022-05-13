@@ -104,6 +104,33 @@ public class BlowdryerRetryTest extends GradleHarness {
 	}
 
 	@Test
+	public void gitlabTriggersRateLimitDate() throws IOException {
+		BlowdryerSetup blowdryerSetup = new BlowdryerSetup(new File("."));
+		blowdryerSetup.gitlab("foo/bar", BlowdryerSetup.GitAnchorType.TAG, "1.0");
+		String fileContent = "foobar";
+
+		wireMockRule.stubFor(WireMock.get(WireMock.urlEqualTo("/bar"))
+				.inScenario(RETRY_SCENARIO)
+				.whenScenarioStateIs(STARTED)
+				.willReturn(aResponse()
+						.withHeader("Retry-After", "Wed, 21 Oct 2015 07:28:00 GMT")
+						.withStatus(429))
+				.willSetStateTo(CAUSE_LIMIT_FAILED));
+
+		wireMockRule.stubFor(WireMock.get(WireMock.urlEqualTo("/bar"))
+				.inScenario(RETRY_SCENARIO)
+				.whenScenarioStateIs(CAUSE_LIMIT_FAILED)
+				.willReturn(aResponse()
+						.withStatus(200)
+						.withBody(fileContent)));
+
+		File downloadedFile = Blowdryer.immutableUrl("http://localhost:" + wireMockRule.port() + "/bar");
+
+		verify(2, getRequestedFor(urlEqualTo("/bar")));
+		assertThat(downloadedFile).hasContent(fileContent);
+	}
+
+	@Test
 	public void gitlabRequestWithoutLimit() throws IOException {
 		BlowdryerSetup blowdryerSetup = new BlowdryerSetup(new File("."));
 		blowdryerSetup.gitlab("foo/bar", BlowdryerSetup.GitAnchorType.TAG, "1.0");

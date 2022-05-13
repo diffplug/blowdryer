@@ -40,7 +40,6 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.annotation.Nullable;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -210,7 +209,7 @@ public class Blowdryer {
 
 	private static void downloadRemote(String url, File dst) throws IOException {
 		OkHttpClient client = new OkHttpClient.Builder()
-				.addInterceptor(rateLimitPlugin.createRateLimitInterceptor() == null ? new BlowdryerSetup.EmptyInterceptor() : rateLimitPlugin.createRateLimitInterceptor())
+				.addInterceptor(new RateLimitInterceptor())
 				.build();
 		Request.Builder req = new Request.Builder().url(url);
 		authPlugin.addAuthToken(url, req);
@@ -278,15 +277,14 @@ public class Blowdryer {
 	}
 
 	static void setResourcePlugin(ResourcePlugin plugin) {
-		setResourcePlugin(plugin, null, null);
+		setResourcePlugin(plugin, null);
 	}
 
-	static void setResourcePlugin(ResourcePlugin plugin, AuthPlugin authPlugin, RateLimitPlugin rateLimitPlugin) {
+	static void setResourcePlugin(ResourcePlugin plugin, AuthPlugin authPlugin) {
 		synchronized (Blowdryer.class) {
 			assertPluginNotSet();
 			Blowdryer.plugin = plugin;
 			Blowdryer.authPlugin = authPlugin == null ? authPluginNone : authPlugin;
-			Blowdryer.rateLimitPlugin = rateLimitPlugin;
 		}
 	}
 
@@ -303,13 +301,6 @@ public class Blowdryer {
 
 	private static final AuthPlugin authPluginNone = (url, builder) -> {};
 	private static AuthPlugin authPlugin = authPluginNone;
-
-	@FunctionalInterface
-	interface RateLimitPlugin {
-		Interceptor createRateLimitInterceptor();
-	}
-
-	private static RateLimitPlugin rateLimitPlugin;
 
 	/** Returns the given resource as a File (as configured by {@link BlowdryerSetup}. */
 	public static File file(String resourcePath) {

@@ -109,7 +109,7 @@ public class BlowdryerSetup {
 				if (url.startsWith(root)) {
 					builder.addHeader("Authorization", "Bearer " + authToken);
 				}
-			}, EmptyInterceptor::new);
+			});
 			return this;
 		}
 	}
@@ -160,7 +160,7 @@ public class BlowdryerSetup {
 				if (url.startsWith(urlStart)) {
 					builder.addHeader("Authorization", "Bearer " + authToken);
 				}
-			}, RateLimitInterceptor::new);
+			});
 			return this;
 		}
 	}
@@ -241,7 +241,7 @@ public class BlowdryerSetup {
 				if (authToken != null) {
 					builder.addHeader("Authorization", authToken);
 				}
-			}, EmptyInterceptor::new);
+			});
 			return this;
 		}
 
@@ -351,40 +351,6 @@ public class BlowdryerSetup {
 		@Override
 		public Response intercept(Chain chain) throws IOException {
 			return chain.proceed(chain.request());
-		}
-	}
-
-	public static class RateLimitInterceptor implements Interceptor {
-
-		private static int RETRY_MAX_ATTEMPTS = 100;
-		private static long RETRY_MS = 100;
-		private static long RETRX_MAX_MS = 300_000;
-
-		private int retryAttempts = 0;
-
-		@Override
-		public Response intercept(Chain chain) throws IOException {
-			Response response = chain.proceed(chain.request());
-			if (response.code() == 429 && retryAttempts < RETRY_MAX_ATTEMPTS) {
-				long retryAfter = Long.parseLong(response.header("Retry-After", "0")) * 1000;
-				if (retryAfter <= 0) {
-					retryAfter = RETRY_MS;
-				}
-				if (retryAfter > RETRX_MAX_MS) {
-					retryAfter = RETRX_MAX_MS;
-				}
-
-				response.close();
-				try {
-					Thread.sleep(retryAfter);
-				} catch (InterruptedException e) {
-					throw new IllegalStateException("interrupted while waiting due to rate limiting", e);
-				}
-				retryAttempts++;
-				response = chain.proceed(chain.request());
-			}
-
-			return response;
 		}
 	}
 
