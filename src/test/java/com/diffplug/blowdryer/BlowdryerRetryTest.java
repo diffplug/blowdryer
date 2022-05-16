@@ -22,6 +22,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.diffplug.common.base.StandardSystemProperty;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
@@ -30,7 +31,6 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 public class BlowdryerRetryTest extends GradleHarness {
 
@@ -38,16 +38,12 @@ public class BlowdryerRetryTest extends GradleHarness {
 	private static final String CAUSE_LIMIT_FAILED = "Cause limitFailed";
 
 	@Rule
-	public TemporaryFolder tempDir = new TemporaryFolder();
-
-	@Rule
 	public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.wireMockConfig().dynamicPort().dynamicHttpsPort());
 
 	@Before
 	public void setup() throws IOException {
 		Blowdryer.setResourcePluginNull();
-		Blowdryer.setTempDirNull();
-		Blowdryer.initTempDir(tempDir.newFolder("temp-cache-dir").getAbsolutePath());
+		Blowdryer.initTempDir(StandardSystemProperty.JAVA_IO_TMPDIR.value());
 	}
 
 	@Test

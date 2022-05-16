@@ -22,7 +22,6 @@ import com.diffplug.common.base.Unhandled;
 import com.google.gson.Gson;
 import groovy.lang.Closure;
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +31,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
@@ -344,13 +342,6 @@ public class BlowdryerSetup {
 					this.hash = hash;
 				}
 			}
-		}
-	}
-
-	public static class EmptyInterceptor implements Interceptor {
-		@Override
-		public Response intercept(Chain chain) throws IOException {
-			return chain.proceed(chain.request());
 		}
 	}
 

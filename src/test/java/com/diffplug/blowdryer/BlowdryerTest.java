@@ -40,7 +40,6 @@ public class BlowdryerTest {
 
 	@BeforeClass
 	public static void setup() {
-		Blowdryer.setTempDirNull();
 		Blowdryer.initTempDir(StandardSystemProperty.JAVA_IO_TMPDIR.value());
 	}
 

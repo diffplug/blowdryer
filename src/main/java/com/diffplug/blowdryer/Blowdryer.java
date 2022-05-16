@@ -59,10 +59,6 @@ public class Blowdryer {
 
 	private Blowdryer() {}
 
-	static void setTempDirNull() {
-		cacheTempDir = null;
-	}
-
 	static void initTempDir(String tempDirPath) {
 		File tempDir = new File(tempDirPath);
 		if (cacheTempDir == null) {

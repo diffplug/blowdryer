@@ -24,7 +24,7 @@ public class RateLimitInterceptor implements Interceptor {
 
 	private static int RETRY_MAX_ATTEMPTS = 100;
 	private static long RETRY_MS = 100;
-	private static long RETRX_MAX_MS = 300_000;
+	private static long RETRX_MAX_MS = 90_000;
 
 	private int retryAttempts = 0;
 
@@ -48,6 +48,7 @@ public class RateLimitInterceptor implements Interceptor {
 
 			response.close();
 			try {
+				System.out.println("Blowdryer request to " + chain.request().url() + " has been rate-limited, retrying in " + retryAfter + " milliseconds");
 				Thread.sleep(retryAfter);
 			} catch (InterruptedException e) {
 				throw new IllegalStateException("interrupted while waiting due to rate limiting", e);
