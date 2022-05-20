@@ -20,8 +20,7 @@ import java.io.IOException;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 
-public class RateLimitInterceptor implements Interceptor {
-
+class RateLimitInterceptor implements Interceptor {
 	private static int RETRY_MAX_ATTEMPTS = 100;
 	private static long RETRY_MS = 100;
 	private static long RETRX_MAX_MS = 90_000;
@@ -31,6 +30,9 @@ public class RateLimitInterceptor implements Interceptor {
 	@Override
 	public Response intercept(Chain chain) throws IOException {
 		Response response = chain.proceed(chain.request());
+		// The retry system depends on the backend being used
+		// - GitLab -> 429 https://github.com/diffplug/blowdryer/pull/30
+		// - GitHub, etc. -> PR welcome
 		if (response.code() == 429 && retryAttempts < RETRY_MAX_ATTEMPTS) {
 			long retryAfter = RETRY_MS;
 			try {
