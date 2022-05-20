@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Add retry on (gitlab) rateLimit
+- Add retry on (gitlab) rateLimit ([#30](https://github.com/diffplug/blowdryer/pull/30))
 
 ## [1.5.1] - 2022-01-31
 ### Fixed
