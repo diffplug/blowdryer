@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 DiffPlug
+ * Copyright (C) 2019-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,15 @@ import java.util.Base64;
 import java.util.UUID;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class BlowdryerTest {
 	private static final String JAR_FILE_RESOURCE_SEPARATOR = "!/";
 	private static final String FILE_PROTOCOL = "file:///";
 
-	static {
+	@BeforeClass
+	public static void setup() {
 		Blowdryer.initTempDir(StandardSystemProperty.JAVA_IO_TMPDIR.value());
 	}
 

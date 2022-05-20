@@ -24,4 +24,5 @@ dependencies {
 	testImplementation 'junit:junit:4.12'
 	testImplementation 'org.assertj:assertj-core:3.14.0'
 	testImplementation 'org.mockito:mockito-core:3.11.2'
+	testImplementation 'com.github.tomakehurst:wiremock-jre8:2.33.2'
 }

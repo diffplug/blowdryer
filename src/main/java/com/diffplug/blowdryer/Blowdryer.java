@@ -104,7 +104,7 @@ public class Blowdryer {
 	 * Downloads the given url to a local file in the system temporary directory.
 	 * It will only be downloaded once, system-wide, and it will not be checked for updates.
 	 * This is appropriate only for immutable URLs, such as specific hashes from Git.
-	 * 
+	 *
 	 * If requiredSuffix is non-null, it is guaranteed that the returned filename will end
 	 * with that string.
 	 */
@@ -204,7 +204,9 @@ public class Blowdryer {
 	}
 
 	private static void downloadRemote(String url, File dst) throws IOException {
-		OkHttpClient client = new OkHttpClient.Builder().build();
+		OkHttpClient client = new OkHttpClient.Builder()
+				.addInterceptor(new RateLimitInterceptor())
+				.build();
 		Request.Builder req = new Request.Builder().url(url);
 		authPlugin.addAuthToken(url, req);
 		try (Response response = client.newCall(req.build()).execute()) {
