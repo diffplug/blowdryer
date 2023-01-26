@@ -248,36 +248,11 @@ It would be handy to have something like this for other script-based build syste
 
 ## Requirements
 
-Requires Java 8+, highly recommend Gradle 6+.
-
-### Gradle 5.0+ workaround
-
-There is a workaround to allow Gradle 5.0+
-
-```gradle
-// buildSrc/build.gradle
-apply plugin: 'java'
-repositories {
-    mavenCentral()
-}
-dependencies {
-    implementation 'com.diffplug:blowdryer:1.6.0'
-}
-
-// settings.gradle
-apply plugin: 'com.diffplug.blowdryerSetup'
-blowdryerSetup { ... }
-
-// root build.gradle
-apply plugin: 'com.diffplug.blowdryer'
-```
-<!---freshmark /version -->
-
-### Gradle 4.x workaround
-
-Blowdryer does not work in Gradle 4.x due to `java.lang.NoSuchMethodError: kotlin.collections.ArraysKt.copyInto([B[BIII)[B`.  If you want to try to fix it, try to fix [this test](https://github.com/diffplug/blowdryer/blob/master/src/test/java/com/diffplug/blowdryer/BlowdryerPlugin4xTest.java).
+Requires Java 8+ and Graadle 6.8+.
 
 ## Acknowledgements
+
+<!---freshmark /version -->
 
 - Thanks to [Volker Gropp](https://github.com/vgropp) for implementing [GitLab support](https://github.com/diffplug/blowdryer/pull/15) and [authToken support for GitHub and GitLab](https://github.com/diffplug/blowdryer/pull/18).
 - Thanks to [Sergey Sklarov](https://github.com/bHacklv) for implementing [Bitbucket support](https://github.com/diffplug/blowdryer/pull/23).
