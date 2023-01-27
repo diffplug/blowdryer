@@ -15,16 +15,22 @@
  */
 package com.diffplug.blowdryer;
 
-
 import java.io.IOException;
 import org.gradle.testkit.runner.GradleRunner;
 
 public class GradleHarness extends ResourceHarness {
 	/** A gradleRunner(). */
 	protected GradleRunner gradleRunner() throws IOException {
-		return GradleRunner.create()
-				.withGradleVersion(BlowdryerSetupPlugin.MINIMUM_GRADLE)
+		GradleRunner runner = GradleRunner.create()
 				.withProjectDir(rootFolder())
 				.withPluginClasspath();
+		if (jreVersion() < 16) {
+			runner.withGradleVersion(BlowdryerSetupPlugin.MINIMUM_GRADLE);
+		}
+		return runner;
+	}
+
+	private static int jreVersion() {
+		return Integer.parseInt(System.getProperty("java.vm.specification.version"));
 	}
 }

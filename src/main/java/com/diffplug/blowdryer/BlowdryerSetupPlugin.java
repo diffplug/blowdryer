@@ -15,7 +15,6 @@
  */
 package com.diffplug.blowdryer;
 
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.gradle.api.GradleException;

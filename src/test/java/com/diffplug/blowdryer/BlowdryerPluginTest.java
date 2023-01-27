@@ -15,11 +15,12 @@
  */
 package com.diffplug.blowdryer;
 
-
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.assertj.core.api.Assertions;
+import org.junit.Assume;
 import org.junit.Test;
 
 public class BlowdryerPluginTest extends GradleHarness {
@@ -325,6 +326,10 @@ public class BlowdryerPluginTest extends GradleHarness {
 	@Test
 	public void localJarFileDownloadExists() throws IOException {
 		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
+		if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win")) {
+			Assertions.assertThat(jarFile).startsWith("/");
+			jarFile = jarFile.substring(1);
+		}
 		settingsLocalJar(jarFile);
 
 		write(BUILD_GRADLE,
@@ -360,6 +365,7 @@ public class BlowdryerPluginTest extends GradleHarness {
 
 	@Test
 	public void tooOldError() throws IOException {
+		Assume.assumeTrue(!System.getProperty("java.vm.specification.version").equals("17"));
 		write(SETTINGS_GRADLE,
 				"plugins { id 'com.diffplug.blowdryerSetup' }",
 				"blowdryerSetup { github('diffplug/blowdryer', 'tag', 'test/2/a') }",
