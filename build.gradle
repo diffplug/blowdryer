@@ -10,14 +10,19 @@ plugins {
 apply from: 干.file('base/changelog.gradle')
 apply from: 干.file('base/java8.gradle')
 
-apply from: 干.file('spotless/freshmark.gradle')
-apply from: 干.file('spotless/java.gradle')
 apply from: 干.file('base/gradle-plugin.gradle')
 apply from: 干.file('base/maven.gradle')
 apply from: 干.file('base/sonatype.gradle')
+apply from: 干.file('spotless/freshmark.gradle')
+apply from: 干.file('spotless/java.gradle')
 
 tasks.named('spotlessFreshmark') {
 	if (JavaVersion.current().isJava12Compatible()) {
+		enabled = false
+	}
+}
+if (System.properties['os.name'].toLowerCase().contains('windows')) {
+	tasks.named('javadoc') {
 		enabled = false
 	}
 }

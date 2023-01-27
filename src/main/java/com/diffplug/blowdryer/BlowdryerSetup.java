@@ -15,7 +15,6 @@
  */
 package com.diffplug.blowdryer;
 
-
 import com.diffplug.common.annotations.VisibleForTesting;
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.base.Unhandled;

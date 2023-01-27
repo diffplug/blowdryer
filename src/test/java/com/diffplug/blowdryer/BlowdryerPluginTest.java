@@ -15,7 +15,6 @@
  */
 package com.diffplug.blowdryer;
 
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
