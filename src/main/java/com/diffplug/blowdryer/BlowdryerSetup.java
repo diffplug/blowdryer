@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 DiffPlug
+ * Copyright (C) 2019-2023 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package com.diffplug.blowdryer;
-
 
 import com.diffplug.common.annotations.VisibleForTesting;
 import com.diffplug.common.base.Errors;
@@ -356,7 +355,7 @@ public class BlowdryerSetup {
 			throw new IllegalArgumentException("repoSubfolder has no effect when reading from a jar, delete the call to repoSubfolder.");
 		}
 
-		String rootUrl = "file:///" + jarFile.getAbsolutePath() + "!/";
+		String rootUrl = "file:///" + jarFile.getAbsolutePath().replace('\\', '/') + "!/";
 		Blowdryer.setResourcePlugin(resource -> rootUrl + resource);
 	}
 

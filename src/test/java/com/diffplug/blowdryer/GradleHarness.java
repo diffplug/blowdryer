@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2020 DiffPlug
+ * Copyright (C) 2018-2023 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,22 @@
  */
 package com.diffplug.blowdryer;
 
-
 import java.io.IOException;
 import org.gradle.testkit.runner.GradleRunner;
 
 public class GradleHarness extends ResourceHarness {
 	/** A gradleRunner(). */
 	protected GradleRunner gradleRunner() throws IOException {
-		return GradleRunner.create().withProjectDir(rootFolder()).withPluginClasspath();
+		GradleRunner runner = GradleRunner.create()
+				.withProjectDir(rootFolder())
+				.withPluginClasspath();
+		if (jreVersion() < 16) {
+			runner.withGradleVersion(BlowdryerSetupPlugin.MINIMUM_GRADLE);
+		}
+		return runner;
+	}
+
+	private static int jreVersion() {
+		return Integer.parseInt(System.getProperty("java.vm.specification.version"));
 	}
 }

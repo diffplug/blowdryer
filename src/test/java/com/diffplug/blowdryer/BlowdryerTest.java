@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2022 DiffPlug
+ * Copyright (C) 2019-2023 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,11 @@ import com.diffplug.blowdryer.BlowdryerSetup.GitAnchorType;
 import com.diffplug.common.base.StandardSystemProperty;
 import java.lang.reflect.Field;
 import java.util.Base64;
+import java.util.Locale;
 import java.util.UUID;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -66,6 +68,10 @@ public class BlowdryerTest {
 	@Test
 	public void immutableUrlOfLocalJar() {
 		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
+		if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win")) {
+			Assertions.assertThat(jarFile).startsWith("/");
+			jarFile = jarFile.substring(1).replace('\\', '/');
+		}
 		assertThat(Blowdryer.immutableUrl(FILE_PROTOCOL + jarFile + JAR_FILE_RESOURCE_SEPARATOR + "sample")).exists();
 	}
 
