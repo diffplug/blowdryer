@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 DiffPlug
+ * Copyright (C) 2019-2023 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -356,5 +356,19 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"assert 干.file('invalid-file.txt').exists()");
 
 		gradleRunner().buildAndFail();
+	}
+
+	@Test
+	public void tooOldError() throws IOException {
+		write(SETTINGS_GRADLE,
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				"blowdryerSetup { github('diffplug/blowdryer', 'tag', 'test/2/a') }",
+				"import com.diffplug.blowdryer.干",
+				"assert 干.file('sample').text == 'a'",
+				"assert 干.prop('sample', 'name') == 'test'",
+				"assert 干.prop('sample', 'ver_spotless') == '1.2.0'",
+				"println 'test was success'");
+		Assertions.assertThat(gradleRunner().withGradleVersion("6.7").buildAndFail().getOutput().replace("\r\n", "\n"))
+				.contains("Blowdryer requires Gradle 6.8 or newer, this was 6.7");
 	}
 }
