@@ -15,27 +15,34 @@
  */
 package com.diffplug.blowdryer;
 
+import java.io.IOException;
 import org.assertj.core.api.Assertions;
+import org.gradle.api.GradleException;
 import org.junit.Test;
 
-public class SettingsDotGradleParsedTest {
-	@Test
-	public void somePlugins() {
-		String input = "pluginManagement {\r\n" +
+public class SettingsDotGradleParsedTest extends ResourceHarness {
+	private static String content(String insidePlugins) {
+		return "pluginManagement {\r\n" +
 				"  repositories {\r\n" +
 				"    mavenCentral()\r\n" +
 				"    gradlePluginPortal()\r\n" +
 				"  }\r\n" +
 				"}\r\n" +
 				"plugins {\r\n" +
-				"  // https://plugins.gradle.org/plugin/com.gradle.plugin-publish\r\n" +
+				insidePlugins +
+				"}\r\n" +
+				"rootProject.name = 'blowdryer'\r\n";
+	}
+
+	@Test
+	public void parser() {
+		String insidePlugins = "  // https://plugins.gradle.org/plugin/com.gradle.plugin-publish\r\n" +
 				"  id 'com.gradle.plugin-publish' version '0.20.0' apply false\r\n" +
 				"  // https://github.com/equodev/equo-ide/blob/main/plugin-gradle/CHANGELOG.md\r\n" +
 				"  id 'dev.equo.ide' version '0.12.1' apply false\r\n" +
 				"  // https://github.com/gradle-nexus/publish-plugin/releases\r\n" +
-				"  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' apply false\r\n" +
-				"}\r\n" +
-				"rootProject.name = 'blowdryer'\r\n";
+				"  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' apply false\r\n";
+		String input = content(insidePlugins);
 		SettingsDotGradleParsed parsed = new SettingsDotGradleParsed(input);
 		Assertions.assertThat(parsed.contentCorrectEndings()).isEqualTo(input);
 		Assertions.assertThat(parsed.beforePlugins).isEqualTo("pluginManagement {\n" +
@@ -51,5 +58,45 @@ public class SettingsDotGradleParsedTest {
 				"  // https://github.com/gradle-nexus/publish-plugin/releases\n" +
 				"  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' apply false");
 		Assertions.assertThat(parsed.afterPlugins).isEqualTo("rootProject.name = 'blowdryer'\n");
+	}
+
+	@Test
+	public void test() throws IOException {
+		String insidePlugins = "  // https://plugins.gradle.org/plugin/com.gradle.plugin-publish\r\n" +
+				"  id 'com.gradle.plugin-publish' version '0.20.0' apply false\r\n" +
+				"  // https://github.com/equodev/equo-ide/blob/main/plugin-gradle/CHANGELOG.md\r\n" +
+				"  id 'dev.equo.ide' version '0.12.1' apply false\r\n" +
+				"  // https://github.com/gradle-nexus/publish-plugin/releases\r\n" +
+				"  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' apply false\r\n";
+		String input = content(insidePlugins);
+		write("settings.gradle", input);
+
+		BlowdryerSetup setup = new BlowdryerSetup(rootFolder());
+
+		// this should succeed
+		setup.pluginVersions(pluginVersions -> {
+			pluginVersions.add(insidePlugins);
+		});
+
+		// this should fail
+		try {
+			setup.pluginVersions(pluginVersions -> {
+				pluginVersions.add("TEST");
+			});
+		} catch (GradleException e) {
+			Assertions.assertThat(e.getMessage()).isEqualTo("settings.gradle plugins block has the wrong content. Add -DsetPluginVersions to overwrite,\n" +
+					"https://github.com/diffplug/blowdryer#plugin-versions for more info.\n" +
+					"\n" +
+					"DESIRED:\n" +
+					"TEST\n" +
+					"\n" +
+					"ACTUAL:\n" +
+					"  // https://plugins.gradle.org/plugin/com.gradle.plugin-publish\n" +
+					"  id 'com.gradle.plugin-publish' version '0.20.0' apply false\n" +
+					"  // https://github.com/equodev/equo-ide/blob/main/plugin-gradle/CHANGELOG.md\n" +
+					"  id 'dev.equo.ide' version '0.12.1' apply false\n" +
+					"  // https://github.com/gradle-nexus/publish-plugin/releases\n" +
+					"  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' apply false");
+		}
 	}
 }
