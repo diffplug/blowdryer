@@ -16,8 +16,8 @@ output = [
 [![Maven central](https://img.shields.io/badge/mavencentral-available-blue.svg)](https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22)
 [![License Apache 2.0](https://img.shields.io/badge/license-apache--2.0-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 
-[![Changelog](https://img.shields.io/badge/changelog-1.6.0-brightgreen.svg)](CHANGELOG.md)
-[![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/1.6.0/index.html)
+[![Changelog](https://img.shields.io/badge/changelog-1.7.0-brightgreen.svg)](CHANGELOG.md)
+[![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/1.7.0/index.html)
 [![Live chat](https://img.shields.io/badge/gitter-chat-brightgreen.svg)](https://gitter.im/diffplug/blowdryer)
 [![CircleCI](https://circleci.com/gh/diffplug/blowdryer.svg?style=shield)](https://circleci.com/gh/diffplug/blowdryer)
 <!---freshmark /shields -->
@@ -47,7 +47,7 @@ Then, in the `settings.gradle` for the project that you want to suck these into,
 
 ```gradle
 plugins {
-  id 'com.diffplug.blowdryerSetup' version '1.6.0'
+  id 'com.diffplug.blowdryerSetup' version '1.7.0'
 }
 
 blowdryerSetup {
@@ -164,7 +164,7 @@ We recommend that your `settings.gradle` should look like this:
 
 ```gradle
 plugins {
-  id 'com.diffplug.blowdryerSetup' version '1.6.0'
+  id 'com.diffplug.blowdryerSetup' version '1.7.0'
   id 'acme.java' version '1.0.0' apply false
   id 'acme.kotlin' version '2.0.0' apply false
 }
@@ -181,7 +181,7 @@ First note that every plugin has `apply false` except for `com.diffplug.blowdrye
 The second thing to note is `setPluginsBlockTo { file('plugin.versions') }`. That means that if you go to `github.com/acme/blowdryer-acme` and then open the `v1.4.5` tab and then go into the `src/main/resources` folder, you will find a file called `plugin.versions`. And the content of that file will be
 
 ```gradle
-  id 'com.diffplug.blowdryerSetup' version '1.6.0'
+  id 'com.diffplug.blowdryerSetup' version '1.7.0'
   id 'acme.java' version '1.0.0' apply false
   id 'acme.kotlin' version '2.0.0' apply false
 ```
@@ -237,9 +237,9 @@ static File   干.immutableUrl(String guaranteedImmutableUrl, String fileSuffix)
   // 干.immutableUrl('https://foo.org/?file=blah.foo&rev=7', '.foo') returns a file which ends in `.foo`
 ```
 
-- [javadoc `Blowdryer`](https://javadoc.io/static/com.diffplug/blowdryer/1.6.0/com/diffplug/blowdryer/Blowdryer.html)
-- [javadoc `BlowdryerSetup`](https://javadoc.io/static/com.diffplug/blowdryer/1.6.0/com/diffplug/blowdryer/BlowdryerSetup.html)
-- [javadoc `BlowdryerSetup.PluginsBlock`](https://javadoc.io/static/com.diffplug/blowdryer/1.6.0/com/diffplug/blowdryer/BlowdryerSetup.html)
+- [javadoc `Blowdryer`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/Blowdryer.html)
+- [javadoc `BlowdryerSetup`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/BlowdryerSetup.html)
+- [javadoc `BlowdryerSetup.PluginsBlock`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/BlowdryerSetup.html)
 
 If you do `apply plugin: 'com.diffplug.blowdryer'` then every project gets an extension object ([code](https://github.com/diffplug/blowdryer/blob/master/src/main/java/com/diffplug/blowdryer/BlowdryerPlugin.java)) where the project field has been filled in for you, which is why we don't pass it explicitly in the examples before this section.  If you don't apply the plugin, you can still call these static methods and pass `project` explicitly for the `proj()` methods.
 
@@ -250,7 +250,7 @@ The Gradle Kotlin DSL doesn't play well with the name-based extension object tha
 ```kotlin
 // settings.gradle.kts
 plugins {
-  id("com.diffplug.blowdryerSetup") version "1.6.0"
+  id("com.diffplug.blowdryerSetup") version "1.7.0"
 }
 import com.diffplug.blowdryer.BlowdryerSetup
 import com.diffplug.blowdryer.BlowdryerSetup.GitAnchorType
@@ -275,9 +275,9 @@ somePlugin {
 
 ### Other packaging options
 
-[`Blowdryer.immutableUrl`](https://javadoc.io/static/com.diffplug/blowdryer/1.6.0/com/diffplug/blowdryer/Blowdryer.html#immutableUrl-java.lang.String-) returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the content of that URL is immutable.
+[`Blowdryer.immutableUrl`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/Blowdryer.html#immutableUrl-java.lang.String-) returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the content of that URL is immutable.
 
-When you setup the Blowdryer plugin in your `settings.gradle`, you're telling Blowdryer what URL scheme to use when resolving a call to [`Blowdryer.file`](https://javadoc.io/static/com.diffplug/blowdryer/1.6.0/com/diffplug/blowdryer/Blowdryer.html#file-java.lang.String-), for example:
+When you setup the Blowdryer plugin in your `settings.gradle`, you're telling Blowdryer what URL scheme to use when resolving a call to [`Blowdryer.file`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/Blowdryer.html#file-java.lang.String-), for example:
 
 ```java
 //blowdryer {
