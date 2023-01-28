@@ -192,22 +192,14 @@ Blowdryer is using the same immutable file mechanism described earlier, but this
 
 The workflow goes like this:
 
-1. enter `devLocal` mide
-```gradle
-...
-blowdryerSetup {
-  //github 'acme/blowdryer-acme', 'tag', 'v1.4.5'
-  devLocal '../path-to-local-blowdryer-acme'
-}
-```
-
-2. Update the `plugin.versions` file in `path-to-local-blowdryer-acme`
+1. Enter `devLocal` mode (demonstrated [above](#dev-workflow))
+2. Update the `plugin.versions` file
 3. When you try to run your build, you will get an error
   - > settings.gradle plugins block has the wrong content. Add -DsetPluginVersions to overwrite
 4. Add `-DsetPluginVersions` to your command line
 5. You'll get another error
  - > settings.gradle plugins block was written successfully. Plugin versions have been updated, try again.
-6. Now the plugins block will be up-to-date
+6. Now the plugins block will be up-to-date and your next build will succeed
 
 ### Tweaking the `plugin.versions`
 
@@ -222,6 +214,12 @@ setPluginsBlockTo {
   replace('1.7.20', '1.8.0') // update Kotlin version but only for this build
 }
 ```
+
+### Compared to version catalogs
+
+Recent versions of Gradle shipped a flexible [version catalog](https://docs.gradle.org/current/userguide/platforms.html) feature. You can use that in combination with blowdryer's `setPluginsBlockTo`. The problem is that every plugin you use throughout the build still has to be declared in the `settings.gradle` with `apply false`. Just having the version in the catalog isn't enough. See [script plugin gotchas](#script-plugin-gotchas) above for the gory classloader details.
+
+Disappointingly, you can't use `libs.versions.toml` inside the `settings.gradle` file, which is exactly the place that we need it.
 
 ## API Reference
 
