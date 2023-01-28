@@ -20,8 +20,8 @@ plugins {
 }
 rootProject.name = 'blowdryer'
 blowdryerSetup {
-	//github 'diffplug/blowdryer-diffplug', 'tag', '6.0.3'
-	devLocal '../blowdryer-diffplug'
+	github 'diffplug/blowdryer-diffplug', 'tag', '7.0.0'
+	//devLocal '../blowdryer-diffplug'
 	setPluginsBlockTo {
 		it.file 'plugin.versions'
 	}
