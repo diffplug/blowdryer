@@ -2,24 +2,16 @@
 
 <!---freshmark shields
 output = [
-    link(shield('Gradle plugin', 'plugins.gradle.org', 'com.diffplug.blowdryer', 'blue'), 'https://plugins.gradle.org/plugin/com.diffplug.blowdryer'),
-    link(shield('Maven central', 'mavencentral', 'available', 'blue'), 'https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22'),
-    link(shield('License Apache 2.0', 'license', 'apache-2.0', 'blue'), 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)'),
-    '',
-    link(shield('Changelog', 'changelog', versionLast, 'brightgreen'), 'CHANGELOG.md'),
-    link(shield('Javadoc', 'javadoc', 'yes', 'brightgreen'), 'https://javadoc.io/doc/com.diffplug/blowdryer/{{versionLast}}/index.html'),
-    link(shield('Live chat', 'gitter', 'chat', 'brightgreen'), 'https://gitter.im/diffplug/blowdryer'),
-    link(image('CircleCI', 'https://circleci.com/gh/diffplug/blowdryer.svg?style=shield'), 'https://circleci.com/gh/diffplug/blowdryer')
+    link(shield('Gradle plugin', 'gradle plugin', 'com.diffplug.blowdryer', 'blue'), 'https://plugins.gradle.org/plugin/com.diffplug.blowdryer'),
+    link(shield('Changelog', 'changelog', versionLast, 'blue'), 'CHANGELOG.md'),
+    link(shield('Maven central', 'mavencentral', 'here', 'blue'), 'https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22'),
+    link(shield('Javadoc', 'javadoc', 'here', 'blue'), 'https://javadoc.io/doc/com.diffplug/blowdryer/{{versionLast}}/index.html'),
 ].join('\n');
 -->
-[![Gradle plugin](https://img.shields.io/badge/plugins.gradle.org-com.diffplug.blowdryer-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.blowdryer)
-[![Maven central](https://img.shields.io/badge/mavencentral-available-blue.svg)](https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22)
-[![License Apache 2.0](https://img.shields.io/badge/license-apache--2.0-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
-
-[![Changelog](https://img.shields.io/badge/changelog-1.7.0-brightgreen.svg)](CHANGELOG.md)
-[![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/1.7.0/index.html)
-[![Live chat](https://img.shields.io/badge/gitter-chat-brightgreen.svg)](https://gitter.im/diffplug/blowdryer)
-[![CircleCI](https://circleci.com/gh/diffplug/blowdryer.svg?style=shield)](https://circleci.com/gh/diffplug/blowdryer)
+[![Gradle plugin](https://img.shields.io/badge/gradle_plugin-com.diffplug.blowdryer-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.blowdryer)
+[![Changelog](https://img.shields.io/badge/changelog-1.7.0-blue.svg)](CHANGELOG.md)
+[![Maven central](https://img.shields.io/badge/mavencentral-here-blue.svg)](https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22)
+[![Javadoc](https://img.shields.io/badge/javadoc-here-blue.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/1.7.0/index.html)
 <!---freshmark /shields -->
 
 If you have multiple loosely-related gradle projects in separate repositories, then you probably have these problems:
@@ -171,14 +163,14 @@ plugins {
 blowdryerSetup {
   github('acme/blowdryer-acme', 'tag', 'v1.4.5')
   setPluginsBlockTo {
-    file('plugin.versions')
+    it.file('plugin.versions')
   }
 }
 ```
 
 First note that every plugin has `apply false` except for `com.diffplug.blowdryerSetup`. That is on purpose. We need to apply `blowdryerSetup` so that we can use the `blowdryerSetup {}` block, and we need to do `apply false` on the other plugins because we're just putting them on the classpath, not actually using them (yet).
 
-The second thing to note is `setPluginsBlockTo { file('plugin.versions') }`. That means that if you go to `github.com/acme/blowdryer-acme` and then open the `v1.4.5` tab and then go into the `src/main/resources` folder, you will find a file called `plugin.versions`. And the content of that file will be
+The second thing to note is `setPluginsBlockTo { it.file('plugin.versions') }`. That means that if you go to `github.com/acme/blowdryer-acme` and then open the `v1.4.5` tab and then go into the `src/main/resources` folder, you will find a file called `plugin.versions`. And the content of that file will be
 
 ```gradle
   id 'com.diffplug.blowdryerSetup' version '1.7.0'
@@ -207,11 +199,11 @@ It doesn't *have* to be called `plugin.versions`, it's just using the `干.file`
 
 ```gradle
 setPluginsBlockTo {
-  file('plugin.versions')
-  file('kotlin-extras.versions')
-  add("  id 'special-plugin-for-just-this-project' version '1.0.0'")
-  remove("   id 'acme.java' version '1.0.0' apply false")
-  replace('1.7.20', '1.8.0') // update Kotlin version but only for this build
+  it.file('plugin.versions')
+  it.file('kotlin-extras.versions')
+  it.add("  id 'special-plugin-for-just-this-project' version '1.0.0'")
+  it.remove("   id 'acme.java' version '1.0.0' apply false")
+  it.replace('1.7.20', '1.8.0') // update Kotlin version but only for this build
 }
 ```
 
@@ -237,9 +229,9 @@ static File   干.immutableUrl(String guaranteedImmutableUrl, String fileSuffix)
   // 干.immutableUrl('https://foo.org/?file=blah.foo&rev=7', '.foo') returns a file which ends in `.foo`
 ```
 
-- [javadoc `Blowdryer`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/Blowdryer.html)
-- [javadoc `BlowdryerSetup`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/BlowdryerSetup.html)
-- [javadoc `BlowdryerSetup.PluginsBlock`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/BlowdryerSetup.html)
+- [javadoc `Blowdryer`](https://javadoc.io/doc/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/Blowdryer.html)
+- [javadoc `BlowdryerSetup`](https://javadoc.io/doc/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/BlowdryerSetup.html)
+- [javadoc `BlowdryerSetup.PluginsBlock`](https://javadoc.io/doc/com.diffplug/blowdryer/latest/com/diffplug/blowdryer/BlowdryerSetup.PluginsBlock.html)
 
 If you do `apply plugin: 'com.diffplug.blowdryer'` then every project gets an extension object ([code](https://github.com/diffplug/blowdryer/blob/master/src/main/java/com/diffplug/blowdryer/BlowdryerPlugin.java)) where the project field has been filled in for you, which is why we don't pass it explicitly in the examples before this section.  If you don't apply the plugin, you can still call these static methods and pass `project` explicitly for the `proj()` methods.
 
