@@ -2,24 +2,16 @@
 
 <!---freshmark shields
 output = [
-    link(shield('Gradle plugin', 'plugins.gradle.org', 'com.diffplug.blowdryer', 'blue'), 'https://plugins.gradle.org/plugin/com.diffplug.blowdryer'),
-    link(shield('Maven central', 'mavencentral', 'available', 'blue'), 'https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22'),
-    link(shield('License Apache 2.0', 'license', 'apache-2.0', 'blue'), 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)'),
-    '',
-    link(shield('Changelog', 'changelog', versionLast, 'brightgreen'), 'CHANGELOG.md'),
-    link(shield('Javadoc', 'javadoc', 'yes', 'brightgreen'), 'https://javadoc.io/doc/com.diffplug/blowdryer/{{versionLast}}/index.html'),
-    link(shield('Live chat', 'gitter', 'chat', 'brightgreen'), 'https://gitter.im/diffplug/blowdryer'),
-    link(image('CircleCI', 'https://circleci.com/gh/diffplug/blowdryer.svg?style=shield'), 'https://circleci.com/gh/diffplug/blowdryer')
+    link(shield('Gradle plugin', 'gradle plugin', 'com.diffplug.blowdryer', 'blue'), 'https://plugins.gradle.org/plugin/com.diffplug.blowdryer'),
+    link(shield('Changelog', 'changelog', versionLast, 'blue'), 'CHANGELOG.md'),
+    link(shield('Maven central', 'mavencentral', 'here', 'blue'), 'https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22'),
+    link(shield('Javadoc', 'javadoc', 'here', 'blue'), 'https://javadoc.io/doc/com.diffplug/blowdryer/{{versionLast}}/index.html'),
 ].join('\n');
 -->
-[![Gradle plugin](https://img.shields.io/badge/plugins.gradle.org-com.diffplug.blowdryer-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.blowdryer)
-[![Maven central](https://img.shields.io/badge/mavencentral-available-blue.svg)](https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22)
-[![License Apache 2.0](https://img.shields.io/badge/license-apache--2.0-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
-
-[![Changelog](https://img.shields.io/badge/changelog-1.7.0-brightgreen.svg)](CHANGELOG.md)
-[![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/1.7.0/index.html)
-[![Live chat](https://img.shields.io/badge/gitter-chat-brightgreen.svg)](https://gitter.im/diffplug/blowdryer)
-[![CircleCI](https://circleci.com/gh/diffplug/blowdryer.svg?style=shield)](https://circleci.com/gh/diffplug/blowdryer)
+[![Gradle plugin](https://img.shields.io/badge/gradle_plugin-com.diffplug.blowdryer-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.blowdryer)
+[![Changelog](https://img.shields.io/badge/changelog-1.7.0-blue.svg)](CHANGELOG.md)
+[![Maven central](https://img.shields.io/badge/mavencentral-here-blue.svg)](https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22)
+[![Javadoc](https://img.shields.io/badge/javadoc-here-blue.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/1.7.0/index.html)
 <!---freshmark /shields -->
 
 If you have multiple loosely-related gradle projects in separate repositories, then you probably have these problems:
