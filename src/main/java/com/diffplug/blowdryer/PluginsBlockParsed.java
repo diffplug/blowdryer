@@ -15,7 +15,7 @@
  */
 package com.diffplug.blowdryer;
 
-public class SettingsDotGradleParsed {
+public class PluginsBlockParsed {
 	boolean isWindowsNewline;
 	String beforePlugins;
 	String inPlugins;
@@ -28,7 +28,7 @@ public class SettingsDotGradleParsed {
 		return input.replace("\n", "⏎");
 	}
 
-	SettingsDotGradleParsed(String dirty) {
+	PluginsBlockParsed(String dirty) {
 		isWindowsNewline = dirty.indexOf("\r\n") != -1;
 		String unix = isWindowsNewline ? dirty.replace("\r\n", "\n") : dirty;
 

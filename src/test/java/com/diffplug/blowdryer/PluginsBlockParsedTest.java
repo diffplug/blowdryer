@@ -20,7 +20,7 @@ import org.assertj.core.api.Assertions;
 import org.gradle.api.GradleException;
 import org.junit.Test;
 
-public class SettingsDotGradleParsedTest extends ResourceHarness {
+public class PluginsBlockParsedTest extends ResourceHarness {
 	private static String content(String insidePlugins) {
 		return "pluginManagement {\r\n" +
 				"  repositories {\r\n" +
@@ -43,7 +43,7 @@ public class SettingsDotGradleParsedTest extends ResourceHarness {
 				"  // https://github.com/gradle-nexus/publish-plugin/releases\r\n" +
 				"  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' apply false\r\n";
 		String input = content(insidePlugins);
-		SettingsDotGradleParsed parsed = new SettingsDotGradleParsed(input);
+		PluginsBlockParsed parsed = new PluginsBlockParsed(input);
 		Assertions.assertThat(parsed.contentCorrectEndings()).isEqualTo(input);
 		Assertions.assertThat(parsed.beforePlugins).isEqualTo("pluginManagement {\n" +
 				"  repositories {\n" +
@@ -74,13 +74,13 @@ public class SettingsDotGradleParsedTest extends ResourceHarness {
 		BlowdryerSetup setup = new BlowdryerSetup(rootFolder());
 
 		// this should succeed
-		setup.pluginVersions(pluginVersions -> {
+		setup.setPluginsBlockTo(pluginVersions -> {
 			pluginVersions.add(insidePlugins);
 		});
 
 		// this should fail
 		try {
-			setup.pluginVersions(pluginVersions -> {
+			setup.setPluginsBlockTo(pluginVersions -> {
 				pluginVersions.add("TEST");
 			});
 		} catch (GradleException e) {

@@ -419,7 +419,7 @@ public class BlowdryerSetup {
 	//////////////////////////////////////////////////
 	// set the plugins block inside settings.gradle //
 	//////////////////////////////////////////////////
-	public class PluginVersions {
+	public static class PluginsBlock {
 		private StringBuilder totalContent = new StringBuilder();
 
 		public void file(String file) throws IOException {
@@ -456,10 +456,10 @@ public class BlowdryerSetup {
 		}
 	}
 
-	public void pluginVersions(Action<PluginVersions> versionSetter) throws IOException {
+	public void setPluginsBlockTo(Action<PluginsBlock> versionSetter) throws IOException {
 		File settingsDotGradle = new File(rootDir, "settings.gradle");
-		SettingsDotGradleParsed parsed = new SettingsDotGradleParsed(readFile(settingsDotGradle));
-		PluginVersions versions = new PluginVersions();
+		PluginsBlockParsed parsed = new PluginsBlockParsed(readFile(settingsDotGradle));
+		PluginsBlock versions = new PluginsBlock();
 		versionSetter.execute(versions);
 		if (parsed.inPlugins.equals(versions.desiredContent())) {
 			return;
@@ -467,6 +467,7 @@ public class BlowdryerSetup {
 		if (System.getProperty("setPluginVersions") != null) {
 			parsed.setPluginContent(versions.desiredContent());
 			Files.write(settingsDotGradle.toPath(), parsed.contentCorrectEndings().getBytes());
+			throw new GradleException("settings.gradle plugins block was written successfully. Plugin versions have been updated, try again.");
 		} else {
 			throw new GradleException("settings.gradle plugins block has the wrong content. Add -DsetPluginVersions to overwrite,\n" +
 					"https://github.com/diffplug/blowdryer#plugin-versions for more info.\n\n" + "" +
