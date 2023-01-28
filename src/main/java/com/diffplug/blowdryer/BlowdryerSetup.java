@@ -21,9 +21,11 @@ import com.diffplug.common.base.Unhandled;
 import com.google.gson.Gson;
 import groovy.lang.Closure;
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
@@ -35,6 +37,8 @@ import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.gradle.api.Action;
+import org.gradle.api.GradleException;
 import org.jetbrains.annotations.NotNull;
 
 /** Configures where {@link Blowdryer#file(String)} downloads files from. */
@@ -48,12 +52,12 @@ public class BlowdryerSetup {
 	private static final String HTTP_PROTOCOL = "http://";
 	private static final String HTTPS_PROTOCOL = "https://";
 
-	private final File referenceDirectory;
+	private final File rootDir;
 
 	/** Pass in the directory that will be used to resolve string arguments to devLocal. */
-	public BlowdryerSetup(File referenceDirectory) {
+	public BlowdryerSetup(File rootDir) {
 		Blowdryer.setResourcePluginNull(); // because of gradle daemon
-		this.referenceDirectory = referenceDirectory;
+		this.rootDir = rootDir;
 	}
 
 	private static final String REPO_SUBFOLDER_DEFAULT = "src/main/resources";
@@ -381,7 +385,7 @@ public class BlowdryerSetup {
 		if (devPath instanceof File) {
 			devPathFile = (File) devPath;
 		} else if (devPath instanceof String) {
-			devPathFile = new File(referenceDirectory, (String) devPath);
+			devPathFile = new File(rootDir, (String) devPath);
 		} else {
 			throw new IllegalArgumentException("Expected a String or File, was a " + devPath.getClass());
 		}
@@ -412,4 +416,70 @@ public class BlowdryerSetup {
 		}
 	}
 
+	//////////////////////////////////////////////////
+	// set the plugins block inside settings.gradle //
+	//////////////////////////////////////////////////
+	public static class PluginsBlock {
+		private StringBuilder totalContent = new StringBuilder();
+
+		public void file(String file) throws IOException {
+			add(readFile(Blowdryer.file(file)));
+		}
+
+		public void add(String line) {
+			totalContent.append(line.replace("\r", ""));
+			if (!line.endsWith("\n")) {
+				totalContent.append('\n');
+			}
+		}
+
+		public void remove(String line) {
+			replace(line + "\n", "");
+		}
+
+		public void replace(String in, String out) {
+			String current = totalContent.toString();
+			String replaced = current.replace(in.replace("\r", ""), out);
+			if (current.equals(replaced)) {
+				throw new IllegalArgumentException("Doesn't contain " + in + "\n\n" + current);
+			}
+			totalContent.setLength(0);
+			totalContent.append(replaced);
+		}
+
+		String desiredContent() {
+			String content = totalContent.toString();
+			while (content.endsWith("\n")) {
+				content = content.substring(0, content.length() - 1);
+			}
+			return content;
+		}
+	}
+
+	public void setPluginsBlockTo(Action<PluginsBlock> versionSetter) throws IOException {
+		File settingsDotGradle = new File(rootDir, "settings.gradle");
+		PluginsBlockParsed parsed = new PluginsBlockParsed(readFile(settingsDotGradle));
+		PluginsBlock versions = new PluginsBlock();
+		versionSetter.execute(versions);
+		if (parsed.inPlugins.equals(versions.desiredContent())) {
+			return;
+		}
+		if (System.getProperty("setPluginVersions") != null) {
+			parsed.setPluginContent(versions.desiredContent());
+			Files.write(settingsDotGradle.toPath(), parsed.contentCorrectEndings().getBytes());
+			throw new GradleException("settings.gradle plugins block was written successfully. Plugin versions have been updated, try again.");
+		} else if (System.getProperty("ignorePluginVersions") != null) {
+			System.err.println("wrong plugins in settings.gradle, ignoring because of -DignorePluginVersions");
+		} else {
+			throw new GradleException("settings.gradle plugins block has the wrong content.\n" +
+					"  Add -DsetPluginVersions to overwrite\n" +
+					"  Add -DignorePluginVersions to ignore\n" +
+					"  https://github.com/diffplug/blowdryer#plugin-versions for more info.\n\n" + "" +
+					"DESIRED:\n" + versions.desiredContent() + "\n\nACTUAL:\n" + parsed.inPlugins);
+		}
+	}
+
+	private static String readFile(File file) throws IOException {
+		return new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+	}
 }

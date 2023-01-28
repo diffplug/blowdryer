@@ -112,9 +112,7 @@ If the property isn't set, you'll get a nice error message describing what was m
 
 #### Script plugin gotchas
 
-Script plugins can't `import` any classes that were loaded from a third-party plugin on the `build.gradle` classpath<sup>[1](#myfootnote1)</sup>.  There is an easy workaround described in [#10](https://github.com/diffplug/blowdryer/issues/10), along with our long-term plans for a fix.
-
-<a name="myfootnote1"><sup>1</sup></a> see [gradle/gradle#4007](https://github.com/gradle/gradle/issues/4007) and [gradle/gradle#1262](https://github.com/gradle/gradle/issues/1262) for history and details
+Script plugins can't `import` any classes that were loaded from a third-party plugin on the `build.gradle` classpath. There is an easy workaround, which is to declare all plugins and their versions in the `settings.gradle` file. Blowdryer includes a mechanism for centralizing plugins and their versions, see [plugin versions](#plugin-versions) below.
 
 ## Dev workflow
 
@@ -160,6 +158,69 @@ blowdryerSetup {
 
 To pull this jar from a maven repository, see [#21](https://github.com/diffplug/blowdryer/issues/21).
 
+## Plugin versions
+
+We recommend that your `settings.gradle` should look like this:
+
+```gradle
+plugins {
+  id 'com.diffplug.blowdryerSetup' version '1.6.0'
+  id 'acme.java' version '1.0.0' apply false
+  id 'acme.kotlin' version '2.0.0' apply false
+}
+blowdryerSetup {
+  github('acme/blowdryer-acme', 'tag', 'v1.4.5')
+  setPluginsBlockTo {
+    file('plugin.versions')
+  }
+}
+```
+
+First note that every plugin has `apply false` except for `com.diffplug.blowdryerSetup`. That is on purpose. We need to apply `blowdryerSetup` so that we can use the `blowdryerSetup {}` block, and we need to do `apply false` on the other plugins because we're just putting them on the classpath, not actually using them (yet).
+
+The second thing to note is `setPluginsBlockTo { file('plugin.versions') }`. That means that if you go to `github.com/acme/blowdryer-acme` and then open the `v1.4.5` tab and then go into the `src/main/resources` folder, you will find a file called `plugin.versions`. And the content of that file will be
+
+```gradle
+  id 'com.diffplug.blowdryerSetup' version '1.6.0'
+  id 'acme.java' version '1.0.0' apply false
+  id 'acme.kotlin' version '2.0.0' apply false
+```
+
+Blowdryer is using the same immutable file mechanism described earlier, but this time it's using it to set just that one section of your `settings.gradle` using a workflow very similar to the [`spotlessCheck` / `spotlessApply` idea](https://github.com/diffplug/spotless/blob/main/plugin-gradle/README.md).
+
+### Updating plugin versions
+
+The workflow goes like this:
+
+1. Enter `devLocal` mode (demonstrated [above](#dev-workflow))
+2. Update the `plugin.versions` file
+3. When you try to run your build, you will get an error
+  - > settings.gradle plugins block has the wrong content. Add -DsetPluginVersions to overwrite
+4. Add `-DsetPluginVersions` to your command line
+5. You'll get another error
+ - > settings.gradle plugins block was written successfully. Plugin versions have been updated, try again.
+6. Now the plugins block will be up-to-date and your next build will succeed
+
+### Tweaking the `plugin.versions`
+
+It doesn't *have* to be called `plugin.versions`, it's just using the `干.file` mechanism and sticking that file in. So you could have `plugin-java.versions` and `plugin-kotlin.versions`. Also, you have other methods you can call:
+
+```gradle
+setPluginsBlockTo {
+  file('plugin.versions')
+  file('kotlin-extras.versions')
+  add("  id 'special-plugin-for-just-this-project' version '1.0.0'")
+  remove("   id 'acme.java' version '1.0.0' apply false")
+  replace('1.7.20', '1.8.0') // update Kotlin version but only for this build
+}
+```
+
+### Compared to version catalogs
+
+Recent versions of Gradle shipped a flexible [version catalog](https://docs.gradle.org/current/userguide/platforms.html) feature. You can use that in combination with blowdryer's `setPluginsBlockTo`. The problem is that every plugin you use throughout the build still has to be declared in the `settings.gradle` with `apply false`. Just having the version in the catalog isn't enough. See [script plugin gotchas](#script-plugin-gotchas) above for the gory classloader details.
+
+Disappointingly, you can't use `libs.versions.toml` inside the `settings.gradle` file, which is exactly the place that we need it.
+
 ## API Reference
 
 You have to apply the `com.diffplug.blowdryerSetup` plugin in your `settings.gradle`.  But you don't actually have to `apply plugin: 'com.diffplug.blowdryer'` in your `build.gradle`, you can also just use these static methods (even in `settings.gradle` or inside the code of other plugins).
@@ -176,8 +237,9 @@ static File   干.immutableUrl(String guaranteedImmutableUrl, String fileSuffix)
   // 干.immutableUrl('https://foo.org/?file=blah.foo&rev=7', '.foo') returns a file which ends in `.foo`
 ```
 
-- [javadoc `BlowdryerSetup`](https://javadoc.io/static/com.diffplug/blowdryer/1.6.0/com/diffplug/blowdryer/BlowdryerSetup.html)
 - [javadoc `Blowdryer`](https://javadoc.io/static/com.diffplug/blowdryer/1.6.0/com/diffplug/blowdryer/Blowdryer.html)
+- [javadoc `BlowdryerSetup`](https://javadoc.io/static/com.diffplug/blowdryer/1.6.0/com/diffplug/blowdryer/BlowdryerSetup.html)
+- [javadoc `BlowdryerSetup.PluginsBlock`](https://javadoc.io/static/com.diffplug/blowdryer/1.6.0/com/diffplug/blowdryer/BlowdryerSetup.html)
 
 If you do `apply plugin: 'com.diffplug.blowdryer'` then every project gets an extension object ([code](https://github.com/diffplug/blowdryer/blob/master/src/main/java/com/diffplug/blowdryer/BlowdryerPlugin.java)) where the project field has been filled in for you, which is why we don't pass it explicitly in the examples before this section.  If you don't apply the plugin, you can still call these static methods and pass `project` explicitly for the `proj()` methods.
 

@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- New `BlowdryerSetup.setPluginsBlockTo` for setting plugin versions ([docs](https://github.com/diffplug/blowdryer#plugin-versions)). ([#32](https://github.com/diffplug/blowdryer/pull/32) implements [#10](https://github.com/diffplug/blowdryer/issues/10))
 ### Fixed
 - Fix `BlowdryerSetup.localJar` on Windows. ([#31](https://github.com/diffplug/blowdryer/pull/31))
 
