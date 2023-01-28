@@ -434,7 +434,7 @@ public class BlowdryerSetup {
 		}
 
 		public void remove(String line) {
-			replace(line, "");
+			replace(line + "\n", "");
 		}
 
 		public void replace(String in, String out) {
