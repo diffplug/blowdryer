@@ -17,7 +17,6 @@ package com.diffplug.blowdryer;
 
 import java.io.IOException;
 import org.assertj.core.api.Assertions;
-import org.gradle.api.GradleException;
 import org.junit.Test;
 
 public class PluginsBlockParsedTest extends ResourceHarness {
@@ -79,24 +78,22 @@ public class PluginsBlockParsedTest extends ResourceHarness {
 		});
 
 		// this should fail
-		try {
-			setup.setPluginsBlockTo(pluginVersions -> {
-				pluginVersions.add("TEST");
-			});
-		} catch (GradleException e) {
-			Assertions.assertThat(e.getMessage()).isEqualTo("settings.gradle plugins block has the wrong content. Add -DsetPluginVersions to overwrite,\n" +
-					"https://github.com/diffplug/blowdryer#plugin-versions for more info.\n" +
-					"\n" +
-					"DESIRED:\n" +
-					"TEST\n" +
-					"\n" +
-					"ACTUAL:\n" +
-					"  // https://plugins.gradle.org/plugin/com.gradle.plugin-publish\n" +
-					"  id 'com.gradle.plugin-publish' version '0.20.0' apply false\n" +
-					"  // https://github.com/equodev/equo-ide/blob/main/plugin-gradle/CHANGELOG.md\n" +
-					"  id 'dev.equo.ide' version '0.12.1' apply false\n" +
-					"  // https://github.com/gradle-nexus/publish-plugin/releases\n" +
-					"  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' apply false");
-		}
+		Assertions.assertThatThrownBy(() -> setup.setPluginsBlockTo(pluginVersions -> {
+			pluginVersions.add("TEST");
+		})).hasMessage("settings.gradle plugins block has the wrong content.\n" +
+				"  Add -DsetPluginVersions to overwrite\n" +
+				"  Add -DignorePluginVersions to ignore\n" +
+				"  https://github.com/diffplug/blowdryer#plugin-versions for more info.\n" +
+				"\n" +
+				"DESIRED:\n" +
+				"TEST\n" +
+				"\n" +
+				"ACTUAL:\n" +
+				"  // https://plugins.gradle.org/plugin/com.gradle.plugin-publish\n" +
+				"  id 'com.gradle.plugin-publish' version '0.20.0' apply false\n" +
+				"  // https://github.com/equodev/equo-ide/blob/main/plugin-gradle/CHANGELOG.md\n" +
+				"  id 'dev.equo.ide' version '0.12.1' apply false\n" +
+				"  // https://github.com/gradle-nexus/publish-plugin/releases\n" +
+				"  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' apply false");
 	}
 }

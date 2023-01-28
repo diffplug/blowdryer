@@ -468,9 +468,13 @@ public class BlowdryerSetup {
 			parsed.setPluginContent(versions.desiredContent());
 			Files.write(settingsDotGradle.toPath(), parsed.contentCorrectEndings().getBytes());
 			throw new GradleException("settings.gradle plugins block was written successfully. Plugin versions have been updated, try again.");
+		} else if (System.getProperty("ignorePluginVersions") != null) {
+			System.err.println("wrong plugins in settings.gradle, ignoring because of -DignorePluginVersions");
 		} else {
-			throw new GradleException("settings.gradle plugins block has the wrong content. Add -DsetPluginVersions to overwrite,\n" +
-					"https://github.com/diffplug/blowdryer#plugin-versions for more info.\n\n" + "" +
+			throw new GradleException("settings.gradle plugins block has the wrong content.\n" +
+					"  Add -DsetPluginVersions to overwrite\n" +
+					"  Add -DignorePluginVersions to ignore\n" +
+					"  https://github.com/diffplug/blowdryer#plugin-versions for more info.\n\n" + "" +
 					"DESIRED:\n" + versions.desiredContent() + "\n\nACTUAL:\n" + parsed.inPlugins);
 		}
 	}
