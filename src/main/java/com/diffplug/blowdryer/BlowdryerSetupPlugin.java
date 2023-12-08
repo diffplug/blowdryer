@@ -32,7 +32,7 @@ public class BlowdryerSetupPlugin implements Plugin<Settings> {
 		if (badSemver(settings.getGradle().getGradleVersion()) < badSemver(MINIMUM_GRADLE)) {
 			throw new GradleException("Blowdryer requires Gradle " + MINIMUM_GRADLE + " or newer, this was " + settings.getGradle().getGradleVersion());
 		}
-		Blowdryer.initTempDir(settings.getProviders().systemProperty("java.io.tmpdir").forUseAtConfigurationTime().get());
+		Blowdryer.initTempDir(settings.getProviders().systemProperty("java.io.tmpdir").get());
 		settings.getExtensions().create(BlowdryerSetup.NAME, BlowdryerSetup.class, settings.getRootDir());
 	}
 
