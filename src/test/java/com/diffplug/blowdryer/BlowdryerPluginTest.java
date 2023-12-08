@@ -382,7 +382,7 @@ public class BlowdryerPluginTest extends GradleHarness {
 	@Test
 	public void deprecationError() throws IOException {
 		settingsGithub("test/2/a");
-		BuildResult build = gradleRunner().withGradleVersion("8.5").withArguments("--warning-mode=fail").buildAndFail();
-		Assertions.assertThat(build.getOutput()).contains("Provider.forUseAtConfigurationTime method has been deprecated");
+		BuildResult build = gradleRunner().withGradleVersion("8.5").withArguments("--warning-mode=fail").build();
+		Assertions.assertThat(build.getOutput()).doesNotContain("Provider.forUseAtConfigurationTime method has been deprecated");
 	}
 }
