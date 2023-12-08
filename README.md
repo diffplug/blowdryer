@@ -9,9 +9,9 @@ output = [
 ].join('\n');
 -->
 [![Gradle plugin](https://img.shields.io/badge/gradle_plugin-com.diffplug.blowdryer-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.blowdryer)
-[![Changelog](https://img.shields.io/badge/changelog-1.7.0-blue.svg)](CHANGELOG.md)
+[![Changelog](https://img.shields.io/badge/changelog-1.7.1-blue.svg)](CHANGELOG.md)
 [![Maven central](https://img.shields.io/badge/mavencentral-here-blue.svg)](https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22com.diffplug%22%20AND%20a%3A%22blowdryer%22)
-[![Javadoc](https://img.shields.io/badge/javadoc-here-blue.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/1.7.0/index.html)
+[![Javadoc](https://img.shields.io/badge/javadoc-here-blue.svg)](https://javadoc.io/doc/com.diffplug/blowdryer/1.7.1/index.html)
 <!---freshmark /shields -->
 
 If you have multiple loosely-related gradle projects in separate repositories, then you probably have these problems:
@@ -39,7 +39,7 @@ Then, in the `settings.gradle` for the project that you want to suck these into,
 
 ```gradle
 plugins {
-  id 'com.diffplug.blowdryerSetup' version '1.7.0'
+  id 'com.diffplug.blowdryerSetup' version '1.7.1'
 }
 
 blowdryerSetup {
@@ -156,7 +156,7 @@ We recommend that your `settings.gradle` should look like this:
 
 ```gradle
 plugins {
-  id 'com.diffplug.blowdryerSetup' version '1.7.0'
+  id 'com.diffplug.blowdryerSetup' version '1.7.1'
   id 'acme.java' version '1.0.0' apply false
   id 'acme.kotlin' version '2.0.0' apply false
 }
@@ -173,7 +173,7 @@ First note that every plugin has `apply false` except for `com.diffplug.blowdrye
 The second thing to note is `setPluginsBlockTo { it.file('plugin.versions') }`. That means that if you go to `github.com/acme/blowdryer-acme` and then open the `v1.4.5` tab and then go into the `src/main/resources` folder, you will find a file called `plugin.versions`. And the content of that file will be
 
 ```gradle
-  id 'com.diffplug.blowdryerSetup' version '1.7.0'
+  id 'com.diffplug.blowdryerSetup' version '1.7.1'
   id 'acme.java' version '1.0.0' apply false
   id 'acme.kotlin' version '2.0.0' apply false
 ```
@@ -242,7 +242,7 @@ The Gradle Kotlin DSL doesn't play well with the name-based extension object tha
 ```kotlin
 // settings.gradle.kts
 plugins {
-  id("com.diffplug.blowdryerSetup") version "1.7.0"
+  id("com.diffplug.blowdryerSetup") version "1.7.1"
 }
 import com.diffplug.blowdryer.BlowdryerSetup
 import com.diffplug.blowdryer.BlowdryerSetup.GitAnchorType
@@ -267,9 +267,9 @@ somePlugin {
 
 ### Other packaging options
 
-[`Blowdryer.immutableUrl`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/Blowdryer.html#immutableUrl-java.lang.String-) returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the content of that URL is immutable.
+[`Blowdryer.immutableUrl`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.1/com/diffplug/blowdryer/Blowdryer.html#immutableUrl-java.lang.String-) returns a `File` containing the downloaded content of the given URL.  It's on you to guarantee that the content of that URL is immutable.
 
-When you setup the Blowdryer plugin in your `settings.gradle`, you're telling Blowdryer what URL scheme to use when resolving a call to [`Blowdryer.file`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.0/com/diffplug/blowdryer/Blowdryer.html#file-java.lang.String-), for example:
+When you setup the Blowdryer plugin in your `settings.gradle`, you're telling Blowdryer what URL scheme to use when resolving a call to [`Blowdryer.file`](https://javadoc.io/static/com.diffplug/blowdryer/1.7.1/com/diffplug/blowdryer/Blowdryer.html#file-java.lang.String-), for example:
 
 ```java
 //blowdryer {
