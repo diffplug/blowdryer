@@ -20,10 +20,12 @@ import java.util.regex.Pattern;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
+import org.gradle.api.provider.Provider;
 
 /** Gradle settings plugin which configures the source URL and version. */
 public class BlowdryerSetupPlugin implements Plugin<Settings> {
 	static final String MINIMUM_GRADLE = "6.8";
+	static final String STOP_FORUSE_AT_CONFIGURATION_TIME = "7.4";
 
 	private static final Pattern BAD_SEMVER = Pattern.compile("(\\d+)\\.(\\d+)");
 
@@ -32,7 +34,11 @@ public class BlowdryerSetupPlugin implements Plugin<Settings> {
 		if (badSemver(settings.getGradle().getGradleVersion()) < badSemver(MINIMUM_GRADLE)) {
 			throw new GradleException("Blowdryer requires Gradle " + MINIMUM_GRADLE + " or newer, this was " + settings.getGradle().getGradleVersion());
 		}
-		Blowdryer.initTempDir(settings.getProviders().systemProperty("java.io.tmpdir").forUseAtConfigurationTime().get());
+		Provider<String> tmpDir = settings.getProviders().systemProperty("java.io.tmpdir");
+		String tmpDirPath = badSemver(settings.getGradle().getGradleVersion()) >= badSemver(STOP_FORUSE_AT_CONFIGURATION_TIME) ? // depends on Gradle version
+				tmpDir.get() : // Gradle 7.4 and later
+				tmpDir.forUseAtConfigurationTime().get(); // before Gradle 7.4
+		Blowdryer.initTempDir(tmpDirPath);
 		settings.getExtensions().create(BlowdryerSetup.NAME, BlowdryerSetup.class, settings.getRootDir());
 	}
 

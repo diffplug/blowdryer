@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import org.assertj.core.api.Assertions;
+import org.gradle.testkit.runner.BuildResult;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -376,5 +377,12 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"println 'test was success'");
 		Assertions.assertThat(gradleRunner().withGradleVersion("6.7").buildAndFail().getOutput().replace("\r\n", "\n"))
 				.contains("Blowdryer requires Gradle 6.8 or newer, this was 6.7");
+	}
+
+	@Test
+	public void deprecationError() throws IOException {
+		settingsGithub("test/2/a");
+		BuildResult build = gradleRunner().withGradleVersion("8.5").withArguments("--warning-mode=fail").build();
+		Assertions.assertThat(build.getOutput()).doesNotContain("Provider.forUseAtConfigurationTime method has been deprecated");
 	}
 }
