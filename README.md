@@ -148,7 +148,20 @@ blowdryerSetup {
 }
 ```
 
-To pull this jar from a maven repository, see [#21](https://github.com/diffplug/blowdryer/issues/21).
+If you'd rather pull the jar from a maven repository, declare it in the `plugins` block of `settings.gradle` and let `classpathJar` find it on the classpath by (a substring of) its filename:
+
+```gradle
+// settings.gradle
+plugins {
+  id 'com.diffplug.blowdryerSetup' version '1.7.1'
+  id 'acme.blowdryer-scripts' version '3.0.0'
+}
+blowdryerSetup {
+  classpathJar('acme.blowdryer-scripts')
+}
+```
+
+If your `acme.blowdryer-scripts` jar bundles its own `Plugin<Settings>` which calls `blowdryerSetup { classpathJar(...) }` internally, then applying that one plugin is all a consumer has to do - they don't need a `blowdryerSetup` block of their own at all.
 
 ## Plugin versions
 
