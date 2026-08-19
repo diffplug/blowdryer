@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2023 DiffPlug
+ * Copyright (C) 2019-2026 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,16 @@ import groovy.lang.Closure;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -361,6 +366,48 @@ public class BlowdryerSetup {
 
 		String rootUrl = "file:///" + jarFile.getAbsolutePath().replace('\\', '/') + "!/";
 		Blowdryer.setResourcePlugin(resource -> rootUrl + resource);
+	}
+
+	/**
+	 * Finds a jar already on the classpath (e.g. one declared in the `plugins` block of
+	 * `settings.gradle`) whose filename contains {@code name}, and uses it to extract a file
+	 * resource, same as {@link #localJar(File)}.
+	 * @param name Substring to match against the filename of a jar on the classpath.
+	 */
+	public void classpathJar(String name) {
+		Objects.requireNonNull(name, "name must not be null.");
+		localJar(findClasspathJar(name));
+	}
+
+	private static File findClasspathJar(String name) {
+		List<URL> candidates = new ArrayList<>();
+		ClassLoader loader = BlowdryerSetup.class.getClassLoader();
+		while (loader != null) {
+			if (loader instanceof URLClassLoader) {
+				for (URL url : ((URLClassLoader) loader).getURLs()) {
+					if (fileName(url).contains(name)) {
+						candidates.add(url);
+					}
+				}
+			}
+			loader = loader.getParent();
+		}
+		if (candidates.isEmpty()) {
+			throw new IllegalArgumentException("No jar on the classpath has a filename containing '" + name + "'.");
+		} else if (candidates.size() > 1) {
+			throw new IllegalArgumentException("Multiple jars on the classpath have a filename containing '" + name + "': " + candidates);
+		}
+		try {
+			return new File(candidates.get(0).toURI());
+		} catch (URISyntaxException e) {
+			throw new IllegalArgumentException("Could not convert " + candidates.get(0) + " to a file", e);
+		}
+	}
+
+	private static String fileName(URL url) {
+		String path = url.getPath();
+		int lastSlash = path.lastIndexOf('/');
+		return lastSlash == -1 ? path : path.substring(lastSlash + 1);
 	}
 
 	@NotNull

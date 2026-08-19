@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2023 DiffPlug
+ * Copyright (C) 2019-2026 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,9 @@
  */
 package com.diffplug.blowdryer;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -69,6 +71,21 @@ public class BlowdryerPluginTest extends GradleHarness {
 		write(SETTINGS_GRADLE,
 				"plugins { id 'com.diffplug.blowdryerSetup' }",
 				"blowdryerSetup { localJar(file('" + dependency + "')) }");
+	}
+
+	private void settingsClasspathJar(String name) throws IOException {
+		write(SETTINGS_GRADLE,
+				"plugins { id 'com.diffplug.blowdryerSetup' }",
+				"blowdryerSetup { classpathJar('" + name + "') }");
+	}
+
+	private File testJarFile() {
+		String jarFile = BlowdryerPluginTest.class.getResource("test.jar").getFile();
+		if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win")) {
+			Assertions.assertThat(jarFile).startsWith("/");
+			jarFile = jarFile.substring(1);
+		}
+		return new File(jarFile);
 	}
 
 	@Test
@@ -362,6 +379,36 @@ public class BlowdryerPluginTest extends GradleHarness {
 				"assert 干.file('invalid-file.txt').exists()");
 
 		gradleRunner().buildAndFail();
+	}
+
+	@Test
+	public void classpathJarFound() throws IOException {
+		settingsClasspathJar("test.jar");
+
+		write(BUILD_GRADLE,
+				"apply plugin: 'com.diffplug.blowdryer'",
+				"assert 干.file('sample').exists()");
+
+		gradleRunnerWithExtraClasspath(testJarFile()).build();
+	}
+
+	@Test
+	public void classpathJarNoMatch() throws IOException {
+		settingsClasspathJar("does-not-exist");
+
+		Assertions.assertThat(gradleRunnerWithExtraClasspath(testJarFile()).buildAndFail().getOutput().replace("\r\n", "\n"))
+				.contains("No jar on the classpath has a filename containing 'does-not-exist'");
+	}
+
+	@Test
+	public void classpathJarMultipleMatches() throws IOException {
+		byte[] testJarBytes = Files.readAllBytes(testJarFile().toPath());
+		File testJarA = write("libs/test-a.jar", testJarBytes);
+		File testJarB = write("libs/test-b.jar", testJarBytes);
+		settingsClasspathJar("test");
+
+		Assertions.assertThat(gradleRunnerWithExtraClasspath(testJarA, testJarB).buildAndFail().getOutput().replace("\r\n", "\n"))
+				.contains("Multiple jars on the classpath have a filename containing 'test'");
 	}
 
 	@Test
