@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.8.0] - 2026-08-27
 ### Added
 - `BlowdryerSetup.classpathJar(String)` finds a jar already on the classpath (e.g. one declared in the `plugins` block of `settings.gradle`) by matching its filename, and uses it as the resource source. ([#21](https://github.com/diffplug/blowdryer/issues/21))
 
